@@ -1,0 +1,36 @@
+# /learning · Our School (LearningDesktop, LearningMobile; P06 of KENBRIDGE_SCREEN_PROMPTS_FROM_LIVE_SITE.md).
+# The four stages themselves come from src/content/programmes.
+main:
+  eyebrow: Learning · Pre-KG to Class X
+  title: Our School
+  introLabel: Four programmes
+  intro: Our school offers four programs to cater to the diverse needs of students from pre-primary to secondary years.
+  introMuted: Each program is designed to cater to the specific needs of each stage of a student’s academic and personal development.
+  stagesTitle: The four stages
+  stagesHint: Each arc fills one more step per stage. Use the arrow keys to move between stages.
+  promises:
+    eyebrow: Pre-KG to Class X
+    title: Every stage,
+    titleEm: one school
+    items:
+      - title: CBSE curriculum
+        text: Affiliated to the Central Board of Secondary Education since 2015
+        muted: (Affiliation No. 830594).
+      - title: English medium
+        text: English is the medium of instruction at every stage, from Pre-KG to Class X.
+      - title: Core + Co-Curricular + Life Management skills
+        text: A specially crafted curriculum that builds all three, side by side.
+      - title: Value Education
+        text: Part of the curriculum.
+        muted: '[School to confirm one line on how it continues through Classes VI–X.]'
+  ages:
+    eyebrow: Admissions
+    title: Admission age criteria
+    note: Ages as on 1 June of the academic year. Age criteria are strictly adhered to.
+    cta: { label: See admission steps, href: /admissions#procedure }
+    # Shared with Admissions (batch 7) once that page reads its own data file.
+    list:
+      - { label: Pre-KG, years: '3' }
+      - { label: LKG, years: '4' }
+      - { label: UKG, years: '5' }
+      - { label: Grade 1, years: '6' }

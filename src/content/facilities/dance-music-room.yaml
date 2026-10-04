@@ -1,0 +1,12 @@
+# Facility data from the FacilityDetail and CampusDesktop board scripts. Only school-approved copy goes in
+# what / how / features; anything not yet approved goes in pending (shown only when facilityDrafts is on).
+num: '09'
+name: Dance & Music Room
+atlasName: Dance Room & Music Room
+short: rooms
+group: grow
+descriptor: Rooms for dance and music, with an Art Room alongside.
+atlasDesc: Rooms for dance and music, with an Art Room alongside.
+homePhoto: Dance-Room-2.jpg
+atlasPhoto: Dance-Room-2.jpg / Music-Room-2.jpg
+photos: [Dance-Room-2.jpg, Music-Room-2.jpg]

@@ -1,0 +1,109 @@
+# Home page copy (HomeDesktop / HomeMobile boards). Facts come from KENBRIDGE_SCREEN_PROMPTS_FROM_LIVE_SITE.md.
+# Where the two boards word a line differently, `sm` holds the 390px wording.
+main:
+  hero:
+    eyebrow: CBSE · English Medium · Kalaburagi · Since 2011
+    titleLine1: Enlighten your child
+    titleEm: with
+    titleLine2: KenBridge.
+    lead: A CBSE English-medium school with a specially crafted curriculum that builds Core, Co-Curricular and Life Management skills.
+    primary: { label: Explore Admissions, href: /admissions }
+    tour: Take the virtual tour
+    photo: '[Photo · DSC_9673 / drone front view · blurred 24 px, darkened]'
+    photoAlt: 'Placeholder: softly blurred campus photograph, drone front view (DSC_9673)'
+
+  values:
+    - word: INTEGRITY
+      line: '[One line on what integrity means at KenBridge, for the school to approve]'
+      sm: '[One line on integrity, for the school to approve]'
+    - word: COMPASSION
+      line: '[One line on what compassion means at KenBridge, for the school to approve]'
+      sm: '[One line on compassion, for the school to approve]'
+    - word: COMMITMENT
+      line: '[One line on what commitment means at KenBridge, for the school to approve]'
+      sm: '[One line on commitment, for the school to approve]'
+
+  idea:
+    quoteStart: Education today must serve the interests of the individual, the nation and
+    quoteEm: humankind
+    body: Providing the right start at the right time and under the right guidance will help develop the child’s personality and will be the key to success in his/her career path. KenBridge School is a CBSE English medium school that brings in a fresh and unique approach to schooling. The curriculum, while moored in the framework defined by CBSE, works with a clear focus to develop in our young learners Core, Co-Curricular and Life Management skills.
+
+  vision: KenBridge Schools nurture the spirit of inquiry and enhance the intellectual, ethical, emotional, physical and social potential of each learner.
+  mission:
+    - Encourage analytical, self-directed learning and creative application of knowledge.
+    - Actively promote teamwork, co-operation and effective communication.
+    - Create a humane and caring environment that caters to the development of a healthy self-esteem.
+    - Inculcate a sense of community service in our children and emphasize the importance of the moral aspects of life.
+
+  journey:
+    - num: '01'
+      label: Pre-Primary
+      range: Pre-KG – UKG
+      title: Pre-Primary
+      cta: Explore Pre-Primary
+      href: /learning/pre-primary
+      photo: Pre-Primary activity room
+      text: '“Play Way” learning, English and Number Work, activity rooms and a performing arts stage.'
+    - num: '02'
+      label: Primary
+      range: Classes I – V
+      title: Primary
+      cta: Explore Primary
+      href: /learning/primary
+      photo: Class-Room.jpg
+      photoPinned: Primary classroom (Class-Room.jpg)
+      text: English, Hindi/Kannada, Maths, EVS, G.K., Value Education and Computers, with a third language from Class IV.
+    - num: '03'
+      label: Middle School
+      # TODO(content): OPEN-QUESTIONS #1. "VI to VII" vs "VI to VIII"; the design uses VI–VIII.
+      range: Classes VI – VIII
+      title: Middle School
+      cta: Explore Middle School
+      href: /learning/middle-school
+      photo: Science lab session
+      text: Science, mathematics, social studies and languages, taught for critical, independent thinking.
+    - num: '04'
+      label: Secondary School
+      range: Classes IX – X
+      title: Secondary School
+      cta: Explore Secondary School
+      href: /learning/secondary-school
+      photo: Library-2.jpg
+      photoPinned: Secondary students in the library (Library-2.jpg)
+      text: A launch pad for college, professional courses and life.
+
+  # Proof in numbers. Bracketed values and sources stay until the school confirms them.
+  stats:
+    - { value: '2011', label: Founded, detail: By the Homi Educational Trust, source: school records }
+    - { value: '830594', label: CBSE affiliation number, labelSm: CBSE affiliation, detail: 'Central Board of Secondary Education, New Delhi', detailSm: 'CBSE, New Delhi', source: CBSE affiliation }
+    - { value: '100', unit: '%', label: 'Class X pass rate, 2024', labelSm: 'Class X pass, 2024', detail: 179 of 179 students passed, detailSm: 179 of 179 passed, source: 'CBSE Class X results, 2024', sourceSm: 'CBSE results, 2024' }
+    - { value: '97.75', unit: '%', label: 'Class X pass rate, 2025', labelSm: 'Class X pass, 2025', detail: '[Students appeared / passed]', detailSm: '[Appeared / passed]', source: 'CBSE Class X results, 2025', sourceSm: 'CBSE results, 2025' }
+    - { value: '20,234', unit: sq m, unitSm: m², label: Campus area, labelSm: Campus, detail: About 5 acres, source: '[Mandatory Public Disclosure]' }
+    - { value: '72', label: Classrooms, source: '[Mandatory Public Disclosure]' }
+    - { value: '6', label: Laboratories, source: '[Mandatory Public Disclosure]' }
+    - { value: '113', label: Teachers, detail: 53 TGT + 60 PRT, source: '[Mandatory Public Disclosure]' }
+
+  campusScenes:
+    - { verb: Learn, places: Classrooms & Labs, photo: Class-Room.jpg · Math-Lab.jpg, photoSm: Class-Room.jpg, cta: Classrooms & Labs, href: /campus#scenes }
+    - { verb: Play, places: Playground & Indoor Sports, photo: Indoor-Sports-Room-1.jpg, cta: Playground & Indoor Sports, href: /campus#scenes }
+    - { verb: Create, places: 'Dance, Music & Art', photo: Dance-Room-2.jpg · Music-Room-2.jpg, photoSm: Dance-Room-2.jpg, cta: 'Dance, Music & Art', href: /campus#scenes }
+    - { verb: Gather, places: Multipurpose Hall, photo: MPH.jpg, cta: Multipurpose Hall, href: /campus/multipurpose-hall }
+  campusPhoto: '[Photo · DJI_0401 · aerial view of the campus, full bleed]'
+  campusPhotoSm: '[Photo · DJI_0401 · aerial]'
+
+  life:
+    album: { year: 2025-26, slug: annual-day, title: Annual Day, yearLabel: 2025–26, count: 18 }
+    photos: ['[Photo · ANNUAL-2025-26SC_01.jpg]', '[Photo · ANNUAL-2025-26SC_07.jpg]', '[Photo · SC_11]', '[Photo · SC_15]']
+    photoSm: '[ANNUAL-2025-26SC_01.jpg]'
+    recentYear: 2026–27
+    recent: [Independence Day, Investiture Ceremony, Yoga Day, Environment Day, Endowment Lecture]
+    activities: [Football, hockey, cricket, basketball, table tennis, badminton, chess, debating, dramatics, elocution, quizzing, music, school band, N.C.C., Scouts]
+
+  admissionSteps:
+    - { title: Register, note: 'From March, at the front office' }
+    - { title: Document scrutiny }
+    - { title: Assessment / interaction }
+    - { title: Admission decision }
+
+  closing:
+    visit: { label: Visit us, href: /contact }

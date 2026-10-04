@@ -1,0 +1,64 @@
+# Stage 1 · Pre-Primary. Hub copy from LearningDesktop/LearningMobile; page copy from P07 of
+# KENBRIDGE_SCREEN_PROMPTS_FROM_LIVE_SITE.md, set in the ProgramDetail template's chapter types.
+stage: 1
+num: '01'
+name: Pre-Primary
+range: Pre-KG – UKG
+hub:
+  lead: A nurturing environment for children to explore, learn and grow.
+  classes: [Pre-KG, LKG, UKG]
+  focus: [Play Way method, English & Number Work, Creative Arts, Physical Education]
+  next: Primary, from Class I
+  cta: Explore Pre-Primary
+  photo: Pre-primary activity room (the “a right choice for YOUR BIG DREAMS” image can guide the crop)
+  photoSm: Pre-primary activity room
+eyebrow: Learning · Stage 1
+chip: Pre-KG · LKG · UKG
+# P07 gives no hero lead; this is the stage's verified one-line summary from the Learning page.
+lead: A nurturing environment for children to explore, learn and grow.
+heroPhoto: Pre-primary activity room
+# TODO(content): OPEN-QUESTIONS #2. P07 lists "Teacher-student 1:20"; ratios stay hidden until the school confirms them.
+facts:
+  - { label: Each class, value: Two teachers + one helper }
+  - { label: Washrooms, value: Attached }
+  - { label: Bags, value: 'Personal shelves, no heavy bags' }
+admissionCta: See admission steps for Pre-Primary
+chapters:
+  - type: subjects
+    title: The foundation of every child’s education
+    # TODO(content): OPEN-QUESTIONS #10. The admission text mentions a "Montessori teacher"; this page says Play Way (the design's choice).
+    intro: The child is introduced to the basic skills of learning through the Play Way method.
+    listLabel: Subjects and areas
+    items:
+      - { name: English }
+      - { name: Number Work }
+      - { name: Environment awareness, note: 'Through discussions, project work, demonstrations and excursions' }
+      - { name: Creative Arts }
+      - { name: Physical Education }
+    calloutKicker: Emphasis
+    callout: Strong emphasis on Creative Arts and Physical Education.
+  - type: subjects
+    title: Spaces made for little learners
+    listLabel: Spaces
+    items:
+      - { name: Multi Media Edutainment Centre, note: Fully computerised }
+      - { name: Activity Rooms, note: 'Stocked with educational play systems, toys and games that build cognitive, problem-solving, motor and muscular skills' }
+      - { name: Performing Arts Room, note: 'A mini stage that builds confidence before an audience and helps overcome stage fright' }
+  - type: statement
+    title: Care and comfort
+    intro: 'Each classroom has two teachers and one lady helper, attached washrooms, and shelves for every student.'
+    statement: 'Safe, secure and hygienic environment: we ensure that students have the necessary conditions to thrive and reach their full potential.'
+  - type: activities
+    title: Celebrating culture
+    intro: 'Indian festivals, birthdays of great leaders and philosophers, and special days are celebrated through special assemblies and classroom activities.'
+    listLabel: Special days
+    words: [Colour Day, Friendship Day, Grandparents’ Day, Smiley Day]
+  - type: age
+    title: Admission age
+    ages:
+      - { label: Pre-KG, years: '3' }
+      - { label: LKG, years: '4' }
+      - { label: UKG, years: '5' }
+    ageNote: Ages as on 1 June of the academic year. Age criteria are strictly adhered to.
+# TODO(content): P07 names no related facilities, so none are linked (the section is left out) until the school chooses them.
+related: []

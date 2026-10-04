@@ -1,0 +1,101 @@
+# /admissions (AdmissionsDesktop, AdmissionsMobile; P13 of KENBRIDGE_SCREEN_PROMPTS_FROM_LIVE_SITE.md).
+# Wording is the board script's, word for word. The open / closed / opening banner is driven by
+# src/data/settings.yaml › admissions (one setting shared with the Home pill).
+main:
+  title: Admissions
+  ctas:
+    enquire: Enquire online
+    call: 'Call admissions: 98869 99660'
+    brochure: Download brochure (PDF)
+  glance:
+    title: At a glance
+    ages: 'Ages on 1 June: Pre-KG 3 · LKG 4 · UKG 5 · Grade 1 6'
+  jumps:
+    - { id: age, label: Age criteria }
+    - { id: procedure, label: Procedure }
+    - { id: notes, label: Important notes }
+    - { id: docs, label: Documents }
+    - { id: faq, label: FAQ }
+    - { id: enquire, label: Enquire }
+    - { id: contact, label: Contact }
+  age:
+    eyebrow: Before you register
+    title: Age criteria
+    intro: Check your child’s age before you register.
+    ages:
+      - { cls: Pre-KG, years: '3', programme: Pre-Primary }
+      - { cls: LKG, years: '4', programme: Pre-Primary }
+      - { cls: UKG, years: '5', programme: Pre-Primary }
+      - { cls: Grade 1, years: '6', programme: Primary }
+    strictLead: Age criteria are strictly adhered to.
+    strict: If the child’s age does not match the class, the application cannot proceed.
+  procedure:
+    eyebrow: Four steps
+    title: Admission procedure
+    note: This explains the process. It does not track an application.
+    steps:
+      - title: Register
+        summary: From March, on the prescribed application form.
+        details:
+          - { text: 'Names are registered from March on the prescribed application form, on payment of the prescribed fee.' }
+          - { text: Collect the form from the school’s front office. }
+          - { text: Submit the completed form within 2 days of issue. }
+      - title: Document scrutiny
+        summary: Birth certificate, reports and photographs.
+        details:
+          - { lead: Birth certificate, text: 'Issued by the Municipal Corporation. Hospital or nursing-home certificates are not accepted.' }
+          - { lead: Assessment reports, text: For Grade 1 onwards. }
+          - { lead: Photographs, text: Recent passport-size colour photographs of the student and of the parents or guardian. }
+      - title: Assessment / interaction
+        summary: The date is informed by SMS.
+        details:
+          # TODO(content): OPEN-QUESTIONS "Nursery vs Pre-KG". The live admission text says "Nursery & LKG";
+          # the programmes say Pre-KG, LKG, UKG. The design keeps the admission wording.
+          - { lead: Nursery & LKG, text: 'The teacher observes and interacts with the child. Both parents must accompany the child.' }
+          - { lead: UKG, text: Observation and interaction. }
+          - { lead: Class I onwards, text: 'An assessment, with both parents present.' }
+          - { lead: Scheduling, text: Interviews are scheduled in order of early submission. Dates cannot be changed. }
+      - title: Decision
+        summary: Subject to assessment and seat availability.
+        details:
+          - { text: Admission is subject to the assessment and to seat availability. }
+          - { text: The school’s decision is final. }
+  notes:
+    title: Important notes
+    items:
+      - Submitting a form does not imply admission.
+      # TODO(content): OPEN-QUESTIONS "Caution Money vs Security Deposit". Decorum says caution money.
+      - 'Fees paid at admission are non-refundable, except the Security Deposit, which is refunded on withdrawal.'
+  docs:
+    title: Documents checklist
+    subtitle: KenBridge School, Kalaburagi · Admissions
+    print: Print checklist
+    items:
+      - { title: Completed application form, note: Collected from the front office and returned within 2 days of issue. }
+      - { title: Birth certificate from the Municipal Corporation, note: Hospital or nursing-home certificates are not accepted. }
+      - { title: Assessment reports, note: For Grade 1 onwards. }
+      - { title: Passport-size colour photographs of the student, note: Recent. }
+      - { title: Passport-size colour photographs of the parents or guardian, note: Recent. }
+    pending: '[School to confirm: how many photographs of each, and whether copies or originals are needed.]'
+  faq:
+    title: Questions parents ask
+    intro: Every answer comes from the school’s admission procedure above.
+    items:
+      - { q: When do registrations open?, a: 'Names are registered from March, on the prescribed application form and on payment of the prescribed fee.' }
+      - { q: How old must my child be?, a: 'As on 1 June of the academic year: Pre-KG 3 years, LKG 4 years, UKG 5 years and Grade 1 6 years.' }
+      - { q: What if my child’s age does not match the class?, a: 'Age criteria are strictly adhered to. If the child’s age does not match the class, the application cannot proceed.' }
+      - { q: Where do I get the application form?, a: From the school’s front office. Submit the completed form within 2 days of issue. }
+      - { q: Which birth certificate is accepted?, a: A birth certificate issued by the Municipal Corporation. Hospital or nursing-home certificates are not accepted. }
+      - { q: Do both parents need to come to the assessment?, a: 'For Nursery and LKG, both parents must accompany the child. From Class I, the assessment takes place with both parents present.' }
+      - { q: Can the assessment date be changed?, a: 'No. The date is informed by SMS, and interviews are scheduled in order of early submission.' }
+      - { q: Does submitting the form guarantee admission?, a: 'No. Submitting a form does not imply admission. Admission is subject to the assessment and to seat availability, and the school’s decision is final.' }
+      - { q: Are fees refundable?, a: 'Fees paid at admission are non-refundable, except the Security Deposit, which is refunded on withdrawal.' }
+  enquire:
+    title: Enquire
+    intro: Ask about admission, availability or the assessment. Prefer to talk? Call
+    externalLead: The school takes enquiries through its online enquiry form.
+    externalNote: It opens on the school’s admissions system (mygallery.mysolution.in) in a new tab.
+  office:
+    title: Admissions office
+  # Class options for the on-page EnquiryForm (shown only when settings.admissions.enquiryOnPage is true).
+  classes: [Pre-KG, LKG, UKG, Class I, Class II, Class III, Class IV, Class V, Class VI, Class VII, Class VIII, Class IX, Class X]

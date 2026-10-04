@@ -1,0 +1,57 @@
+---
+// "Pass % by year" (AchievementsDesktop / AchievementsMobile). A 90–100% scale; the first batch sits at
+// the left, the disclosed years at the right, and the undisclosed gap is a dashed grey line with its
+// own label, so a missing year is never drawn as if it had a value. Built from src/data/results.yaml.
+import { getResults } from '../../lib/site';
+
+interface Props { size: 'lg' | 'sm' }
+const { size } = Astro.props;
+const r = await getResults();
+const g = size === 'lg'
+  ? { w: 400, h: 270, left: 48, right: 392, firstX: 64, startX: 278, step: 48, labelMax: 392, gapLabelY: 56, idT: 'lineT', idD: 'lineD' }
+  : { w: 350, h: 250, left: 44, right: 346, firstX: 62, startX: 238, step: 46, labelMax: 326, gapLabelY: 54, idT: 'mLineT', idD: 'mLineD' };
+const y = (pct: number) => 30 + (100 - pct) * 18;
+const years = [...r.classX].sort((a, b) => a.year - b.year).map((d, i) => ({ label: String(d.year), pct: parseFloat(d.passPct), x: g.startX + i * g.step }));
+const first = { label: r.firstBatch.year, pct: parseFloat(r.firstBatch.passPct), x: g.firstX };
+const fmt = (p: number) => `${p}%`;
+const gapFrom = parseInt(r.firstBatch.year.slice(0, 4), 10) + 2; // 2016-17 → first gap year 2018
+const gapTo = years[0] ? parseInt(years[0].label, 10) - 1 : gapFrom;
+const gapText = `not in the disclosure, ${gapFrom}–${String(gapTo).slice(2)}`;
+// Point labels: neighbouring years at the same value share one label ("100% · 100%").
+const labels: { x: number; y: number; text: string }[] = [{ x: first.x, y: 18, text: fmt(first.pct) }];
+for (let i = 0; i < years.length; ) {
+  let j = i;
+  while (j + 1 < years.length && years[j + 1].pct === years[i].pct) j++;
+  const group = years.slice(i, j + 1);
+  const x = group.reduce((s, d) => s + d.x, 0) / group.length;
+  const below = years[i].pct < 100;
+  labels.push({ x: below ? Math.min(x, g.labelMax) : x, y: below ? y(years[i].pct) + 23.5 : 18, text: group.map((d) => fmt(d.pct)).join(' · ') });
+  i = j + 1;
+}
+const desc = `${[first, ...years].map((d) => `${d.label}: ${fmt(d.pct)}`).join('. ')}. Pass percentages for ${gapFrom} to ${gapTo} are not in the disclosure.`;
+---
+<svg class="pass-chart" role="img" aria-labelledby={`${g.idT} ${g.idD}`} viewBox={`0 0 ${g.w} ${g.h}`}>
+  <title id={g.idT}>Class X pass percentage by year</title>
+  <desc id={g.idD}>{desc}</desc>
+  <g class="grid"><path d={`M${g.left} 30H${g.right}`} /><path d={`M${g.left} 120H${g.right}`} /></g>
+  <path class="axis" d={`M${g.left} 210H${g.right}`} />
+  <g class="tick"><text x={g.left - (size === 'lg' ? 8 : 6)} y="34" text-anchor="end">100%</text><text x={g.left - (size === 'lg' ? 8 : 6)} y="124" text-anchor="end">95%</text><text x={g.left - (size === 'lg' ? 8 : 6)} y="214" text-anchor="end">90%</text></g>
+  {years[0] && <path class="gap" d={`M${first.x} ${y(first.pct)}H${years[0].x}`} />}
+  {years[0] && <text class="gap-label" x={(first.x + years[0].x) / 2} y={g.gapLabelY} text-anchor="middle">{gapText}</text>}
+  <path class="line" d={years.map((d, i) => `${i ? 'L' : 'M'}${d.x} ${y(d.pct)}`).join('')} />
+  {[first, ...years].map((d) => <circle class="pt" cx={d.x} cy={y(d.pct)} r="5"><title>{d.label}: {fmt(d.pct)}</title></circle>)}
+  <g class="val">{labels.map((l) => <text x={l.x} y={l.y} text-anchor="middle">{l.text}</text>)}</g>
+  <g class="tick">{[first, ...years].map((d) => <text x={d.x} y="234" text-anchor="middle">{d.label}</text>)}</g>
+</svg>
+
+<style>
+  .pass-chart { width: 100%; height: auto; overflow: visible; font-family: var(--font-body); font-variant-numeric: tabular-nums; }
+  .grid path { stroke: var(--border); stroke-width: 1; }
+  .axis { stroke: var(--border-strong); stroke-width: 1; }
+  .tick { fill: var(--text-muted); font-size: 12px; }
+  .gap { fill: none; stroke: var(--border-strong); stroke-width: 2; stroke-dasharray: 4 6; }
+  .gap-label { fill: var(--text-muted); font-size: 11px; }
+  .line { fill: none; stroke: var(--brand); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .pt { fill: var(--brand); stroke: var(--surface-raised); stroke-width: 2; }
+  .val { fill: var(--text); font-size: 12px; font-weight: 700; }
+</style>

@@ -1,0 +1,123 @@
+/* Design tokens, taken from the design-system boards:
+   Main (colour), Type, Space (grid, space, radius, motion), MobileFoundations.
+   Names are the contract every component uses. */
+:root {
+  /* brand */
+  --brand: #7F0305;
+  --brand-strong: #5A0204;
+  --brand-hover: #6A0204;
+  --brand-tint: #F4E6E2;
+  --brand-pressed-tint: #EBD3CD;
+  --accent: #F89A1C;
+  --accent-tint: #FDEBD2;
+  --accent-soft: #F5C400; /* emblem rays only */
+
+  /* surfaces */
+  --bg: #FBF7F0;
+  --surface: #FFFFFF;
+  --surface-raised: #FFFDF8;
+  --surface-dark: #2A0A0B;
+  --surface-disabled: #F3ECE1;
+
+  /* ink and rules */
+  --text: #1F1A17;
+  --text-muted: #5C534D;
+  --text-disabled: #6E655E;
+  --text-disabled-soft: #8F857D;
+  --text-on-dark: #FBF7F0;
+  --text-on-dark-muted: #CDBFB4;
+  --border: #E7DED2;
+  --border-strong: #857A71;
+  --rule-on-dark: rgba(251, 247, 240, 0.16);
+  --rule-on-dark-strong: rgba(251, 247, 240, 0.28);
+  --link-underline: rgba(127, 3, 5, 0.4);
+
+  /* state */
+  --focus: #005FCC;
+  --focus-on-dark: #7FB2FF;
+  --focus-ring: var(--focus);
+  --success: #1F7A3D;
+  --warning: #B25E00;
+  --warning-text: #A35500;
+  --error: #B3261E;
+
+  /* photo placeholders (Content board) */
+  --ph-1: #E9DFD0;
+  --ph-2: #E3D6C5;
+  --ph-3: #EDE4D8;
+  --ph-4: #E6DACB;
+  --ph-dark: #3B1416;
+
+  /* learning stage accents: mark / text / tint */
+  --stage1-mark: #F89A1C; --stage1-text: #A35500; --stage1-tint: #FDEBD2;
+  --stage2-mark: #7F0305; --stage2-text: #7F0305; --stage2-tint: #F4E6E2;
+  --stage3-mark: #5A0204; --stage3-text: #5A0204; --stage3-tint: #E7DED2;
+  --stage4-mark: #2A0A0B; --stage4-text: #2A0A0B; --stage4-tint: #E7DED2;
+
+  /* type */
+  --font-display: 'Cormorant Garamond', 'Cormorant Fallback', Garamond, 'Times New Roman', serif;
+  --font-body: Manrope, 'Manrope Fallback', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --fs-display-xl: clamp(3.5rem, 1.829rem + 6.857vw, 8rem);      /* 56 → 128 */
+  --fs-display-l: clamp(2.75rem, 1.729rem + 4.190vw, 5.5rem);    /* 44 → 88 */
+  --fs-h1: clamp(2.25rem, 1.6rem + 2.667vw, 4rem);               /* 36 → 64 */
+  --fs-h2: clamp(1.75rem, 1.379rem + 1.524vw, 2.75rem);          /* 28 → 44 */
+  --fs-h3: clamp(1.375rem, 1.236rem + 0.571vw, 1.75rem);         /* 22 → 28 */
+  --fs-body: clamp(1.0625rem, 1.039rem + 0.095vw, 1.125rem);     /* 17 → 18 */
+  --fs-small: clamp(0.875rem, 0.852rem + 0.095vw, 0.9375rem);    /* 14 → 15 */
+  --fs-eyebrow: clamp(0.75rem, 0.727rem + 0.095vw, 0.8125rem);   /* 12 → 13 */
+  --fs-numeral: clamp(4rem, 2.7rem + 5.333vw, 7.5rem);           /* 64 → 120 */
+  --tracking-eyebrow: 0.14em;
+  --measure: 68ch;
+
+  /* space: 8px rhythm, 4px half-step for icon gaps only */
+  --space-0-5: 4px;
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-6: 48px;
+  --space-8: 64px;
+  --space-12: 96px;
+  --space-16: 128px;
+  --space-20: 160px;
+
+  /* grid: 12 / 8 / 4 columns */
+  --page-max: 1440px;
+  --margin: 20px;
+  --gutter: 16px;
+  --section-pad: 64px;
+
+  /* radius, elevation */
+  --radius-none: 0;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --shadow-overlay: 0 1px 2px rgba(42, 10, 11, 0.06), 0 16px 40px -20px rgba(42, 10, 11, 0.28);
+
+  /* motion */
+  --dur-micro: 160ms;
+  --dur-component: 320ms;
+  --dur-scene: 900ms;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-standard: cubic-bezier(.2, 0, 0, 1);
+  --reveal-travel: 12px;
+
+  /* shell */
+  --utility-h: 44px;
+  --header-h: 88px;
+  --mobile-header-h: 65px;
+}
+
+@media (min-width: 640px) {
+  :root { --margin: 32px; --gutter: 24px; --section-pad: 96px; --reveal-travel: 16px; }
+}
+@media (min-width: 1024px) {
+  :root { --margin: 64px; --gutter: 32px; --section-pad: 128px; }
+}
+
+/* Dark (night-maroon) sections: lighter focus ring and on-dark ink. */
+.on-dark {
+  --focus-ring: var(--focus-on-dark);
+  color: var(--text-on-dark);
+}

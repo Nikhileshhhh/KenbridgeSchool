@@ -1,0 +1,42 @@
+---
+// Admissions status pill (HomeDesktop §1 on dark, §11 on light). Driven by settings.admissions.state.
+import { getSettings } from '../../lib/site';
+import { admissionsPill } from '../../lib/admissions-status';
+
+interface Props { tone?: 'dark' | 'light' }
+const { tone = 'dark' } = Astro.props;
+const settings = await getSettings();
+const pill = admissionsPill(settings.admissions.state);
+const dot = tone === 'dark' ? pill.dot : pill.dotL;
+const ring = tone === 'dark' ? pill.ring : pill.ringL;
+---
+<a class:list={['pill', `pill--${tone}`]} href="/admissions">
+  <span class="pill-dot" aria-hidden="true" style={`background:${dot};box-shadow:0 0 0 3px ${ring}`}></span>
+  <span><strong>{pill.label}</strong><span aria-hidden="true" class="pill-sep"> · </span><span class="pill-action">{pill.action}</span></span>
+</a>
+
+<style>
+  .pill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.4;
+    text-decoration: none;
+    font-variant-numeric: tabular-nums;
+  }
+  @media (min-width: 1024px) { .pill { display: inline-flex; min-height: 44px; padding: 0 16px; line-height: normal; } }
+  .pill strong { font-weight: 700; }
+  .pill-dot { flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; }
+  .pill-action { text-decoration: underline; text-underline-offset: 3px; }
+  .pill--dark { border: 1px solid rgba(251, 247, 240, 0.32); background: rgba(42, 10, 11, 0.6); color: var(--text-on-dark); }
+  .pill--dark:hover { color: var(--text-on-dark); background: rgba(42, 10, 11, 0.8); }
+  .pill--dark .pill-sep { color: var(--text-on-dark-muted); }
+  .pill--light { border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); }
+  .pill--light:hover { color: var(--text); border-color: var(--brand); }
+  .pill--light .pill-sep { color: var(--text-muted); }
+  .pill--light .pill-action { color: var(--brand); }
+</style>

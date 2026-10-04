@@ -1,0 +1,159 @@
+---
+// Development-only review pages (never built for production):
+//   /dev/kit         UI primitives from the Components, Patterns and Content boards
+//   /dev/shell-hero  the header over a dark hero (ShellHeader states A and B)
+//   /dev/enquiry-states  every EnquiryForm state (AdmissionsFormStates)
+//   /dev/contact-states  every ContactForm state (ContactForm board)
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Button from '../../components/ui/Button.astro';
+import TextLink from '../../components/ui/TextLink.astro';
+import Eyebrow from '../../components/ui/Eyebrow.astro';
+import Tag from '../../components/ui/Tag.astro';
+import Placeholder from '../../components/ui/Placeholder.astro';
+import StatBlock from '../../components/ui/StatBlock.astro';
+import Field from '../../components/ui/Field.astro';
+import Rays from '../../components/ui/Rays.astro';
+import FlameMark from '../../components/ui/FlameMark.astro';
+import Breadcrumbs from '../../components/shell/Breadcrumbs.astro';
+import EnquiryForm from '../../components/forms/EnquiryForm.astro';
+import ContactForm from '../../components/forms/ContactForm.astro';
+
+export function getStaticPaths() {
+  if (import.meta.env.PROD) return [];
+  return [{ params: { page: 'kit' } }, { params: { page: 'shell-hero' } }, { params: { page: 'enquiry-states' } }, { params: { page: 'contact-states' } }];
+}
+const cFilled = { name: 'Ravi Kulkarni', email: 'ravi.k@example.com', subject: 'Visiting the campus', msg: 'Could we visit the campus on a Saturday morning with our daughter?' };
+const cWrong = { name: 'Ravi Kulkarni', email: 'ravi.k@', subject: '', msg: '' };
+const { page } = Astro.params;
+const filled = { name: 'Priya Patil', email: 'priya.patil@example.com', phone: '98450 12345', cls: 'Class I', msg: 'We are moving to Kalaburagi in May. Is a visit possible before registration?' };
+const wrong = { name: 'Priya Patil', email: 'priya.patil@', phone: '98450 123', cls: '', msg: '' };
+---
+{page === 'enquiry-states' ? (
+  <BaseLayout title="Enquiry form states (dev)" description="Development review page." noindex current="none">
+    <div class="container dev">
+      <p class="eyebrow-text" style="color:var(--brand)">Only if a backend is confirmed</p>
+      <h1 class="h1">Enquiry form · all states</h1>
+      <div class="states">
+        <div><p class="state-k">01 Empty</p><EnquiryForm idPrefix="s1" /></div>
+        <div><p class="state-k state-k--err">02 Errors on submit · summary takes focus</p><EnquiryForm idPrefix="s2" state="errors" values={wrong} /></div>
+        <div><p class="state-k">03 Sending · button locked, fields kept</p><EnquiryForm idPrefix="s3" state="sending" values={filled} /></div>
+        <div><p class="state-k state-k--err">04 Could not send · values kept</p><EnquiryForm idPrefix="s4" state="failed" values={filled} /></div>
+        <div><p class="state-k state-k--ok">05 Sent</p><EnquiryForm idPrefix="s5" state="success" values={filled} /></div>
+        <div style="max-width:350px"><p class="state-k state-k--err">06 Mobile · errors</p><EnquiryForm idPrefix="s6" state="errors" values={wrong} compact /></div>
+      </div>
+    </div>
+  </BaseLayout>
+) : page === 'contact-states' ? (
+  <BaseLayout title="Contact form states (dev)" description="Development review page." noindex current="none">
+    <div class="container dev">
+      <p class="eyebrow-text" style="color:var(--brand)">ContactForm board · live mode states</p>
+      <h1 class="h1">Contact form · all states</h1>
+      <div class="states">
+        <div><p class="state-k">01 Empty</p><ContactForm idPrefix="c1" /></div>
+        <div><p class="state-k state-k--err">02 Errors on submit · summary takes focus</p><ContactForm idPrefix="c2" state="errors" values={cWrong} /></div>
+        <div><p class="state-k">03 Sending · button locked, fields kept</p><ContactForm idPrefix="c3" state="sending" values={cFilled} /></div>
+        <div><p class="state-k state-k--err">04 Could not send · values kept</p><ContactForm idPrefix="c4" state="failed" values={cFilled} /></div>
+        <div><p class="state-k state-k--ok">05 Sent</p><ContactForm idPrefix="c5" state="success" values={cFilled} /></div>
+        <div style="max-width:350px"><p class="state-k state-k--err">06 Mobile · errors</p><ContactForm idPrefix="c6" state="errors" values={cWrong} compact /></div>
+      </div>
+    </div>
+  </BaseLayout>
+) : page === 'kit' ? (
+  <BaseLayout title="UI kit (dev)" description="Development review page." noindex current="none">
+    <div class="container dev">
+      <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Admissions', href: '/admissions' }, { label: 'Fee structure' }]} />
+      <Eyebrow>04 — Actions &amp; inputs</Eyebrow>
+      <h1 class="h1">Clear actions. <span class="em">Calm</span> inputs.</h1>
+
+      <h2 class="h3 rule-title">Buttons</h2>
+      <div class="row">
+        <Button arrow>Apply for admission</Button>
+        <Button variant="secondary">Download prospectus</Button>
+        <Button disabled>Apply for admission</Button>
+        <Button size="l">Large · 56</Button>
+        <Button size="s">Small · 44</Button>
+      </div>
+      <div class="row on-dark dark-box">
+        <Button variant="accent" arrow>Book a campus visit</Button>
+        <Button variant="outline-dark">Download prospectus</Button>
+        <TextLink href="#" kind="plain" onDark>Meet our teachers</TextLink>
+      </div>
+
+      <h2 class="h3 rule-title">Links</h2>
+      <div class="row">
+        <TextLink href="#">Explore academics</TextLink>
+        <TextLink href="https://cbseaff.nic.in" kind="external">CBSE Mandatory Disclosure</TextLink>
+        <TextLink href="#" kind="pdf" size="240 KB">Fee structure</TextLink>
+      </div>
+
+      <h2 class="h3 rule-title">Fields</h2>
+      <form class="fields" novalidate>
+        <Field id="f1" name="tel" label="Parent’s mobile number" type="tel" autocomplete="tel" hint="10 digits. Used only for admission updates." />
+        <Field id="f5" name="tel2" label="Parent’s mobile number" type="tel" value="90000 000" error="Enter a 10-digit mobile number" />
+        <Field id="c4" name="stage" label="Stage applying for" as="select" options={[{ value: '', label: 'Choose a stage' }, { value: 'pp', label: 'Pre-Primary' }]} />
+        <Field id="c5" name="q" label="Your question" as="textarea" optional wide />
+      </form>
+
+      <h2 class="h3 rule-title">Tags</h2>
+      <div class="row"><Tag>CBSE</Tag><Tag>Grades 6–8</Tag><Tag tone="accent">New</Tag><Tag tone="page">Page</Tag><Tag tone="pdf">PDF</Tag><Tag tone="album">Album</Tag><Tag tone="external">External</Tag></div>
+
+      <h2 class="h3 rule-title">Stat block</h2>
+      <StatBlock stats={[
+        { value: '2011', label: 'Founded', detail: 'By the Homi Educational Trust' },
+        { value: '830594', label: 'CBSE affiliation', detail: 'Central Board of Secondary Education, New Delhi' },
+        { value: '[000]', label: 'Students', detail: '[Enrolment, academic year — to confirm]' },
+        { value: '[00]%', label: 'Class X pass rate', detail: '[Year · source: CBSE results]' }
+      ]} />
+
+      <h2 class="h3 rule-title">Image frame</h2>
+      <div class="row frames">
+        <Placeholder label="3 : 2 · [Students at work in the science lab]" />
+        <Placeholder label="4 : 5 · [Portrait of a teacher in the library]" ratio="4 / 5" />
+        <Placeholder label="[Morning assembly, main courtyard]" ratio="21 / 9" tone="dark" corners />
+      </div>
+
+      <h2 class="h3 rule-title">Motifs</h2>
+      <div class="dark-box on-dark motif">
+        <Rays class="motif-rays" fan />
+        <span class="motif-word">Step <span class="em">forward</span></span>
+      </div>
+      <div class="row"><FlameMark size={72} /><FlameMark size={24} /><FlameMark size={16} /><FlameMark size={12} /></div>
+    </div>
+  </BaseLayout>
+) : (
+  <BaseLayout title="Shell over a hero (dev)" description="Development review page." header="hero" noindex current="learning">
+    <section class="on-dark dev-hero">
+      <div class="container dev-hero-in">
+        <h1 class="h1 dev-hero-h">Where learning becomes a <span class="em">journey</span></h1>
+        <p class="muted dev-hero-ph">[Page hero photograph · full-bleed]</p>
+      </div>
+    </section>
+    <div class="container dev" style="min-height:140vh">
+      <p class="body">Scroll: the header turns solid without changing size. Open a menu over the hero: it turns solid first and the page dims.</p>
+    </div>
+  </BaseLayout>
+)}
+
+<script>
+  import '../../scripts/enquiry.js';
+</script>
+
+<style>
+  .dev { display: flex; flex-direction: column; gap: 32px; padding-block: 48px 96px; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+  .dark-box { background: var(--surface-dark); padding: 40px; }
+  .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+  .frames > :global(*) { flex: 1 1 260px; }
+  .motif { position: relative; height: 320px; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 56px; }
+  .motif :global(.motif-rays) { position: absolute; left: 50%; bottom: 40px; width: 720px; height: 240px; margin-left: -360px; }
+  .motif-word { position: relative; font-family: var(--font-display); font-size: 64px; line-height: 1; }
+  .dev-hero { background: var(--ph-dark); min-height: 640px; display: flex; align-items: flex-end; }
+  .dev-hero-in { padding-block: 200px 48px; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+  .dev-hero-h { max-width: 9.5em; }
+  .dev-hero-ph { font-size: 13px; }
+  .states { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 560px), 1fr)); gap: 56px 32px; align-items: start; }
+  .states > div { display: flex; flex-direction: column; gap: 14px; }
+  .state-k { font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .state-k--err { color: var(--error); }
+  .state-k--ok { color: var(--success); }
+</style>

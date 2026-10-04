@@ -1,0 +1,18 @@
+# Facility data from the FacilityDetail and CampusDesktop board scripts. Only school-approved copy goes in
+# what / how / features; anything not yet approved goes in pending (shown only when facilityDrafts is on).
+num: '10'
+name: Library
+short: library
+group: learn
+descriptor: A 150 sq m library.
+atlasDesc: A 150 sq m library.
+homePhoto: Library-2.jpg
+atlasPhoto: Library-2.jpg
+photos: [Library-2.jpg, Library-3.jpg, 'lib3.jpg (2015: replace with a newer photo if available)']
+facts:
+  - { value: '150', unit: sq m, label: Library area, source: CBSE Mandatory Public Disclosure }
+pending:
+  what: 'One or two lines from the school: the collection, reading spaces and opening hours.'
+  how: How each stage uses the library, for example library periods. Awaiting the school’s copy.
+  features: Only items the school approves are listed here.
+related: [classrooms, language-lab, science-lab]

@@ -1,0 +1,117 @@
+---
+// NotFoundDesktop / NotFoundMobile. Served with a real 404 status (Vercel serves 404.html).
+// No redirect, no countdown, no timers. Search is a plain GET form to /search?q=.
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/ui/Icon.astro';
+import rays from '../assets/brand/part-rays.png';
+---
+<BaseLayout
+  title="Page not found"
+  description="The page you were looking for has moved or no longer exists."
+  noindex
+>
+  <section class="nf" aria-labelledby="nfH1">
+    <Image src={rays} alt="" aria-hidden="true" class="nf-rays" loading="eager" />
+    <div class="nf-body">
+      <p class="nf-eyebrow tnum">Error 404</p>
+      <h1 id="nfH1" class="nf-title">Page not found</h1>
+      <p class="nf-text">The page you were looking for has moved or no longer exists.</p>
+      <nav aria-label="Where to next" class="nf-nav">
+        <ul role="list" class="nf-links">
+          <li><a href="/" class="nf-btn nf-btn--primary">Return home<Icon name="arrow" size={18} /></a></li>
+          <li><a href="/admissions" class="nf-btn">Admissions<Icon name="arrow" size={18} /></a></li>
+          <li><a href="/information" class="nf-btn">School Information<Icon name="arrow" size={18} /></a></li>
+        </ul>
+      </nav>
+      <form role="search" action="/search" method="get" class="nf-search">
+        <label for="nfQ" class="nf-label">Search the site</label>
+        <div class="nf-controls">
+          <input id="nfQ" name="q" type="search" autocomplete="off" class="nf-input" />
+          <button type="submit" class="nf-btn nf-submit"><Icon name="search" size={18} />Search</button>
+        </div>
+      </form>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf {
+    position: relative;
+    overflow: hidden;
+    min-height: 640px;
+    padding: 56px 20px 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .nf :global(.nf-rays) {
+    position: absolute;
+    pointer-events: none;
+    right: -200px;
+    top: 20px;
+    width: 700px;
+    height: 700px;
+    max-width: none;
+    opacity: 0.2;
+    -webkit-mask-image: radial-gradient(ellipse 60% 60% at 40% 50%, #000 0%, transparent 72%);
+    mask-image: radial-gradient(ellipse 60% 60% at 40% 50%, #000 0%, transparent 72%);
+  }
+  .nf-body { position: relative; display: flex; flex-direction: column; gap: 18px; max-width: 920px; }
+  .nf-eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brand); }
+  .nf-title {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 2.514rem + 6.095vw, 8rem);
+    font-weight: 500;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+  }
+  .nf-text { font-size: clamp(1.125rem, 1.055rem + 0.286vw, 1.3125rem); line-height: 1.55; color: #3A332E; }
+  .nf-nav { margin-top: 12px; }
+  .nf-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .nf-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    min-height: 56px;
+    padding: 0 20px;
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--brand);
+    background: var(--surface);
+    color: var(--brand);
+    font-size: 17px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .nf-btn:hover { background: var(--brand-tint); color: var(--brand); }
+  .nf-btn :global(svg) { flex-shrink: 0; }
+  .nf-btn--primary { border: 0; background: var(--brand); color: #FFFFFF; }
+  .nf-btn--primary:hover { background: var(--brand-hover); color: #FFFFFF; }
+  .nf-search { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; max-width: 560px; }
+  .nf-label { font-size: 15px; font-weight: 600; }
+  .nf-controls { display: flex; gap: 8px; }
+  .nf-input {
+    flex: 1;
+    min-width: 0;
+    height: 56px;
+    padding: 0 16px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    font-size: 17px;
+  }
+  .nf-input:hover, .nf-input:focus { border-color: var(--text); }
+  .nf-submit { justify-content: center; gap: 8px; padding: 0 16px; font-size: 16px; }
+
+  @media (min-width: 1024px) {
+    .nf { min-height: 760px; padding: 120px max(var(--margin), calc((100% - var(--page-max)) / 2 + var(--margin))) 128px; }
+    .nf :global(.nf-rays) { right: -120px; top: -80px; width: 1300px; height: 1300px; mask-image: radial-gradient(ellipse 60% 60% at 40% 50%, #000 0%, transparent 72%); }
+    .nf-body { gap: 24px; }
+    .nf-nav { margin-top: 20px; }
+    .nf-links { flex-direction: row; flex-wrap: wrap; }
+    .nf-links .nf-btn { min-width: 220px; }
+    .nf-search { margin-top: 16px; }
+    .nf-submit { padding: 0 22px; }
+  }
+</style>

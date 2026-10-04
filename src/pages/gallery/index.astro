@@ -1,0 +1,20 @@
+---
+// /gallery shows the latest academic year (GalleryDesktop). Each year also has its own page.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import YearView from '../../components/gallery/YearView.astro';
+import { academicYearsSince } from '../../lib/academic-year';
+
+const latest = academicYearsSince(2011)[0].slug;
+---
+<BaseLayout
+  title="Gallery"
+  description={`Photo albums from KenBridge School, Kalaburagi, grouped by academic year from 2011-12 to ${latest}.`}
+  current="gallery"
+  breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Gallery' }]}
+>
+  <YearView year={latest} />
+</BaseLayout>
+
+<script>
+  import '../../scripts/gallery.js';
+</script>

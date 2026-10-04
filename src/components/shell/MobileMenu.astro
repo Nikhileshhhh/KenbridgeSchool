@@ -1,0 +1,295 @@
+---
+// MobileMenu + MobileShell boards. Below 1280px the Menu button opens this full-height sheet.
+// With JS: a modal dialog (focus trap, inert page, scroll lock, Esc / back gesture closes,
+// the current section opens by itself). Without JS: a :target overlay with every section open.
+import { Image } from 'astro:assets';
+import logo from '../../assets/brand/logo-official-transparent.png';
+import Icon from '../ui/Icon.astro';
+import { getNavigation, getServices, getFacilities, getSchool, resolveLink } from '../../lib/site';
+import { academicYearsSince } from '../../lib/academic-year';
+
+interface Props { current?: string }
+const { current = 'none' } = Astro.props;
+
+const nav = await getNavigation();
+const services = await getServices();
+const facilities = await getFacilities();
+const school = await getSchool();
+const years = academicYearsSince();
+
+const sections = nav.sections.map((s) => {
+  let links = s.groups.flatMap((g) => g.links).map((l) => resolveLink(l, services));
+  if (s.facilityGroups.length) {
+    links = [
+      resolveLink({ label: s.lead?.label ?? 'Campus overview', href: s.lead?.href ?? '/campus' }, services),
+      ...facilities.map((f) => resolveLink({ label: f.data.name, href: `/campus/${f.id}` }, services))
+    ];
+  }
+  return { key: s.key, label: s.label, hub: s.hub, years: s.years, links };
+});
+const [phone1, phone2] = school.phones;
+---
+<nav id="mobile-menu" class="mm mobile-only" aria-label="Site menu" data-mobile-menu data-current={current}>
+  <div class="mm-head">
+    <a class="mm-brand" href="/" aria-label="KenBridge School Gulbarga, home">
+      <Image src={logo} alt="" width={44} height={44} densities={[1, 2]} format="png" class="mm-logo" />
+      <span class="mm-brand-text">
+        <span class="wordmark mm-word">KenBridge School</span>
+        <span class="mm-affil tnum">CBSE Affiliation No. {school.affiliationNo}</span>
+      </span>
+    </a>
+    <a class="mm-close no-js-only" href="#top">Close<Icon name="close" /></a>
+    <button type="button" class="mm-close js-only" data-menu-close>Close<Icon name="close" /></button>
+  </div>
+
+  <div class="mm-scroll">
+    <ul role="list" class="mm-sections">
+      {sections.map((s) => (
+        <li class="mm-section" data-mm-section={s.key}>
+          <h2 class="mm-h">
+            <button type="button" class="mm-toggle js-only" aria-expanded="false" aria-controls={`mm-${s.key}`} data-mm-toggle>
+              <span class="mm-label">{s.label}</span>
+              <span class="mm-icon" aria-hidden="true"><Icon name="plus" size={14} class="mm-plus" /><Icon name="minus" size={14} class="mm-minus" /></span>
+            </button>
+            <a class="mm-toggle mm-hub no-js-only" href={s.hub}><span class="mm-label">{s.label}</span></a>
+          </h2>
+          <div id={`mm-${s.key}`} class="mm-panel" data-mm-panel>
+            {s.years ? (
+              <ul role="list" class="mm-years">
+                {years.map((y) => <li><a class="mm-year tnum" href={`/gallery/${y.slug}`}>{y.label}</a></li>)}
+              </ul>
+            ) : (
+              <ul role="list">
+                {s.links.map((l) => (
+                  <li>
+                    <a class="mm-row" href={l.href} target={l.newTab ? '_blank' : undefined} rel={l.kind === 'ext' ? 'noopener' : undefined}>
+                      <span class="mm-row-text">
+                        <span class="mm-row-label">{l.label}</span>
+                        {l.meta && l.kind === 'internal' && <span class="mm-row-meta tnum">{l.meta}</span>}
+                      </span>
+                      {l.kind === 'ext' && <span class="mm-ext"><Icon name="external" size={14} /></span>}
+                      {(l.kind === 'pdf' || l.kind === 'video') && <span class="mm-tag">{l.kind === 'pdf' ? 'PDF' : 'Video'}</span>}
+                      {l.srNote && <span class="vh">{l.srNote}</span>}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </li>
+      ))}
+    </ul>
+
+    <div class="mm-contact">
+      <span class="mm-contact-label eyebrow-text">Logins &amp; contact</span>
+      <a class="mm-tap" href={services.parentLogin.url} target="_blank" rel="noopener">
+        <span class="mm-tap-icon" aria-hidden="true"><Icon name="user" size={18} /></span>
+        <span class="mm-tap-text"><span class="mm-tap-title">Parent Login</span><span class="mm-tap-sub">Parent portal</span></span>
+        <Icon name="external" size={14} class="mm-tap-ext" /><span class="vh"> (opens in a new tab)</span>
+      </a>
+      <a class="mm-tap" href={services.staffLogin.url} target="_blank" rel="noopener">
+        <span class="mm-tap-icon" aria-hidden="true"><Icon name="briefcase" size={18} /></span>
+        <span class="mm-tap-text"><span class="mm-tap-title">Staff Login</span><span class="mm-tap-sub">Staff portal</span></span>
+        <Icon name="external" size={14} class="mm-tap-ext" /><span class="vh"> (opens in a new tab)</span>
+      </a>
+      <a class="mm-tap" href={`tel:${phone1.tel}`}>
+        <span class="mm-tap-icon" aria-hidden="true"><Icon name="phone" size={18} /></span>
+        <span class="mm-tap-text"><span class="mm-tap-title">Call the school</span><span class="mm-tap-sub tnum">{phone1.display}</span></span>
+      </a>
+      <a class="mm-alt tnum" href={`tel:${phone2.tel}`}>Or call {phone2.display}</a>
+      <a class="mm-tap mm-tap--last" href={school.whatsapp.href}>
+        <span class="mm-tap-icon" aria-hidden="true"><Icon name="whatsapp" size={18} /></span>
+        <span class="mm-tap-text"><span class="mm-tap-title">WhatsApp</span><span class="mm-tap-sub tnum">{school.whatsapp.display}</span></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="mm-foot">
+    <a class="mm-admissions" href="/admissions">Admissions<Icon name="arrow" /></a>
+  </div>
+</nav>
+
+<style>
+  .mm {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    --focus-ring: var(--focus);
+  }
+  /* No JS: the Menu link targets #mobile-menu. With JS the script adds .is-open. */
+  :global(html:not(.js)) .mm:target, .mm.is-open { display: flex; }
+  @media (prefers-reduced-motion: no-preference) {
+    .mm.is-open { animation: kb-sheet 320ms var(--ease-out) both; }
+    .mm-panel:not([hidden]) { animation: kb-panel 250ms var(--ease-out) both; }
+  }
+  .mm :focus-visible { outline-offset: -2px; }
+
+  .mm-head {
+    flex-shrink: 0;
+    height: 65px;
+    padding: 0 12px 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .mm-brand { display: flex; align-items: center; gap: 10px; min-height: 44px; color: var(--text); text-decoration: none; }
+  .mm-brand :global(.mm-logo) { width: 44px; height: 44px; }
+  .mm-brand-text { display: flex; flex-direction: column; gap: 3px; }
+  .mm-word { font-size: 22px; }
+  .mm-affil { font-size: 12px; font-weight: 500; line-height: 1.1; color: var(--text-muted); }
+  .mm-close {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 12px 0 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .mm-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  .mm-sections { list-style: none; margin: 0; padding: 0; }
+  .mm-section { border-bottom: 1px solid var(--border); }
+  .mm-h { margin: 0; font: inherit; }
+  .mm-toggle {
+    width: 100%;
+    min-height: 64px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    text-decoration: none;
+  }
+  .mm-toggle:active { background: var(--surface-disabled); }
+  .mm-label { font-family: var(--font-display); font-size: 28px; font-weight: 500; line-height: 1; }
+  .mm-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border-strong);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brand);
+  }
+  .mm-toggle :global(.mm-minus) { display: none; }
+  .mm-toggle[aria-expanded='true'] :global(.mm-minus) { display: block; }
+  .mm-toggle[aria-expanded='true'] :global(.mm-plus) { display: none; }
+
+  .mm-panel { padding: 0 20px 16px; }
+  .mm-panel ul { list-style: none; margin: 0; padding: 0; }
+  .mm-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 52px;
+    padding: 6px 0;
+    border-top: 1px solid var(--border);
+    color: var(--text);
+    text-decoration: none;
+  }
+  .mm-row:active, .mm-year:active, .mm-tap:active { background: var(--brand-tint); }
+  .mm-row-text { display: flex; flex-direction: column; gap: 2px; }
+  .mm-row-label { font-size: 16px; font-weight: 600; line-height: 1.3; }
+  .mm-row-meta { font-size: 14px; line-height: 1.35; color: var(--text-muted); }
+  .mm-ext { display: inline-flex; color: var(--brand); }
+  .mm-tag {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .mm-years { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 12px; }
+  .mm-year {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    border-top: 1px solid var(--border);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .mm-contact { padding: 32px 20px 24px; display: flex; flex-direction: column; }
+  .mm-contact-label { padding-bottom: 8px; font-size: 12px; color: var(--brand); }
+  .mm-tap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 64px;
+    border-top: 1px solid var(--border);
+    color: var(--text);
+    text-decoration: none;
+  }
+  .mm-tap--last { border-bottom: 1px solid var(--border); }
+  .mm-tap-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--brand-tint);
+    color: var(--brand);
+  }
+  .mm-tap-text { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+  .mm-tap-title { font-size: 17px; font-weight: 600; }
+  .mm-tap-sub { font-size: 14px; color: var(--text-muted); }
+  .mm :global(.mm-tap-ext) { color: var(--brand); flex-shrink: 0; }
+  .mm-alt {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    padding-left: 54px;
+    color: var(--brand);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--link-underline);
+    text-underline-offset: 4px;
+  }
+
+  .mm-foot { flex-shrink: 0; padding: 12px 20px calc(28px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); background: var(--bg); }
+  .mm-admissions {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 52px;
+    border-radius: var(--radius-md);
+    background: var(--brand);
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .mm-admissions:hover { background: var(--brand-hover); color: #FFFFFF; }
+</style>

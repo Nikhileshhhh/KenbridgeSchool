@@ -1,0 +1,20 @@
+# Site settings. One place for switches that more than one page reads.
+main:
+  admissions:
+    # closed | open | opening. One setting shared by the Home pill and the Admissions banner
+    # (OPEN-QUESTIONS #11). The academic year rolls over by itself each June.
+    state: closed
+    # Optional: replaces the Admissions banner sentence word for word. Leave empty to use the default.
+    statusText: ''
+    # true swaps the external enquiry card on /admissions for the on-page EnquiryForm.
+    # Keep false until a form backend is confirmed (OPEN-QUESTIONS, Services and integrations).
+    enquiryOnPage: false
+  forms:
+    # demo: validates in the browser and says plainly that nothing was sent (no backend yet).
+    # live: posts to the form service once one is chosen.
+    mode: demo
+  # Shows missing facility copy as dashed "To confirm" boxes for the school to review.
+  # On for the design demo; set to false before launch.
+  facilityDrafts: true
+  # Path to the school song recording once supplied (for example /media/school-song.mp3).
+  songRecording: null

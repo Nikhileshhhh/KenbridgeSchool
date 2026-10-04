@@ -1,0 +1,321 @@
+---
+// /campus/[facility] · Facility Detail template (FacilityDetail, FacilityDetailMobile and the Library and
+// Indoor Sports wrappers). One template for all ten. Only school-approved copy is shown; unapproved
+// copy appears as dashed "Draft" boxes only while settings.facilityDrafts is on (the demo). Sparse copy
+// collapses into one two-column row ("compact"); 2–4 extra photos make an image story.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/shell/Breadcrumbs.astro';
+import Icon from '../../components/ui/Icon.astro';
+import Placeholder from '../../components/ui/Placeholder.astro';
+import { getFacilities, getSettings, metaDescription } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const all = await getFacilities();
+  return all.map((f) => ({ params: { facility: f.id } }));
+}
+
+const { facility } = Astro.params;
+const all = Object.fromEntries((await getFacilities()).map((f) => [f.id, f.data]));
+const f = all[facility!];
+const { facilityDrafts: drafts } = await getSettings();
+
+const hero = f.photos[0] ?? 'photo needed';
+type Block = { id: string; title: string; paras: string[]; list: string[]; pending?: string; pendingItems: string[] };
+const blocks: Block[] = [];
+const add = (id: string, title: string, paras: string[], list: string[], pNote?: string, pItems: string[] = []) => {
+  const has = paras.length > 0 || list.length > 0;
+  const showPending = drafts && !has && !!pNote;
+  if (!has && !showPending) return;
+  blocks.push({ id, title, paras, list, pending: showPending ? pNote : undefined, pendingItems: showPending ? pItems : [] });
+};
+add('what', 'What it is', f.what, [], f.pending?.what);
+add('how', 'How students use it', f.how, [], f.pending?.how, f.pending?.howItems ?? []);
+add('features', 'Features', [], f.features, f.pending?.features);
+// Sparse copy (one short paragraph per block, no lists, nothing pending) collapses into one row.
+const compact = blocks.length > 0 && blocks.every((b) => !b.list.length && !b.pending && b.paras.length <= 1);
+const story = f.photos.slice(1, 5);
+const related = f.related.map((k) => {
+  const r = all[k];
+  if (!r) throw new Error(`Unknown related facility "${k}" in ${facility}`);
+  return { href: `/campus/${k}`, num: r.num, name: r.name, note: r.photos.length ? `Photo · ${r.photos[0]}` : 'Photo needed' };
+});
+const crumbs = [{ label: 'Campus', href: '/campus' }, { label: f.name }];
+const ldCrumbs = [{ label: 'Home', href: '/' }, ...crumbs];
+---
+<BaseLayout
+  title={f.name}
+  description={metaDescription(`${f.name} at KenBridge School, Kalaburagi. ${f.descriptor.startsWith('[') ? f.atlasDesc.startsWith('[') ? 'Part of the campus of a CBSE school on Shahabad Road, founded in 2011.' : f.atlasDesc : f.descriptor}`)}
+  header="hero"
+  current="campus"
+  breadcrumbs={ldCrumbs}
+>
+  <section class="fd-hero on-dark" aria-labelledby="facH1">
+    <div class="fd-hero-bg" role="img" aria-label={`Placeholder for a photograph: ${f.name} (${hero})`}></div>
+    <div class="fd-hero-shade" aria-hidden="true"></div>
+    <span class="fd-corner fd-corner--l only-lg" aria-hidden="true"></span>
+    <span class="fd-corner fd-corner--r only-lg" aria-hidden="true"></span>
+    <span class="fd-hero-ph" aria-hidden="true"><span class="only-lg">[Photo · {hero} · full bleed]</span><span class="only-sm">[Photo · {hero} · portrait crop]</span></span>
+    <div class="container fd-hero-copy">
+      <Breadcrumbs items={crumbs} onDark collapse />
+      <p class="fd-kicker tnum">Facility {f.num} of 10</p>
+      <h1 id="facH1" class="fd-h1">{f.name}</h1>
+      {f.alt && <p class="fd-alt">also the {f.alt}</p>}
+    </div>
+  </section>
+
+  <section class="fd-brief" aria-label="In brief">
+    <div class="container fd-brief-grid">
+      <div class="fd-rule" aria-hidden="true"></div>
+      <div class="fd-brief-body">
+        <p class="fd-descriptor">{f.descriptor}</p>
+        {f.facts.length > 0 && (
+          <dl class="fd-facts tnum">
+            {f.facts.map((x) => (
+              <div class="fd-fact">
+                <dt>{x.label}<br /><span class="fd-source">Source: {x.source}</span></dt>
+                <dd><span class="fd-fact-num">{x.value}</span>{x.unit && <span class="fd-fact-unit">{x.unit}</span>}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+      </div>
+    </div>
+  </section>
+
+  {compact && (
+    <section class="fd-compact" aria-label={`About the ${f.short}`}>
+      <div class="container fd-compact-grid">
+        <div class="fd-compact-row" style={`--n:${blocks.length}`}>
+          {blocks.map((b) => (
+            <div class="fd-compact-block">
+              <h2 id={`${b.id}Title`} class="fd-compact-h2">{b.title}</h2>
+              {b.paras.map((p) => <p class="fd-compact-p">{p}</p>)}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {!compact && blocks.map((b) => (
+    <section class="fd-block" aria-labelledby={`${b.id}Title`}>
+      <div class="container fd-block-grid">
+        <h2 id={`${b.id}Title`} class="fd-block-h2">{b.title}</h2>
+        <div class="fd-block-body">
+          {b.paras.map((p) => <p class="fd-block-p">{p}</p>)}
+          {b.list.length > 0 && (
+            <ul class="fd-list" role="list">{b.list.map((it) => <li><span class="fd-diamond" aria-hidden="true"></span>{it}</li>)}</ul>
+          )}
+          {b.pending && (
+            <div class="fd-draft">
+              <p class="fd-draft-k">
+                <svg class="only-lg" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6.5" /><path d="M8 4.5V8.5M8 11V11.2" /></svg>
+                Draft · not shown on the live page
+              </p>
+              <p class="fd-draft-p">{b.pending}</p>
+              {b.pendingItems.length > 0 && (
+                <ul class="fd-draft-items" role="list">{b.pendingItems.map((pi) => <li>{pi}<span class="fd-draft-tag">To confirm</span></li>)}</ul>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  {story.length >= 2 && (
+    <section class="fd-story" aria-labelledby="storyTitle">
+      <div class="container">
+        <h2 id="storyTitle" class="fd-story-h2">Inside the {f.short}</h2>
+        <div class:list={['fd-story-grid', `fd-story-grid--${story.length}`]}>
+          {story.map((file, i) => (
+            <figure class="fd-story-fig">
+              <Placeholder label={`[Photo · ${file}]`} alt={`Placeholder for a photograph: ${file}`} class="fd-story-ph" />
+              <figcaption class="fd-story-cap"><span class="fd-story-n tnum">0{i + 1}</span><span>[Caption from the school: what the photo shows.]</span></figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {related.length > 0 && (
+    <section class="fd-related" aria-labelledby="relTitle">
+      <div class="container">
+        <h2 id="relTitle" class="fd-related-h2">Related facilities</h2>
+        <ul class="fd-related-list" role="list">
+          {related.map((r) => (
+            <li>
+              <a class="fd-rel" href={r.href}>
+                <Placeholder label={`[${r.note}]`} alt={`Placeholder for a photograph: ${r.name}`} class="fd-rel-ph" />
+                <span class="fd-rel-text"><span class="fd-rel-num tnum">{r.num}</span><span class="fd-rel-name">{r.name}</span></span>
+                <Icon name="arrow" size={20} class="fd-rel-arrow" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <nav class:list={['fd-cta', related.length === 0 && 'fd-cta--ruled']} aria-label="Campus">
+    <div class="container fd-cta-row">
+      <a class="fd-btn fd-btn--secondary" href="/campus"><Icon name="arrow-left" size={16} />Back to campus</a>
+      <div class="fd-cta-end">
+        <p class="fd-cta-p only-lg">See it in person.</p>
+        <a class="fd-btn fd-btn--primary" href="/contact">Visit the campus<Icon name="arrow" size={16} /></a>
+      </div>
+    </div>
+  </nav>
+</BaseLayout>
+
+<style>
+  /* ---------- hero ---------- */
+  .fd-hero { position: relative; min-height: 620px; padding-bottom: 40px; background: #3B1416; color: var(--text-on-dark); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
+  .fd-hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 45% at 60% 35%, rgba(150, 110, 70, 0.42) 0%, rgba(59, 20, 22, 0) 70%), #3B1416; }
+  .fd-hero-shade { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(42, 10, 11, 0.94) 0%, rgba(42, 10, 11, 0.3) 55%, rgba(42, 10, 11, 0.55) 100%); }
+  .fd-corner { position: absolute; top: 121px; width: 24px; height: 24px; border: 0 solid var(--text-on-dark-muted); }
+  .fd-corner--l { left: 32px; border-left-width: 1px; border-top-width: 1px; }
+  .fd-corner--r { right: 32px; border-right-width: 1px; border-top-width: 1px; }
+  .fd-hero-ph { position: absolute; left: var(--margin); top: 92px; font-size: 12px; color: var(--text-on-dark-muted); }
+  .fd-hero-copy { position: relative; display: flex; flex-direction: column; gap: 14px; }
+  .fd-kicker { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+  .fd-h1 { font-family: var(--font-display); font-size: clamp(3.75rem, 1.8rem + 8vw, 9rem); font-weight: 500; line-height: 0.95; letter-spacing: -0.015em; overflow-wrap: break-word; }
+  .fd-alt { font-family: var(--font-display); font-size: 24px; font-style: italic; font-weight: 400; color: #E8DCCF; }
+
+  /* ---------- in brief ---------- */
+  .fd-brief { padding: 48px 0 52px; border-bottom: 1px solid var(--border); }
+  .fd-brief-grid { display: flex; flex-direction: column; gap: 24px; }
+  .fd-rule { width: 56px; height: 2px; background: var(--accent); }
+  .fd-brief-body { display: flex; flex-direction: column; gap: 24px; }
+  .fd-descriptor { font-family: var(--font-display); font-size: clamp(2.125rem, 1.614rem + 2.095vw, 3.25rem); font-weight: 500; line-height: 1.18; }
+  .fd-facts { margin: 0; display: flex; flex-direction: column; gap: 20px; padding-top: 20px; border-top: 1px solid var(--text); }
+  .fd-fact { display: flex; flex-direction: column; gap: 6px; }
+  .fd-fact dt { order: 2; font-size: 15px; line-height: 1.45; }
+  .fd-source { font-size: 13px; color: var(--text-muted); }
+  .fd-fact dd { order: 1; margin: 0; display: flex; align-items: baseline; gap: 8px; }
+  .fd-fact-num { font-family: var(--font-display); font-size: 64px; font-weight: 500; line-height: 0.9; color: var(--brand); }
+  .fd-fact-unit { font-size: 15px; color: var(--text-muted); }
+
+  /* ---------- what / how / features ---------- */
+  .fd-compact { padding: 40px 0 48px; border-bottom: 1px solid var(--border); }
+  .fd-compact-row { display: flex; flex-direction: column; gap: 28px; }
+  .fd-compact-block { display: flex; flex-direction: column; gap: 10px; padding-top: 18px; border-top: 1px solid var(--text); }
+  .fd-compact-h2 { font-family: var(--font-display); font-size: 28px; font-weight: 500; line-height: 1.1; }
+  .fd-compact-p { font-size: 17px; line-height: 1.7; }
+  .fd-block { padding: 44px 0; border-bottom: 1px solid var(--border); }
+  .fd-block-grid { display: flex; flex-direction: column; gap: 16px; }
+  .fd-block-h2 { font-family: var(--font-display); font-size: 32px; font-weight: 500; line-height: 1.05; }
+  .fd-block-body { display: flex; flex-direction: column; gap: 16px; }
+  .fd-block-p { font-size: 17px; line-height: 1.7; }
+  .fd-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--text); }
+  .fd-list li { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); font-size: 17px; }
+  .fd-diamond { width: 7px; height: 7px; flex-shrink: 0; background: var(--brand); transform: rotate(45deg); }
+  .fd-draft { display: flex; flex-direction: column; gap: 10px; padding: 18px; border: 1.5px dashed var(--warning-text); border-radius: var(--radius-sm); background: var(--accent-tint); }
+  .fd-draft-k { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--warning-text); }
+  .fd-draft-p { font-size: 16px; line-height: 1.55; }
+  .fd-draft-items { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .fd-draft-items li { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px; border: 1px solid var(--warning-text); border-radius: var(--radius-sm); background: var(--surface-raised); font-size: 14px; font-weight: 600; }
+  .fd-draft-tag { font-size: 11px; font-weight: 700; color: var(--warning-text); }
+
+  /* ---------- image story ---------- */
+  .fd-story { padding: 48px 0 56px; }
+  .fd-story-h2 { font-family: var(--font-display); font-size: clamp(2rem, 1.786rem + 0.857vw, 2.5rem); font-weight: 500; line-height: 1.05; }
+  .fd-story-grid { margin-top: 28px; display: flex; flex-direction: column; gap: 28px; }
+  .fd-story-fig { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .fd-story-fig :global(.fd-story-ph) { aspect-ratio: 4 / 3 !important; padding: 12px; font-size: 12px; }
+  .fd-story-cap { display: flex; gap: 10px; font-size: 14px; line-height: 1.5; color: var(--text-muted); }
+  .fd-story-n { font-weight: 700; color: var(--brand); }
+
+  /* ---------- related ---------- */
+  .fd-related { padding: 48px 0 56px; background: var(--surface-raised); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .fd-related-h2 { padding-bottom: 18px; border-bottom: 1px solid var(--text); font-family: var(--font-display); font-size: clamp(2.25rem, 1.821rem + 1.714vw, 3rem); font-weight: 500; line-height: 1; }
+  .fd-related-list { list-style: none; margin: 0; padding: 0; }
+  .fd-rel { display: grid; grid-template-columns: 96px 1fr auto; gap: 16px; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); color: var(--text); text-decoration: none; }
+  .fd-rel:hover { color: var(--text); }
+  .fd-rel:hover .fd-rel-name { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 1px; }
+  .fd-rel :global(.fd-rel-ph) { aspect-ratio: 4 / 3 !important; padding: 5px; font-size: 9px; line-height: 1.2; }
+  .fd-rel-text { display: flex; flex-direction: column; gap: 2px; }
+  .fd-rel-num { font-size: 12px; font-weight: 700; color: var(--brand); }
+  .fd-rel-name { font-family: var(--font-display); font-size: 24px; font-weight: 500; line-height: 1.1; }
+  .fd-rel :global(.fd-rel-arrow) { width: 18px; height: 18px; color: var(--brand); }
+
+  /* ---------- CTA ---------- */
+  .fd-cta { padding: 40px 0 48px; }
+  .fd-cta--ruled { border-top: 1px solid var(--border); }
+  .fd-cta-row { display: flex; flex-direction: column-reverse; gap: 12px; }
+  .fd-cta-end { display: flex; flex-direction: column; }
+  .fd-btn { display: flex; align-items: center; gap: 10px; min-height: 56px; border-radius: var(--radius-md); font-size: 16px; font-weight: 600; text-decoration: none; }
+  .fd-btn--primary { justify-content: space-between; padding: 0 18px 0 20px; background: var(--brand); color: #FFFFFF; }
+  .fd-btn--primary:hover { background: var(--brand-hover); color: #FFFFFF; }
+  .fd-btn--secondary { justify-content: center; border: 1.5px solid var(--brand); color: var(--brand); }
+  .fd-btn--secondary:hover { background: var(--brand-tint); color: var(--brand); }
+
+  @media (min-width: 1024px) {
+    .fd-hero { min-height: 860px; padding-bottom: 72px; }
+    .fd-hero-bg { background: radial-gradient(ellipse 55% 50% at 62% 42%, rgba(150, 110, 70, 0.42) 0%, rgba(59, 20, 22, 0) 70%), radial-gradient(ellipse 35% 30% at 25% 60%, rgba(110, 90, 60, 0.32) 0%, rgba(59, 20, 22, 0) 70%), #3B1416; }
+    .fd-hero-shade { background: linear-gradient(0deg, rgba(42, 10, 11, 0.94) 0%, rgba(42, 10, 11, 0.3) 52%, rgba(42, 10, 11, 0.55) 100%); }
+    .fd-hero-ph { left: auto; right: var(--margin); top: 160px; font-size: 13px; }
+    .fd-hero-copy { gap: 24px; }
+    .fd-kicker { font-size: 13px; }
+    .fd-h1 { line-height: 0.92; letter-spacing: -0.02em; }
+    .fd-alt { margin-top: -4px; font-size: 32px; }
+
+    .fd-brief { padding: 104px 0 96px; }
+    .fd-brief-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; }
+    .fd-rule { grid-column: 1 / span 3; margin-top: 30px; width: 72px; }
+    .fd-brief-body { grid-column: 4 / span 8; gap: 40px; }
+    .fd-descriptor { line-height: 1.15; }
+    .fd-facts { flex-direction: row; gap: 56px; padding-top: 28px; }
+    .fd-fact { gap: 8px; }
+    .fd-fact-num { font-size: 80px; }
+    .fd-fact-unit { font-size: 16px; }
+
+    .fd-compact { padding: 88px 0; }
+    .fd-compact-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; }
+    .fd-compact-row { grid-column: 4 / span 8; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); column-gap: 48px; }
+    .fd-compact-block { gap: 16px; padding-top: 24px; }
+    .fd-compact-h2 { font-size: 34px; line-height: 1.05; }
+    .fd-compact-p { font-size: 19px; }
+    .fd-block { padding: 88px 0; }
+    .fd-block-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; }
+    .fd-block-h2 { grid-column: 1 / span 3; font-size: 36px; }
+    .fd-block-body { grid-column: 4 / span 8; gap: 20px; }
+    .fd-block-p { max-width: 760px; font-size: 21px; }
+    .fd-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
+    .fd-list li { gap: 14px; padding: 18px 0; font-size: 18px; }
+    .fd-diamond { width: 8px; height: 8px; }
+    .fd-draft { gap: 14px; padding: 24px 28px; }
+    .fd-draft-k { font-size: 13px; letter-spacing: 0.14em; }
+    .fd-draft-p { font-size: 17px; line-height: 1.6; }
+    .fd-draft-items li { padding: 0 12px; font-size: 15px; }
+    .fd-draft-tag { font-size: 12px; }
+
+    .fd-story { padding: 104px 0 112px; }
+    .fd-story-grid { margin-top: 40px; display: grid; gap: 32px; }
+    .fd-story-grid--2 { grid-template-columns: 7fr 5fr; height: 620px; }
+    .fd-story-grid--3 { grid-template-columns: 8fr 4fr; grid-template-rows: 1fr 1fr; height: 760px; }
+    .fd-story-grid--3 .fd-story-fig:first-child { grid-row: 1 / span 2; }
+    .fd-story-grid--4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; height: 1000px; }
+    .fd-story-fig { gap: 12px; min-height: 0; }
+    .fd-story-fig :global(.fd-story-ph) { flex: 1; aspect-ratio: auto !important; min-height: 0; padding: 14px; font-size: 13px; }
+    .fd-story-cap { gap: 12px; font-size: 15px; }
+
+    .fd-related { padding: 104px 0 112px; }
+    .fd-related-h2 { padding-bottom: 28px; }
+    .fd-related-list { margin-top: 40px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 32px; }
+    .fd-rel { grid-template-columns: 1fr auto; grid-template-areas: 'ph ph' 'text arrow'; gap: 18px 16px; padding: 0; border: 0; }
+    .fd-rel :global(.fd-rel-ph) { grid-area: ph; aspect-ratio: 3 / 2 !important; padding: 12px; font-size: 12px; line-height: 1.4; }
+    .fd-rel-text { grid-area: text; gap: 4px; }
+    .fd-rel-name { font-size: 32px; }
+    .fd-rel :global(.fd-rel-arrow) { grid-area: arrow; width: 20px; height: 20px; }
+
+    .fd-cta { padding: 80px 0; }
+    .fd-cta-row { flex-direction: row; justify-content: space-between; align-items: center; gap: 32px; }
+    .fd-cta-end { flex-direction: row; align-items: center; gap: 28px; }
+    .fd-cta-p { font-family: var(--font-display); font-size: 30px; font-weight: 500; }
+    .fd-btn { display: inline-flex; height: 56px; font-size: 17px; }
+    .fd-btn--secondary { padding: 0 24px 0 20px; }
+    .fd-btn--primary { padding: 0 22px 0 24px; }
+  }
+</style>

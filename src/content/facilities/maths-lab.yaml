@@ -1,0 +1,13 @@
+# Facility data from the FacilityDetail and CampusDesktop board scripts. Only school-approved copy goes in
+# what / how / features; anything not yet approved goes in pending (shown only when facilityDrafts is on).
+num: '07'
+name: Maths Lab
+short: lab
+group: learn
+# TODO(content): OPEN-QUESTIONS #8. One or two approved lines per facility.
+descriptor: '[One line from the school.]'
+atlasDesc: '[One or two lines from the school.]'
+atlasPlaceholder: true
+homePhoto: Math-Lab.jpg
+atlasPhoto: Math-Lab.jpg
+photos: [Math-Lab.jpg]

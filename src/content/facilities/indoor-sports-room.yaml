@@ -1,0 +1,17 @@
+# Facility data from the FacilityDetail and CampusDesktop board scripts. Only school-approved copy goes in
+# what / how / features; anything not yet approved goes in pending (shown only when facilityDrafts is on).
+num: '08'
+name: Indoor Sports Room
+short: room
+group: grow
+descriptor: An indoor sports arena for indoor games.
+atlasDesc: An indoor arena for indoor games.
+homePhoto: Indoor-Sports-Room-1.jpg
+atlasPhoto: Indoor-Sports-Room-1.jpg
+photos: [Indoor-Sports-Room-1.jpg, Indoor-Sports-Room-2.jpg, Indoor-Sports-Room-3.jpg]
+pending:
+  what: 'One or two lines from the school on the room itself: its size, surface and equipment.'
+  how: The site’s sports list names these games. Confirm which are played in this room before they are shown.
+  howItems: [Table tennis, Badminton, Chess]
+  features: Only items the school approves are listed here.
+related: [playground, multipurpose-hall, dance-music-room]

@@ -1,0 +1,72 @@
+# Page copy for /contact (ContactDesktop, ContactMobile, ContactForm), /services (ServicesDesktop,
+# ServicesMobile), /search (SearchPage, SearchStates) and /app. Phones, email, address and hours come
+# from school.yaml; service URLs from services.yaml.
+main:
+  contact:
+    title: Visit KenBridge
+    lead: We’d love to hear from you.
+    photo:
+      label: '[Photo · Drone-Front.jpg · warm evening light]'
+      alt: 'Placeholder: warm drone photograph of the campus front (Drone-Front.jpg)'
+    phoneNotes: [Admissions, '', '']
+    # The Contact board words the meeting note more briefly than the Information hub.
+    meeting: Parents may meet the Principal/Vice Principal Mon–Fri, 3–4 PM, by appointment.
+    map:
+      directions: https://www.google.com/maps/search/?api=1&query=KenBridge+School+Shahabad+Road+Kalaburagi
+      # TODO(content): confirm the exact pin with the school before launch (PLAN §5 contacts).
+      embed: https://www.google.com/maps?q=KenBridge+School+Shahabad+Road+Kalaburagi&output=embed
+      iframeTitle: Map of KenBridge School, Shahabad Road, Kalaburagi
+      note: The interactive map loads from Google only when you ask. Google may set cookies.
+      drawingLabel: KenBridge School · Shahabad Road
+    form:
+      title: Write to us
+      intro: Questions about the school, a visit, or anything else. For admissions, the
+      introLink: admissions enquiry form
+      introAfter: is quickest.
+    shortcuts:
+      - { icon: enquiry, title: Admissions enquiry, desc: The school’s online enquiry form, service: admissionEnquiry }
+      - { icon: parents, title: Parent Login, desc: The school’s parent portal, service: parentLogin }
+      - { icon: staff, title: Staff Login, desc: For KenBridge staff, service: staffLogin }
+      - { icon: upload, title: Careers, desc: Upload your résumé, service: careers }
+      - { icon: video, title: Virtual Tour, desc: A walk through the campus, service: virtualTour, domain: YouTube }
+
+  services:
+    title: Services
+    lead: Quick links to the school’s online services. Each one opens on its own site.
+    # Shown as two large buttons on phones (ServicesMobile "Most used"); the same rows are then left
+    # out of the lists below on phones.
+    mostUsed: [parentLogin, admissionEnquiry]
+    groups:
+      - id: fam
+        title: Families
+        note: For parents of current students
+        items:
+          - { service: parentLogin, icon: parents }
+          - { service: tc, icon: certificate }
+          # No file supplied yet: shown without a link (PLAN §0, Media).
+          - { title: Fee Structure, desc: The current fee structure., kind: pdf, domain: kenbridgegulbarga.com, icon: fees }
+          - { title: Academic Calendar, desc: 'Terms, holidays and key dates for the year.', kind: pdf, domain: kenbridgegulbarga.com, icon: calendar }
+      - id: staff
+        title: Staff
+        note: For KenBridge staff
+        items:
+          - { service: staffLogin, icon: staff, title: Staff Login (ERP) }
+          - { service: careers, icon: upload, title: 'Careers: upload your resume' }
+      - id: pros
+        title: Prospective families
+        note: Thinking of joining KenBridge
+        items:
+          - { service: admissionEnquiry, icon: enquiry }
+          - { service: brochure, icon: brochure }
+          - { service: virtualTour, icon: video }
+    legend:
+      external: 'External: opens another site in a new tab'
+      pdf: 'PDF: downloads a file'
+      signins: Sign-ins happen on each service’s own site, never on this page.
+    app:
+      title: KBS Gulbarga app
+      lead: The school’s app for families, on Android and iOS.
+      playBadge: '[Official “Get it on Google Play” badge artwork]'
+      appleBadge: '[Official “Download on the App Store” badge artwork]'
+      qrTitle: Scan with your phone
+      qrNote: Opens the right store for your phone, via kenbridgegulbarga.com/app.

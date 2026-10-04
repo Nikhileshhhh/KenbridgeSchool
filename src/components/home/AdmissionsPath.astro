@@ -1,0 +1,100 @@
+---
+// HomeDesktop §11 / HomeMobile admissions path: four steps on the bridge arc (desktop) or a
+// vertical path (phones), the status pill (same setting as the hero) and two actions.
+import Icon from '../ui/Icon.astro';
+import StatusPill from './StatusPill.astro';
+import { getHome, getServices } from '../../lib/site';
+const { admissionSteps } = await getHome();
+const services = await getServices();
+---
+<section class="adm" aria-labelledby="admTitle">
+  <div class="container adm-inner">
+    <div class="adm-head">
+      <div class="adm-titles">
+        <span class="adm-eyebrow eyebrow-text">Admissions</span>
+        <h2 id="admTitle" class="adm-title">Four steps to joining KenBridge</h2>
+      </div>
+      <StatusPill tone="light" />
+    </div>
+
+    <div class="adm-steps-wrap">
+    <svg class="adm-arc only-lg" aria-hidden="true" focusable="false" viewBox="0 0 1200 200" preserveAspectRatio="none">
+      <path d="M40 200A1190 1190 0 0 1 1160 200" fill="none" stroke="#857A71" stroke-width="1.5" vector-effect="non-scaling-stroke" />
+    </svg>
+    <ol aria-label="Admission steps" class="adm-steps">
+      {admissionSteps.map((s, i) => (
+        <li class:list={['adm-step', `adm-step--${i + 1}`]}>
+          <span class:list={['adm-rail']} aria-hidden="true">
+            {i < admissionSteps.length - 1 && <span class="adm-line only-sm"></span>}
+            <span class:list={['adm-dot', i === 0 && 'is-first']}>{i + 1}</span>
+          </span>
+          <span class="adm-step-text">
+            <strong class="adm-step-title">{s.title}</strong>
+            {s.note && <span class="adm-step-note">{s.note}</span>}
+          </span>
+        </li>
+      ))}
+    </ol>
+    </div>
+
+    <div class="adm-actions">
+      <a class="adm-btn adm-btn--primary arrow-nudge" href="/admissions#procedure">Admission procedure<span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
+      <a class="adm-btn adm-btn--secondary" href={services.admissionEnquiry.url} target="_blank" rel="noopener">Enquire online<Icon name="external" size={14} /><span class="vh"> (opens in a new tab)</span></a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .adm { padding: 64px 0; background: var(--bg); border-top: 1px solid var(--border); }
+  .adm-inner { display: flex; flex-direction: column; gap: 24px; }
+  .adm-head { display: flex; flex-direction: column; gap: 24px; }
+  .adm-titles { display: flex; flex-direction: column; gap: 10px; }
+  .adm-eyebrow { font-size: 12px; color: var(--brand); }
+  .adm-title { font-family: var(--font-display); font-size: clamp(2.5rem, 1.943rem + 2.286vw, 4rem); font-weight: 500; line-height: 1.05; }
+  .adm-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .adm-step { display: grid; grid-template-columns: 32px 1fr; gap: 16px; min-height: 72px; }
+  .adm-step--1 { min-height: 84px; }
+  .adm-step--4 { min-height: 48px; }
+  .adm-rail { position: relative; display: flex; justify-content: center; }
+  .adm-line { position: absolute; top: 32px; bottom: 0; width: 1.5px; background: var(--border-strong); }
+  .adm-dot {
+    position: relative; width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg); border: 1.5px solid var(--brand); color: var(--brand); font-size: 13px; font-weight: 800;
+  }
+  .adm-dot.is-first { background: var(--brand); color: #FFFFFF; border: 0; }
+  .adm-step-text { display: flex; flex-direction: column; gap: 4px; padding-top: 2px; }
+  .adm-step-title { font-family: var(--font-display); font-size: 24px; font-weight: 600; line-height: 1.1; }
+  .adm-step-note { font-size: 15px; color: var(--text-muted); }
+  .adm-actions { display: flex; flex-direction: column; gap: 24px; }
+  .adm-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px; height: 52px;
+    border-radius: var(--radius-md); font-size: 16px; font-weight: 600; text-decoration: none;
+  }
+  .adm-btn--primary { background: var(--brand); color: #FFFFFF; }
+  .adm-btn--primary:hover { background: var(--brand-hover); color: #FFFFFF; }
+  .adm-btn--secondary { gap: 8px; border: 1.5px solid var(--brand); color: var(--brand); }
+  .adm-btn--secondary:hover { background: var(--brand-tint); color: var(--brand); }
+  .adm-btn .arrow { display: inline-flex; }
+
+  @media (min-width: 1024px) {
+    .adm { padding: 128px 0; }
+    .adm-inner { gap: 40px; }
+    .adm-head { flex-direction: row; justify-content: space-between; align-items: flex-end; gap: 32px; }
+    .adm-titles { gap: 14px; }
+    .adm-eyebrow { font-size: 13px; }
+    .adm-steps-wrap { position: relative; margin-top: 24px; height: 260px; }
+    .adm-steps { position: absolute; inset: 0; display: block; }
+    .adm-arc { position: absolute; left: 0; top: 0; width: 100%; height: 110px; overflow: visible; }
+    .adm-step { position: absolute; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+    .adm-step--1 { left: 3.33%; top: 110px; transform: translate(-16px, -50%); width: 280px; }
+    .adm-step--2, .adm-step--3 { top: 41.7px; transform: translate(-50%, -16px); align-items: center; text-align: center; width: 260px; }
+    .adm-step--2 { left: 33.9%; }
+    .adm-step--3 { left: 66.1%; }
+    .adm-step--4 { left: 96.67%; top: 110px; transform: translate(calc(-100% + 16px), -50%); align-items: flex-end; text-align: right; width: 280px; }
+    .adm-step-text { gap: 10px; padding: 0; align-items: inherit; }
+    .adm-step-title { margin-top: 10px; font-size: 28px; }
+    .adm-actions { flex-direction: row; gap: 16px; padding-top: 32px; border-top: 1px solid var(--border); }
+    .adm-btn { display: inline-flex; padding: 0 22px 0 24px; }
+  }
+</style>

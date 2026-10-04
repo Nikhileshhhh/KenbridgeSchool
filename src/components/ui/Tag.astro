@@ -1,0 +1,37 @@
+---
+// Components board · Tags (not interactive), plus the search result types
+// (SearchPage: Page outline, PDF maroon tint, Album saffron tint, External dark).
+interface Props { tone?: 'neutral' | 'accent' | 'page' | 'pdf' | 'album' | 'external'; class?: string }
+const { tone = 'neutral', class: cls } = Astro.props;
+---
+<span class:list={['tag', `tag--${tone}`, cls]}><slot /></span>
+
+<style>
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    height: 28px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-raised);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .tag--accent { border-color: transparent; background: var(--accent-tint); color: var(--text); }
+  .tag--page, .tag--pdf, .tag--album, .tag--external {
+    height: 24px;
+    padding: 0 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .tag--page { background: var(--surface); border-color: var(--border-strong); color: var(--text); }
+  .tag--pdf { background: var(--brand-tint); border-color: var(--brand); color: var(--brand); }
+  .tag--album { background: var(--accent-tint); border-color: var(--warning-text); color: var(--warning-text); }
+  .tag--external { background: var(--text); border-color: var(--text); color: #FFFFFF; }
+</style>

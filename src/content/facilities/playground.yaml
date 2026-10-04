@@ -1,0 +1,13 @@
+# Facility data from the FacilityDetail and CampusDesktop board scripts. Only school-approved copy goes in
+# what / how / features; anything not yet approved goes in pending (shown only when facilityDrafts is on).
+num: '03'
+name: Playground
+short: playground
+group: grow
+descriptor: Developed to support various sports events.
+atlasDesc: Developed to support various sports events, with synthetic courts for outdoor games.
+homePhoto: '[Playground photo]'
+atlasPhoto: playground
+photoNeeded: true
+photos: []
+what: ['Developed to support various sports events, with synthetic courts for outdoor games.']

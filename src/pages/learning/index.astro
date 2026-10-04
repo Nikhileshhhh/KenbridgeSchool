@@ -1,0 +1,403 @@
+---
+// /learning · Our School (LearningDesktop, LearningMobile). Desktop: a typographic path, then a stage
+// index (tabs with JS; anchors to stacked panels without it). Phones: a vertical path and stacked chapters.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/shell/Breadcrumbs.astro';
+import Eyebrow from '../../components/ui/Eyebrow.astro';
+import Button from '../../components/ui/Button.astro';
+import Icon from '../../components/ui/Icon.astro';
+import ArcGlyph from '../../components/ui/ArcGlyph.astro';
+import Placeholder from '../../components/ui/Placeholder.astro';
+import { getMain, getProgrammes } from '../../lib/site';
+
+const L = await getMain('learning');
+const stages = (await getProgrammes()).map((p) => ({ slug: p.id, ...p.data }));
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'Our School' }];
+// Path geometry from the board (a 1312 × 340 arc on desktop; a 350 × 320 vertical arc on phones).
+const stops = [[300, 182.8], [540, 135.5], [772, 135.5], [1012, 182.8]];
+const vstops = [[28.6, 40], [47.7, 120], [47.7, 200], [28.6, 280]];
+const dots = [[4, 65.4], [336, 23.3], [672, 10], [1008, 26]];
+---
+<BaseLayout
+  title="Our School"
+  description="Four programmes from Pre-KG to Class X at KenBridge School, Kalaburagi: Pre-Primary, Primary, Middle School and Secondary School, on the CBSE curriculum."
+  current="learning"
+  breadcrumbs={crumbs}
+>
+  <div class="container lh-crumbs"><Breadcrumbs items={crumbs} collapse /></div>
+
+  <section class="lh-hero" aria-labelledby="learnH1">
+    <div class="container">
+      <Eyebrow class="lh-eyebrow">{L.eyebrow}</Eyebrow>
+      <h1 id="learnH1" class="lh-h1">{L.title}</h1>
+
+      <div class="lh-path only-lg">
+        <svg class="lh-path-svg" aria-hidden="true" focusable="false" viewBox="0 0 1312 340" preserveAspectRatio="none">
+          <path d="M0 320A1227.46 1227.46 0 0 1 1312 320" />
+          <path d="M0 312V340M1312 312V340" />
+        </svg>
+        <div class="lh-path-cover" aria-hidden="true"></div>
+        <ol class="lh-stops" aria-label="The four programmes, in order">
+          {stages.map((s, i) => (
+            <li class:list={['lh-stop', `lh-stop--${i + 1}`]} style={`left:${(stops[i][0] / 1312) * 100}%;top:${stops[i][1]}px;--tx:var(--stage${s.stage}-text);--delay:${500 + i * 280}ms`}>
+              <a class="lh-stop-name" href={`#stage-${s.slug}`} data-stage-link={i}><span class="vh">Stage {s.num}: </span><span class="lh-stop-label">{s.name}</span></a>
+              <span class="lh-dot" aria-hidden="true"></span>
+              <span class="lh-stop-meta tnum"><span class="lh-stop-num">{s.num}</span>{s.range}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <div class="lh-vpath only-sm">
+        <svg class="lh-vpath-svg" aria-hidden="true" focusable="false" viewBox="0 0 350 320"><path d="M16 10A347.88 347.88 0 0 1 16 310" /></svg>
+        <div class="lh-vpath-cover" aria-hidden="true"></div>
+        <ol class="lh-vstops" aria-label="The four programmes, in order">
+          {stages.map((s, i) => (
+            <li class="lh-vstop" style={`left:${vstops[i][0]}px;top:${vstops[i][1]}px;--tx:var(--stage${s.stage}-text);--delay:${450 + i * 260}ms`}>
+              <span class="lh-dot lh-dot--sm" aria-hidden="true"></span>
+              <a class="lh-vstop-link" href={`#m-stage-${s.slug}`}>
+                <span class="vh">Stage {s.num}: </span><span class="lh-vstop-name">{s.name}</span>
+                <span class="lh-vstop-meta tnum"><span class="lh-stop-num">{s.num}</span>{s.range}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="lh-intro" aria-label="Introduction">
+    <div class="container lh-intro-grid">
+      <p class="lh-intro-label eyebrow-text">{L.introLabel}</p>
+      <p class="lh-intro-p">{L.intro} <span class="lh-muted">{L.introMuted}</span></p>
+    </div>
+  </section>
+
+  <!-- Desktop: stage index + panel. Without JS the index is a list of anchors and every panel shows. -->
+  <section id="stages" class="lh-stages only-lg" aria-labelledby="stagesTitle">
+    <div class="container">
+      <div class="lh-stages-head">
+        <h2 id="stagesTitle" class="lh-h2">{L.stagesTitle}</h2>
+        <p class="lh-count tnum js-only" aria-live="polite"><span class="vh">Showing stage </span><span class="lh-count-num" data-stage-count style={`color:var(--stage1-text)`}>01</span> <span class="lh-muted">/ 04</span></p>
+      </div>
+      <div class="lh-stages-grid" data-stage-tabs>
+        <div class="lh-index-wrap">
+          <div class="lh-index" data-stage-index aria-label="Learning stages">
+            {stages.map((s, i) => (
+              <a class="lh-tab" id={`stageTab${i + 1}`} href={`#stage-${s.slug}`} data-stage-tab style={`--mark:var(--stage${s.stage}-mark);--tx:var(--stage${s.stage}-text)`}>
+                <span class="lh-tab-num tnum">{s.num}</span>
+                <span class="lh-tab-text">
+                  <span class="lh-tab-name">{s.name}</span>
+                  <span class="lh-tab-range tnum">{s.range}</span>
+                </span>
+                <span class="lh-tab-end">
+                  <ArcGlyph stage={s.stage} />
+                  <Icon name="arrow" size={18} class="lh-tab-arrow" />
+                </span>
+              </a>
+            ))}
+          </div>
+          <p class="lh-hint js-only"><ArcGlyph stage={2} />{L.stagesHint}</p>
+        </div>
+
+        <div class="lh-panels">
+          {stages.map((s, i) => (
+            <div class="lh-panel" id={`stage-${s.slug}`} data-stage-panel style={`--mark:var(--stage${s.stage}-mark);--tx:var(--stage${s.stage}-text);--tint:var(--stage${s.stage}-tint)`}>
+              <div class:list={['lh-frame', s.stage === 4 && 'lh-frame--dark']}>
+                <div class="lh-photo">
+                  <span class="lh-photo-tag tnum">Stage {s.num}</span>
+                  <Placeholder label={`[Photo · ${s.hub.photo}]`} ratio="16 / 10" alt={`Placeholder for a photograph: ${s.hub.photo}`} />
+                </div>
+              </div>
+              <div class="lh-panel-body" data-stage-body>
+                <div class="lh-bar" aria-hidden="true"></div>
+                <p class="lh-panel-kicker tnum">Stage {s.num} of 04 · {s.range}</p>
+                <h3 class="lh-h3">{s.name}</h3>
+                <p class="lh-panel-lead">{s.hub.lead}</p>
+                <dl class="lh-dl">
+                  <dt class="lh-dt lh-dt--classes">Classes</dt>
+                  <dd class="lh-dd"><ul class="lh-classes tnum" role="list">{s.hub.classes.map((c) => <li>{c}</li>)}</ul></dd>
+                  {s.hub.focus.length > 0 && (
+                    <>
+                      <dt class="lh-dt">Focus</dt>
+                      <dd class="lh-dd"><ul class="lh-focus" role="list">{s.hub.focus.map((f) => <li><span class="lh-diamond" aria-hidden="true"></span>{f}</li>)}</ul></dd>
+                    </>
+                  )}
+                  <dt class="lh-dt">Next</dt>
+                  <dd class="lh-dd lh-next">{s.hub.next}</dd>
+                </dl>
+                <Button variant="secondary" href={`/learning/${s.slug}`} arrow class="lh-explore">{s.hub.cta}</Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Phones: the four stages as chapters. -->
+  <section class="lh-chapters only-sm" aria-labelledby="mStagesTitle">
+    <h2 id="mStagesTitle" class="container lh-h2">{L.stagesTitle}</h2>
+    {stages.map((s) => (
+      <article id={`m-stage-${s.slug}`} class="lh-ch" aria-labelledby={`mStageH-${s.slug}`} style={`--mark:var(--stage${s.stage}-mark);--tx:var(--stage${s.stage}-text);--tint:var(--stage${s.stage}-tint)`}>
+        <div class="lh-ch-bar" aria-hidden="true"></div>
+        <div class="lh-ch-top">
+          <span class="lh-ch-num tnum"><span class="vh">Stage </span>{s.num}</span>
+          <ArcGlyph stage={s.stage} />
+        </div>
+        <div class="lh-ch-head">
+          <p class="lh-ch-range tnum">{s.range}</p>
+          <h3 id={`mStageH-${s.slug}`} class="lh-ch-h3">{s.name}</h3>
+        </div>
+        <div class:list={['lh-frame', 'lh-frame--sm', s.stage === 4 && 'lh-frame--dark']}>
+          <Placeholder label={`[Photo · ${s.hub.photoSm}]`} ratio="3 / 2" alt={`Placeholder for a photograph: ${s.hub.photoSm}`} class="lh-ph-sm" />
+        </div>
+        <p class="lh-ch-lead">{s.hub.lead}</p>
+        <dl class="lh-ch-dl">
+          <dt class="lh-dt">Classes</dt>
+          <dd class="lh-dd"><ul class="lh-classes lh-classes--sm tnum" role="list">{s.hub.classes.map((c) => <li>{c}</li>)}</ul></dd>
+          {s.hub.focus.length > 0 && (
+            <>
+              <dt class="lh-dt lh-dt--gap">Focus</dt>
+              <dd class="lh-dd"><ul class="lh-focus lh-focus--sm" role="list">{s.hub.focus.map((f) => <li><span class="lh-diamond" aria-hidden="true"></span>{f}</li>)}</ul></dd>
+            </>
+          )}
+        </dl>
+        <a class="lh-ch-cta" href={`/learning/${s.slug}`}>{s.hub.cta}<Icon name="arrow" size={18} /></a>
+        <p class="lh-ch-next"><Icon name="arrow-down" size={16} /><span><strong>Next:</strong> {s.hub.next}</span></p>
+      </article>
+    ))}
+  </section>
+
+  <section class="lh-one" aria-labelledby="oneTitle">
+    <div class="container">
+      <div class="lh-one-head">
+        <p class="eyebrow-text lh-red tnum">{L.promises.eyebrow}</p>
+        <h2 id="oneTitle" class="lh-one-h2">{L.promises.title} <span class="em">{L.promises.titleEm}</span></h2>
+      </div>
+      <div class="lh-one-body">
+        <div class="lh-one-arc only-lg" aria-hidden="true">
+          <svg viewBox="0 0 1312 72" preserveAspectRatio="none" focusable="false"><path d="M0 66A3870.29 3870.29 0 0 1 1312 66" /><path d="M1312 58V74" /></svg>
+          {dots.map(([x, y]) => <span class="lh-one-dot" style={`left:${(x / 1312) * 100}%;top:${y}px`}></span>)}
+        </div>
+        <div class="lh-one-line only-sm" aria-hidden="true"></div>
+        <ul class="lh-one-list" role="list">
+          {L.promises.items.map((p) => (
+            <li class="lh-one-item">
+              <span class="lh-one-node only-sm" aria-hidden="true"></span>
+              <h3 class="lh-one-h3">{p.title}</h3>
+              <p class="lh-one-p">{p.text}{p.muted && <> <span class:list={['lh-muted', p.muted.startsWith('(') && 'tnum']}>{p.muted}</span></>}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="lh-ages" aria-labelledby="ageTitle">
+    <div class="container lh-ages-grid">
+      <div class="lh-ages-head">
+        <p class="eyebrow-text lh-red">{L.ages.eyebrow}</p>
+        <h2 id="ageTitle" class="lh-ages-h2">{L.ages.title}</h2>
+      </div>
+      <dl class="lh-ages-dl tnum">
+        {L.ages.list.map((a) => (
+          <div class="lh-age"><dt>{a.label}</dt><dd><span class="lh-age-num">{a.years}</span><span class="lh-age-unit">years</span></dd></div>
+        ))}
+      </dl>
+      <p class="lh-ages-note">{L.ages.note}</p>
+      <Button href={L.ages.cta.href} arrow class="lh-ages-cta">{L.ages.cta.label}</Button>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import '../../scripts/learning.js';
+</script>
+
+<style>
+  .lh-crumbs { padding-top: 12px; }
+  .lh-red { color: var(--brand); }
+  .lh-muted { color: var(--text-muted); }
+
+  /* ---------- hero ---------- */
+  .lh-hero { padding: 20px 0 56px; }
+  .lh-hero :global(.lh-eyebrow) { font-size: 12px; gap: 8px; }
+  .lh-h1 { margin-top: 16px; font-family: var(--font-display); font-size: clamp(4.25rem, 2.55rem + 6.97vw, 8rem); font-weight: 500; line-height: 0.95; letter-spacing: -0.015em; }
+
+  .lh-path-cover, .lh-vpath-cover { position: absolute; background: var(--bg); transform-origin: right center; }
+  .lh-stops, .lh-vstops { list-style: none; margin: 0; padding: 0; }
+  .lh-stop, .lh-vstop { position: absolute; width: 0; height: 0; }
+  .lh-dot { position: absolute; left: -8px; top: -8px; width: 16px; height: 16px; border-radius: 50%; background: var(--tx); box-shadow: 0 0 0 4px var(--bg); }
+  .lh-dot--sm { left: -7px; top: -7px; width: 14px; height: 14px; }
+  .lh-stop-num { color: var(--tx); }
+  @media (prefers-reduced-motion: no-preference) {
+    .lh-path-cover, .lh-vpath-cover { animation: kb-draw 1400ms cubic-bezier(.65, 0, .35, 1) 200ms both; }
+    .lh-stop, .lh-vstop { animation: kb-fade 500ms ease-out var(--delay) both; }
+  }
+  @media (prefers-reduced-motion: reduce) { .lh-path-cover, .lh-vpath-cover { display: none; } }
+
+  .lh-vpath { position: relative; margin-top: 32px; width: 350px; max-width: 100%; height: 320px; }
+  .lh-vpath-svg { position: absolute; inset: 0; width: 350px; height: 320px; overflow: visible; }
+  .lh-vpath-svg path { fill: none; stroke: var(--brand); stroke-width: 1.5; }
+  .lh-vpath-cover { left: 0; top: -4px; width: 60px; height: 328px; }
+  .lh-vstop-link { position: absolute; left: 22px; top: -30px; display: flex; flex-direction: column; justify-content: center; min-height: 60px; white-space: nowrap; color: var(--text); text-decoration: none; }
+  .lh-vstop-link:hover { color: var(--text); }
+  .lh-vstop-link:hover .lh-vstop-name { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 1px; }
+  .lh-vstop-name { font-family: var(--font-display); font-size: 34px; font-weight: 500; line-height: 1; }
+  .lh-vstop-meta { margin-top: 6px; display: flex; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+
+  /* ---------- intro ---------- */
+  .lh-intro { padding: 48px 0 64px; border-top: 1px solid var(--border); }
+  .lh-intro-grid { display: flex; flex-direction: column; gap: 16px; }
+  .lh-intro-label { color: var(--text-muted); }
+  .lh-intro-p { font-family: var(--font-display); font-size: clamp(1.75rem, 1.5rem + 0.95vw, 2.5rem); font-weight: 500; line-height: 1.3; }
+
+  /* ---------- phone chapters ---------- */
+  .lh-h2 { font-family: var(--font-display); font-weight: 500; line-height: 1; }
+  .lh-chapters .lh-h2 { padding-top: 8px; padding-bottom: 40px; font-size: 48px; }
+  .lh-ch { position: relative; padding: 48px var(--margin) 40px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 18px; }
+  .lh-ch-bar { position: absolute; left: 0; top: 0; width: 100%; height: 6px; background: var(--mark); }
+  .lh-ch-top { display: flex; justify-content: space-between; align-items: center; }
+  .lh-ch-num { font-family: var(--font-display); font-size: 64px; font-weight: 500; line-height: 0.9; color: var(--tx); }
+  .lh-ch-head { display: flex; flex-direction: column; gap: 8px; }
+  .lh-ch-range { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tx); }
+  .lh-ch-h3 { font-family: var(--font-display); font-size: 44px; font-weight: 500; line-height: 1; }
+  .lh-frame { padding: 16px; background: var(--tint); }
+  .lh-frame--sm { padding: 10px; }
+  .lh-frame--dark { background: var(--surface-dark); }
+  .lh-frame--sm :global(.lh-ph-sm) { padding: 12px; font-size: 12px; }
+  .lh-ch-lead { font-family: var(--font-display); font-size: 24px; font-weight: 500; line-height: 1.3; }
+  .lh-ch-dl { display: flex; flex-direction: column; gap: 10px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .lh-dt { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .lh-dt--gap { margin-top: 8px; }
+  .lh-dd { margin: 0; }
+  .lh-classes { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .lh-classes li { display: inline-flex; align-items: center; height: 40px; padding: 0 14px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; }
+  .lh-classes--sm li { height: 36px; padding: 0 12px; }
+  .lh-focus { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 32px; }
+  .lh-focus li { display: flex; align-items: center; gap: 12px; font-size: 18px; line-height: 1.4; }
+  .lh-focus--sm { display: flex; flex-direction: column; gap: 8px; }
+  .lh-focus--sm li { font-size: 17px; }
+  .lh-diamond { width: 8px; height: 8px; flex-shrink: 0; background: var(--tx); transform: rotate(45deg); }
+  .lh-focus--sm .lh-diamond { width: 7px; height: 7px; }
+  .lh-ch-cta { display: flex; justify-content: space-between; align-items: center; min-height: 56px; padding: 0 18px 0 20px; border: 1.5px solid var(--brand); border-radius: var(--radius-md); color: var(--brand); font-size: 16px; font-weight: 600; text-decoration: none; }
+  .lh-ch-cta:hover { background: var(--brand-tint); color: var(--brand); }
+  .lh-ch-next { display: flex; align-items: center; gap: 10px; font-size: 15px; line-height: 1.4; color: var(--text-muted); }
+  .lh-ch-next strong { color: var(--text); font-weight: 700; }
+
+  /* ---------- every stage, one school ---------- */
+  .lh-one { padding: 64px 0 72px; background: var(--surface-raised); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .lh-one-head { display: flex; flex-direction: column; gap: 14px; }
+  .lh-one-h2 { font-family: var(--font-display); font-size: clamp(3rem, 2.443rem + 2.286vw, 5rem); font-weight: 500; line-height: 1.02; }
+  .lh-one-body { position: relative; margin-top: 36px; }
+  .lh-one-line { position: absolute; left: 6px; top: 8px; bottom: 8px; width: 1.5px; background: var(--brand); }
+  .lh-one-list { list-style: none; margin: 0; padding: 0 0 0 28px; display: flex; flex-direction: column; gap: 28px; }
+  .lh-one-item { position: relative; display: flex; flex-direction: column; gap: 8px; }
+  .lh-one-node { position: absolute; left: -28px; top: 6px; width: 14px; height: 14px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 4px var(--surface-raised); }
+  .lh-one-h3 { font-family: var(--font-display); font-size: 28px; font-weight: 500; line-height: 1.1; }
+  .lh-one-p { font-size: 16px; line-height: 1.6; }
+
+  /* ---------- admission age ---------- */
+  .lh-ages { padding: 64px 0 72px; }
+  .lh-ages-grid { display: flex; flex-direction: column; gap: 16px; }
+  .lh-ages-head { display: flex; flex-direction: column; gap: 16px; }
+  .lh-ages-h2 { font-family: var(--font-display); font-size: clamp(2.5rem, 2.071rem + 1.714vw, 3.5rem); font-weight: 500; line-height: 1.05; }
+  .lh-ages-dl { margin: 8px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--text); }
+  .lh-age { display: flex; flex-direction: column; gap: 6px; padding: 20px 16px 20px 0; border-bottom: 1px solid var(--border); }
+  .lh-age:nth-child(even) { padding: 20px 0 20px 16px; border-left: 1px solid var(--border); }
+  .lh-age dt { order: 2; font-size: 15px; font-weight: 700; }
+  .lh-age dd { order: 1; margin: 0; display: flex; align-items: baseline; gap: 6px; }
+  .lh-age-num { font-family: var(--font-display); font-size: 64px; font-weight: 500; line-height: 0.9; color: var(--brand); }
+  .lh-age-unit { font-size: 14px; color: var(--text-muted); }
+  .lh-ages-note { font-size: 15px; line-height: 1.6; color: var(--text-muted); }
+  .lh-ages-grid :global(.lh-ages-cta) { margin-top: 8px; justify-content: space-between; height: auto; min-height: 56px; padding: 0 18px 0 20px; }
+
+  @media (min-width: 1024px) {
+    .lh-crumbs { padding-top: 32px; }
+    .lh-hero { padding: 56px 0 72px; }
+    .lh-hero :global(.lh-eyebrow) { font-size: 13px; gap: 10px; }
+    .lh-h1 { margin-top: 20px; letter-spacing: -0.02em; }
+    .lh-path { position: relative; margin-top: 40px; height: 340px; }
+    .lh-path-svg { position: absolute; inset: 0; width: 100%; height: 340px; overflow: visible; }
+    .lh-path-svg path { fill: none; stroke: var(--brand); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+    .lh-path-cover { left: -4px; top: 0; width: calc(100% + 8px); height: 342px; }
+    .lh-stop-name { position: absolute; bottom: 16px; display: flex; align-items: flex-end; min-height: 44px; white-space: nowrap; color: var(--text); text-decoration: none; }
+    .lh-stop-name:hover { color: var(--text); }
+    .lh-stop-name:hover .lh-stop-label { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 8px; }
+    .lh-stop-label { font-family: var(--font-display); font-size: clamp(1.875rem, 0.6rem + 2.4vw, 2.75rem); font-weight: 500; line-height: 1; }
+    .lh-stop-meta { position: absolute; top: 18px; display: flex; gap: 8px; white-space: nowrap; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+    .lh-stop--1 .lh-stop-name { right: -6px; }
+    .lh-stop--1 .lh-stop-meta { left: 14px; }
+    .lh-stop--2 .lh-stop-name, .lh-stop--3 .lh-stop-name, .lh-stop--2 .lh-stop-meta, .lh-stop--3 .lh-stop-meta { left: 0; transform: translateX(-50%); }
+    .lh-stop--4 .lh-stop-name { left: -6px; }
+    .lh-stop--4 .lh-stop-meta { right: 14px; }
+
+    .lh-intro { padding: 96px 0 120px; }
+    .lh-intro-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; }
+    .lh-intro-label { grid-column: 1 / span 3; margin-top: 10px; }
+    .lh-intro-p { grid-column: 4 / span 8; font-size: 40px; }
+
+    .lh-stages { padding: 0 0 136px; }
+    .lh-stages-head { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 40px; border-bottom: 1px solid var(--text); }
+    .lh-stages .lh-h2 { font-size: 72px; }
+    .lh-count { font-family: var(--font-display); font-size: 28px; }
+    .lh-stages-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; padding-top: 48px; }
+    .lh-index-wrap { grid-column: 1 / span 5; align-self: start; position: sticky; top: 112px; }
+    .lh-index { display: flex; flex-direction: column; border-top: 1px solid var(--border); }
+    .lh-tab { display: grid; grid-template-columns: 96px 1fr auto; align-items: center; gap: 16px; width: 100%; min-height: 148px; padding: 24px 24px 24px 28px; border-bottom: 1px solid var(--border); color: var(--text); text-decoration: none; cursor: pointer; }
+    .lh-tab:hover { background: var(--surface-raised); color: var(--text); }
+    .lh-tab:hover .lh-tab-name { color: var(--text); }
+    .lh-tab-num { font-family: var(--font-display); font-size: 56px; font-weight: 500; line-height: 1; color: var(--tx); }
+    .lh-tab-text { display: flex; flex-direction: column; gap: 8px; }
+    .lh-tab-name { font-family: var(--font-display); font-size: 38px; font-weight: 500; line-height: 1.05; color: var(--text-muted); }
+    .lh-tab-range { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+    .lh-tab-end { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+    .lh-tab :global(.lh-tab-arrow) { opacity: 0; color: var(--text); }
+    .lh-tab[aria-selected='true'] { background: var(--surface-raised); box-shadow: inset 6px 0 0 var(--mark); }
+    .lh-tab[aria-selected='true'] .lh-tab-name { font-weight: 600; color: var(--text); }
+    .lh-tab[aria-selected='true'] :global(.lh-tab-arrow) { opacity: 1; }
+    /* Without JS every tab is a plain anchor: names stay full ink. */
+    :global(html:not(.js)) .lh-tab-name { color: var(--text); }
+    .lh-hint { margin-top: 24px; display: flex; align-items: center; gap: 12px; font-size: 14px; line-height: 1.5; color: var(--text-muted); }
+
+    .lh-panels { grid-column: 6 / span 7; display: flex; flex-direction: column; gap: 96px; }
+    .lh-panel { display: flex; flex-direction: column; }
+    .lh-photo { position: relative; }
+    .lh-photo-tag { position: absolute; z-index: 1; left: 16px; top: 16px; display: inline-flex; align-items: center; height: 32px; padding: 0 12px; background: var(--bg); font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tx); }
+    .lh-panel-body { display: flex; flex-direction: column; gap: 24px; padding-top: 40px; }
+    .lh-bar { width: 64px; height: 4px; background: var(--mark); }
+    .lh-panel-kicker { font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tx); }
+    .lh-h3 { font-family: var(--font-display); font-size: 64px; font-weight: 500; line-height: 1; }
+    .lh-panel-lead { max-width: 680px; font-family: var(--font-display); font-size: 30px; font-weight: 500; line-height: 1.3; }
+    .lh-dl { margin-top: 8px; display: grid; grid-template-columns: 120px 1fr; row-gap: 20px; column-gap: 24px; padding-top: 24px; border-top: 1px solid var(--border); }
+    .lh-dl .lh-dt { padding-top: 2px; font-size: 13px; }
+    .lh-dl .lh-dt--classes { padding-top: 10px; }
+    .lh-next { font-size: 18px; line-height: 1.4; }
+    .lh-panel-body :global(.lh-explore) { align-self: flex-start; margin-top: 8px; }
+
+    .lh-one { padding: 120px 0 136px; }
+    .lh-one-head { gap: 20px; }
+    .lh-one-body { margin-top: 72px; }
+    .lh-one-arc { position: relative; height: 72px; }
+    .lh-one-arc svg { display: block; width: 100%; height: 72px; overflow: visible; }
+    .lh-one-arc path { fill: none; stroke: var(--brand); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+    .lh-one-dot { position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -2px; border-radius: 50%; background: var(--brand); }
+    .lh-one-list { margin-top: 32px; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 32px; }
+    .lh-one-item { gap: 16px; padding-top: 24px; border-top: 1px solid var(--text); }
+    .lh-one-h3 { font-size: 34px; }
+    .lh-one-p { font-size: 17px; line-height: 1.65; }
+
+    .lh-ages { padding: 120px 0 128px; }
+    .lh-ages-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: auto auto 1fr; column-gap: 32px; row-gap: 20px; }
+    .lh-ages-head { grid-column: 1 / span 4; gap: 20px; }
+    .lh-ages-note { grid-column: 1 / span 4; font-size: 17px; line-height: 1.65; }
+    .lh-ages-grid :global(.lh-ages-cta) { grid-column: 1 / span 4; justify-self: start; align-self: start; margin-top: 12px; min-height: 0; height: 52px; padding: 0 22px 0 24px; }
+    .lh-ages-dl { grid-column: 6 / span 7; grid-row: 1 / span 3; margin: 0; align-self: center; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--border); }
+    .lh-age, .lh-age:nth-child(even) { gap: 10px; padding: 32px 24px; border-bottom: 0; border-left: 1px solid var(--border); }
+    .lh-age:first-child { padding-left: 0; border-left: 0; }
+    .lh-age:last-child { padding-right: 0; }
+    .lh-age-num { font-size: 96px; }
+    .lh-age-unit { font-size: 15px; }
+  }
+</style>

@@ -1,0 +1,15 @@
+# Founder tribute and Principal's message (P04 / P05, verbatim from the live site). No portraits or
+# signatures exist on the site, so both pages are typographic (FounderDesktop / PrincipalDesktop boards).
+main:
+  name: Neville Irani
+  honorific: Late Shri
+  roles: [Visionary, Educationalist, Engineer, Social worker, Philanthropist, Rotarian]
+  motto: Service Above Self
+  mottoCaption: His Rotary motto
+  lead: Neville was someone for whom destiny wasn’t written. He penned it down himself.
+  paragraphs:
+    - His unbound initiative, selfless social service, unassuming generosity and philanthropic contribution to individuals and organizations like Rotary International have lit up a thousand lives. A great man of extraordinary integrity and enthusiasm, whose name will never be forgotten, he was a leader who succeeded in every endeavour. He not only dreamt but also created and achieved what he dreamt through his hard work.
+    - Today, Neville is not with us physically, but he lives on in our hearts and in each and every brick of our institution. He is our life, our beacon that will always be there to guide us and show us the right path.
+  closing: Neville, we all KenBridgeans love you and miss you and will leave no stone unturned, as we march forward, to make your mission and dream of KenBridge a reality.
+  words: ['Good Thoughts,', 'Good Words,', 'Good Deeds.']
+  excerpt: His unbound initiative, selfless social service, unassuming generosity and philanthropic contribution to individuals and organizations like Rotary International have lit up a thousand lives.

@@ -1,0 +1,123 @@
+---
+// /information/rules (RulesDesktop, RulesMobile). Four groups keep the school's original rule numbers
+// (i–xv) as anchors (#rule-vii). Desktop: a sticky contents rail; phones: a native "Contents" disclosure.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/shell/Breadcrumbs.astro';
+import Icon from '../../components/ui/Icon.astro';
+import RelatedLinks from '../../components/info/RelatedLinks.astro';
+import { getMain } from '../../lib/site';
+
+const { rules: R } = await getMain('info');
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'School Information', href: '/information' }, { label: R.title }];
+---
+<BaseLayout
+  title="School Rules"
+  description="The 15 school rules at KenBridge School, Kalaburagi: arrival, uniform and grooming, food, and leave and meetings."
+  current="information"
+  breadcrumbs={crumbs}
+>
+  <section class="ru-hero" aria-labelledby="rH1">
+    <div class="container ru-hero-in">
+      <Breadcrumbs items={crumbs} />
+      <div class="ru-hero-row">
+        <h1 id="rH1" class="ru-h1">{R.title}</h1>
+        <p class="ru-meta">{R.meta}</p>
+      </div>
+    </div>
+  </section>
+
+  <details class="ru-mtoc only-sm">
+    <summary class="ru-sum">Contents<Icon name="chevron-down" size={16} class="ru-chev" /></summary>
+    <ul class="ru-toc-list" role="list">
+      {R.groups.map((g) => <li><a class="ru-toc" href={`#${g.id}`}><span class="ru-toc-t">{g.title}{g.parents && ' · For parents'}</span><span class="ru-toc-r">{g.range}</span></a></li>)}
+    </ul>
+  </details>
+
+  <div class="container ru-body">
+    <nav class="ru-rail only-lg" aria-label="Contents">
+      <p class="ru-rail-k">Contents</p>
+      <ul class="ru-rail-list" role="list">
+        {R.groups.map((g) => <li><a class="ru-toc" href={`#${g.id}`}><span class="ru-toc-t">{g.title}{g.parents && ' · For parents'}</span><span class="ru-toc-r">{g.range}</span></a></li>)}
+      </ul>
+      <p class="ru-rail-k ru-rail-k--gap">Related</p>
+      <ul class="ru-rel" role="list">
+        <li><a class="ru-link" href="/information/decorum">Decorum</a></li>
+        <li><a class="ru-link" href="/information/timings">School Timings</a></li>
+      </ul>
+    </nav>
+
+    <div class="ru-groups">
+      {R.groups.map((g) => (
+        <section id={g.id} class:list={['ru-group', g.parents && 'ru-group--parents']} aria-labelledby={`${g.id}-h`}>
+          {g.parents && <p class="ru-parents"><Icon name="people" size={14} />For parents</p>}
+          <h2 id={`${g.id}-h`} class="ru-h2">{g.title}{!g.parents && <span class="ru-count">{g.rules.length} rule{g.rules.length === 1 ? '' : 's'}</span>}</h2>
+          <ol class="ru-list" role="list">
+            {g.rules.map((r) => (
+              <li id={`rule-${r.n}`} class="ru-rule">
+                <span class="ru-n"><span class="vh">Rule </span>{r.n}.</span>
+                <p class="ru-p">{r.text}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))}
+    </div>
+  </div>
+
+  <RelatedLinks items={[
+    { title: 'Decorum', desc: 'Attendance, absence, withdrawal and suspension', href: '/information/decorum' },
+    { title: 'School Timings', desc: 'Terms, bells, class and period timings', href: '/information/timings' }
+  ]} />
+</BaseLayout>
+
+<style>
+  .ru-hero { padding: 12px 0 28px; }
+  .ru-hero-in, .ru-hero-row { display: flex; flex-direction: column; gap: 12px; }
+  .ru-h1 { font-family: var(--font-display); font-size: clamp(3.75rem, 2.4rem + 3.429vw, 6rem); font-weight: 500; line-height: 0.95; }
+  .ru-meta { font-size: 15px; color: var(--text-muted); }
+  .ru-mtoc { margin: 0 var(--margin); border-top: 1px solid var(--text); border-bottom: 1px solid var(--text); }
+  .ru-sum { display: flex; justify-content: space-between; align-items: center; min-height: 56px; cursor: pointer; font-size: 16px; font-weight: 700; list-style: none; }
+  .ru-sum::-webkit-details-marker { display: none; }
+  .ru-mtoc[open] :global(.ru-chev) { transform: rotate(180deg); }
+  .ru-toc-list { list-style: none; margin: 0 0 12px; padding: 0; border-top: 1px solid var(--border); }
+  .ru-toc { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 48px; padding: 8px 0; color: var(--text); text-decoration: none; }
+  .ru-toc:hover { color: var(--brand); }
+  .ru-toc:hover .ru-toc-t { text-decoration: underline; text-underline-offset: 5px; }
+  .ru-toc-t { font-size: 16px; font-weight: 600; }
+  .ru-toc-r { font-family: var(--font-display); font-size: 17px; font-style: italic; color: var(--text-muted); white-space: nowrap; }
+
+  .ru-body { padding-top: 36px; padding-bottom: 64px; }
+  .ru-groups { display: flex; flex-direction: column; gap: 44px; }
+  .ru-group { scroll-margin-top: 24px; }
+  .ru-group--parents { padding: 24px 20px 8px; background: var(--surface); border: 1px solid var(--border); box-shadow: inset 4px 0 0 var(--accent); }
+  .ru-parents { margin-bottom: 10px; display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 10px; background: var(--accent-tint); font-size: 12px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--warning-text); }
+  .ru-h2 { padding-bottom: 14px; border-bottom: 1px solid var(--text); display: flex; justify-content: space-between; align-items: baseline; gap: 16px; font-family: var(--font-display); font-size: 32px; font-weight: 500; line-height: 1; }
+  .ru-count { font-family: var(--font-body); font-size: 13px; font-weight: 600; color: var(--text-muted); }
+  .ru-list { list-style: none; margin: 0; padding: 0; }
+  .ru-rule { display: grid; grid-template-columns: 48px 1fr; gap: 10px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .ru-rule:target { background: var(--accent-tint); }
+  .ru-n { font-family: var(--font-display); font-size: 24px; font-style: italic; font-weight: 500; line-height: 1.1; color: var(--brand); }
+  .ru-p { font-size: 17px; line-height: 1.6; }
+
+  @media (min-width: 1024px) {
+    .ru-hero { padding: 28px 0 56px; border-bottom: 1px solid var(--border); }
+    .ru-hero-in { gap: 20px; }
+    .ru-hero-row { flex-direction: row; justify-content: space-between; align-items: flex-end; gap: 32px; padding-top: 12px; }
+    .ru-h1 { line-height: 0.92; }
+    .ru-meta { margin-bottom: 8px; font-size: 16px; }
+    .ru-body { padding-top: 64px; padding-bottom: 112px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; align-items: start; }
+    .ru-rail { grid-column: 1 / span 3; position: sticky; top: 112px; display: flex; flex-direction: column; gap: 10px; }
+    .ru-rail-k { font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+    .ru-rail-k--gap { margin-top: 24px; }
+    .ru-rail-list { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--border); }
+    .ru-rail .ru-toc { padding-left: 18px; }
+    .ru-rel { list-style: none; margin: 0; padding: 0; }
+    .ru-link { display: inline-flex; align-items: center; min-height: 44px; font-size: 16px; font-weight: 600; color: var(--brand); text-decoration: underline; text-decoration-color: var(--link-underline); text-underline-offset: 5px; }
+    .ru-groups { grid-column: 5 / span 8; gap: 64px; }
+    .ru-group--parents { padding: 36px 40px 16px; }
+    .ru-h2 { font-size: 40px; }
+    .ru-rule { grid-template-columns: 72px 1fr; gap: 16px; padding: 22px 0; }
+    .ru-n { font-size: 30px; }
+    .ru-p { font-size: 19px; line-height: 1.65; }
+  }
+</style>

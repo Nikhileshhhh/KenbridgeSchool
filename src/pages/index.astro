@@ -1,0 +1,45 @@
+---
+// Home (HomeDesktop 1–3, HomeMobile 1–3, *Reduced, Journey, HomeJourneyScroll, EmblemHero, EmblemMobile).
+// Emotional curve: Wonder → Curiosity → Trust → Understanding → Confidence → Action.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HomeHero from '../components/home/HomeHero.astro';
+import ValuesBand from '../components/home/ValuesBand.astro';
+import IdeaSection from '../components/home/IdeaSection.astro';
+import VisionMission from '../components/home/VisionMission.astro';
+import Journey from '../components/home/Journey.astro';
+import ProofNumbers from '../components/home/ProofNumbers.astro';
+import Achievers from '../components/home/Achievers.astro';
+import CampusScenes from '../components/home/CampusScenes.astro';
+import FacilitiesMosaic from '../components/home/FacilitiesMosaic.astro';
+import LifeSection from '../components/home/LifeSection.astro';
+import AdmissionsPath from '../components/home/AdmissionsPath.astro';
+import QuickAccess from '../components/home/QuickAccess.astro';
+import ClosingScene from '../components/home/ClosingScene.astro';
+import TourDialog from '../components/home/TourDialog.astro';
+---
+<BaseLayout
+  title="Home"
+  description="KenBridge School Gulbarga is a CBSE English-medium school in Kalaburagi, Karnataka, founded in 2011 by the Homi Educational Trust. Pre-KG to Class X."
+  header="hero"
+>
+  <HomeHero />
+  <ValuesBand />
+  <IdeaSection />
+  <VisionMission />
+  <Journey />
+  <ProofNumbers />
+  <Achievers />
+  <CampusScenes />
+  <FacilitiesMosaic />
+  <LifeSection />
+  <AdmissionsPath />
+  <QuickAccess />
+  <ClosingScene />
+  <TourDialog />
+</BaseLayout>
+
+<script>
+  import '../scripts/emblem/emblem.js';
+  import '../scripts/journey.js';
+  import '../scripts/home.js';
+</script>

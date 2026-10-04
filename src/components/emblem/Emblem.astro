@@ -1,0 +1,235 @@
+---
+// Emblem / EmblemSpec boards. The stage always renders the official artwork as five stacked
+// layers at 81.27% of the stage (the exact footprint of the 3D emblem at rest). That static
+// layer is the first paint, the reduced-motion state and the no-WebGL state. When `live` is set
+// (Home only), src/scripts/emblem/emblem.js may load the 3D engine and fade a canvas in over it.
+// "What our logo means": a <details> list without JS; real buttons with aria-pressed with JS.
+import { Image } from 'astro:assets';
+import FlameMark from '../ui/FlameMark.astro';
+import Icon from '../ui/Icon.astro';
+import head from '../../assets/brand/part-head.png';
+import book from '../../assets/brand/part-book.png';
+import nib from '../../assets/brand/part-nib.png';
+import flame from '../../assets/brand/part-flame.png';
+import rays from '../../assets/brand/part-rays.png';
+import logo from '../../assets/brand/logo-official-transparent.png';
+
+interface Props {
+  /** Stage size in px, desktop and below 1024px. */
+  size: number;
+  sizeSm?: number;
+  surface?: 'night' | 'ivory' | 'none';
+  /** Ivory pool behind the emblem on dark (maroon on night is only 1.67 : 1). */
+  pool?: boolean;
+  meaning?: boolean;
+  meaningOpen?: boolean;
+  kenLine?: boolean;
+  /** Allow the 3D engine (Home only). */
+  live?: boolean;
+  /** Load the static layers eagerly (hero). */
+  eager?: boolean;
+  /** Marks the hero emblem that travels to the header logo on scroll. */
+  travel?: boolean;
+  dark?: boolean;
+  class?: string;
+}
+const {
+  size, sizeSm = size, surface = 'none', pool = true, meaning = false, meaningOpen = false,
+  kenLine = true, live = false, eager = false, travel = false, dark = true, class: cls
+} = Astro.props;
+
+const parts = [
+  { key: 'head', num: '01', label: 'Head of Student', x: '30%', y: '12%' },
+  { key: 'book', num: '02', label: 'Book', x: '18%', y: '32%' },
+  { key: 'nib', num: '03', label: 'Pen Tip', x: '33%', y: '91%' },
+  { key: 'flame', num: '04', label: 'Flame of Knowledge', x: '66%', y: '6%' },
+  { key: 'rays', num: '05', label: 'Rays of Education', x: '84%', y: '86%' }
+];
+// Stacking order from the Emblem board: book, nib, flame, rays, head.
+const layers = [
+  { key: 'book', src: book }, { key: 'nib', src: nib }, { key: 'flame', src: flame },
+  { key: 'rays', src: rays }, { key: 'head', src: head }
+];
+---
+<div
+  class:list={['emblem', dark ? 'emblem--dark' : 'emblem--light', `emblem--${surface}`, cls]}
+  style={`--emblem-size:${size}px;--emblem-size-sm:${sizeSm}px`}
+  data-emblem
+  data-live={live ? 'true' : undefined}
+  data-travel={travel ? 'true' : undefined}
+>
+  <div
+    class="emblem-stage"
+    role="img"
+    aria-label="KenBridge School emblem: the head of a student, an open book, a pen tip, the flame of knowledge and the rays of education"
+    data-emblem-stage
+  >
+    {pool && dark && <div class="emblem-pool" aria-hidden="true"></div>}
+    <div class="emblem-static" aria-hidden="true" data-emblem-static>
+      <Image
+        src={logo}
+        alt=""
+        width={512}
+        height={512}
+        format="png"
+        loading={eager ? 'eager' : 'lazy'}
+        fetchpriority={eager ? 'high' : undefined}
+        class="emblem-full"
+        draggable="false"
+      />
+      {meaning && layers.map((l) => (
+        <Image
+          src={l.src}
+          alt=""
+          width={512}
+          height={512}
+          format="png"
+          loading={eager ? 'eager' : 'lazy'}
+          class="emblem-layer"
+          data-part={l.key}
+          draggable="false"
+        />
+      ))}
+    </div>
+    {meaning && parts.map((p) => (
+      <div class="emblem-card" style={`left:${p.x};top:${p.y}`} aria-hidden="true" data-card={p.key} hidden>
+        <span class="emblem-card-num tnum">{p.num}</span><span class="emblem-card-label">{p.label}</span>
+      </div>
+    ))}
+  </div>
+
+  {meaning && (
+    <details class="emblem-meaning" open={meaningOpen} data-emblem-meaning>
+      <summary class="emblem-toggle">
+        <FlameMark size={14} onDark={dark} />
+        <span>What our logo means</span>
+        <Icon name="chevron-down" size={12} class="emblem-chev" />
+      </summary>
+      <div class="emblem-panel">
+        <ul class="emblem-chips" aria-label="Parts of the emblem" role="list">
+          {parts.map((p) => (
+            <li>
+              <button type="button" class="emblem-chip js-only" aria-pressed="false" data-chip={p.key}>
+                <span class="emblem-chip-num tnum">{p.num}</span>{p.label}
+              </button>
+              <span class="emblem-chip emblem-chip--static no-js-only"><span class="emblem-chip-num tnum">{p.num}</span>{p.label}</span>
+            </li>
+          ))}
+        </ul>
+        {kenLine && (
+          <p class="emblem-ken">
+            <strong>KEN</strong> = one’s range of knowledge · <strong>BRIDGE</strong> = a structure carrying a road, a path.
+          </p>
+        )}
+      </div>
+    </details>
+  )}
+  <p class="vh" aria-live="polite" data-emblem-announce></p>
+</div>
+
+<style>
+  .emblem {
+    --ink: var(--text-on-dark);
+    --muted: var(--text-on-dark-muted);
+    --line: rgba(251, 247, 240, 0.28);
+    position: relative;
+    width: var(--emblem-size-sm);
+    max-width: 100%;
+    color: var(--ink);
+  }
+  .emblem--light { --ink: var(--text); --muted: var(--text-muted); --line: var(--border); }
+  .emblem--night { background: var(--surface-dark); padding: 40px; box-sizing: content-box; }
+  .emblem--ivory { background: var(--bg); padding: 40px; box-sizing: content-box; }
+  @media (min-width: 1024px) { .emblem { width: var(--emblem-size); } }
+
+  .emblem-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    touch-action: pan-y;
+    transform-origin: 50% 50%;
+  }
+  .emblem-pool {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(255, 244, 227, 0.96) 0%, rgba(255, 244, 227, 0.82) 48%, rgba(255, 244, 227, 0.34) 74%, rgba(255, 244, 227, 0) 100%);
+  }
+  .emblem-static { position: absolute; left: 9.365%; top: 9.365%; width: 81.27%; height: 81.27%; transition: opacity 220ms ease-out; }
+  /* At rest: the official artwork itself. While a part is highlighted: the five cut layers. */
+  .emblem-static :global(.emblem-full) { position: absolute; inset: 0; width: 100%; height: 100%; user-select: none; transition: opacity 220ms ease-out; }
+  .emblem-static.is-parts :global(.emblem-full) { opacity: 0; }
+  .emblem-static:not(.is-parts) :global(.emblem-layer) { opacity: 0; }
+  .emblem-static :global(.emblem-layer) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    user-select: none;
+    transition: opacity 220ms ease-out, transform 220ms var(--ease-out);
+  }
+  .emblem-static :global(.emblem-layer.is-dim) { opacity: 0.28; }
+  .emblem-static :global(.emblem-layer.is-lift) { transform: translateY(-4px) scale(1.012); }
+  .emblem :global(canvas) { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; opacity: 0; transition: opacity 220ms ease-out; }
+  .emblem :global(canvas.is-on) { opacity: 1; }
+  .emblem-stage.has-3d .emblem-static { opacity: 0; }
+
+  .emblem-card {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px 8px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(42, 10, 11, 0.12), 0 10px 24px -12px rgba(42, 10, 11, 0.45);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .emblem-card[hidden] { display: none; }
+  .emblem-card-num { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; color: var(--brand); }
+  .emblem-card-label { font-size: 15px; font-weight: 700; }
+
+  .emblem-meaning { margin-top: 16px; }
+  .emblem-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 0 2px;
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+  }
+  .emblem-toggle::-webkit-details-marker { display: none; }
+  .emblem-toggle :global(.emblem-chev) { transition: transform var(--dur-micro); }
+  .emblem-meaning[open] .emblem-toggle :global(.emblem-chev) { transform: rotate(180deg); }
+  .emblem-panel { display: flex; flex-direction: column; gap: 14px; padding-top: 14px; }
+  .emblem-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .emblem-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid rgba(251, 247, 240, 0.45);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .emblem--light .emblem-chip { border-color: var(--border-strong); background: var(--surface); }
+  .emblem-chip.is-on { border-color: var(--accent); background: var(--accent); color: var(--text); }
+  .emblem-chip-num { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; opacity: 0.8; }
+  .emblem-ken { margin: 0; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; line-height: 1.55; color: var(--muted); }
+  .emblem-ken strong { color: var(--ink); letter-spacing: 0.06em; }
+  @media (prefers-reduced-motion: reduce) {
+    .emblem-static, .emblem-static :global(.emblem-layer), .emblem :global(canvas), .emblem-toggle :global(.emblem-chev) { transition: none; }
+  }
+</style>

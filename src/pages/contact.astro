@@ -1,0 +1,255 @@
+---
+// /contact (ContactDesktop, ContactMobile, ContactForm). Desktop: campus photo beside the essentials
+// (call, email, address), then office hours beside the map, "Write to us", and shortcuts. Phones: the
+// essentials first, then hours, the photo, the map, the form and the shortcuts.
+// The Google map is never loaded until asked for: a light drawing shows first, and "Show interactive
+// map" (JS) swaps in the embed. Without JS the drawing stays and "Open in Google Maps" is the way out.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ContactForm from '../components/forms/ContactForm.astro';
+import Icon from '../components/ui/Icon.astro';
+import ServiceIcon from '../components/ui/ServiceIcon.astro';
+import { getMain, getSchool, getServices } from '../lib/site';
+
+const { contact: C } = await getMain('contact');
+const school = await getSchool();
+const services = await getServices();
+const enquiry = services.admissionEnquiry;
+const a = school.address;
+const shortcuts = C.shortcuts.map((s) => ({ ...s, url: services[s.service].url, domain: s.domain ?? services[s.service].domain }));
+---
+<BaseLayout
+  title="Contact"
+  description="Contact KenBridge School, Shahabad Road, Kalaburagi: phone numbers, WhatsApp, email, address and directions, office hours, and a form to write to the school."
+  current="contact"
+>
+  <section class="ct-top" aria-labelledby="ctH1">
+    <div class="ct-photo only-lg" role="img" aria-label={C.photo.alt}><span class="ct-photo-l">{C.photo.label}</span></div>
+    <div class="ct-intro">
+      <div class="ct-hero">
+        <h1 id="ctH1" class="ct-h1">{C.title}</h1>
+        <p class="ct-lead">{C.lead}</p>
+      </div>
+      <div class="ct-ess">
+        <div>
+          <h2 class="ct-k">Call</h2>
+          <div class="ct-calls">
+            {school.phones.slice(0, 2).map((p, i) => (
+              <a class="ct-row" href={`tel:${p.tel}`}><Icon name="phone" size={22} class="ct-ico" /><span class="ct-num tnum"><span class="vh">Call </span>{p.display}</span>{C.phoneNotes[i] && <span class="ct-note">{C.phoneNotes[i]}</span>}</a>
+            ))}
+            <div class="ct-pair">
+              <a class="ct-row" href={`tel:${school.phones[2].tel}`}><Icon name="phone" size={22} class="ct-ico" /><span class="ct-num tnum"><span class="vh">Call </span>{school.phones[2].display}</span></a>
+              <a class="ct-row ct-wa" href={school.whatsapp.href} target="_blank" rel="noopener"><Icon name="whatsapp" size={20} class="ct-wa-ico" />WhatsApp<span class="ct-wa-num tnum"> {school.phones[2].display}</span><span class="vh"> (opens WhatsApp)</span></a>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h2 class="ct-k">Email</h2>
+          <a class="ct-row ct-mail" href={`mailto:${school.email}`}><Icon name="mail" size={22} class="ct-ico" />{school.email}</a>
+        </div>
+        <div>
+          <h2 class="ct-k">Address</h2>
+          <div class="ct-addr">
+            <address class="ct-address"><Icon name="pin" size={22} class="ct-ico ct-ico--top" /><span>{a.name}, {a.street.split(', ')[0]},<br />{a.street.split(', ').slice(1).join(', ')},<br />{a.city},<br />{a.region}, India</span></address>
+            <a class="ct-dir" href={C.map.directions} target="_blank" rel="noopener"><Icon name="directions" size={18} />Get directions<span class="vh"> in Google Maps (opens in a new tab)</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ct-hm" aria-label="Hours and map">
+    <div class="ct-hm-grid">
+      <div class="ct-hours-wrap">
+        <aside class="ct-hours" aria-labelledby="ctHours">
+          <h2 id="ctHours" class="ct-h2"><ServiceIcon name="clock" size={22} />Office hours</h2>
+          <table class="ct-hours-t tnum">
+            <caption class="vh">School office working hours</caption>
+            <tbody>{school.hours.map((h) => <tr><th scope="row">{h.daysLong ?? h.days}</th><td class:list={[h.time === 'Holiday' && 'ct-muted']}>{h.time}</td></tr>)}</tbody>
+          </table>
+          <p class="ct-meet">{C.meeting}</p>
+        </aside>
+      </div>
+      <div class="ct-photo ct-photo--sm only-sm" role="img" aria-label={C.photo.alt}><span class="ct-photo-l">{C.photo.label}</span></div>
+      <section class="ct-map" aria-labelledby="ctMap">
+        <div class="ct-map-head">
+          <h2 id="ctMap" class="ct-h2">On the map</h2>
+          <a class="ct-link" href={C.map.directions} target="_blank" rel="noopener">Open in Google Maps<Icon name="external" size={15} /><span class="vh"> (opens in a new tab)</span></a>
+        </div>
+        <div class="ct-map-box" data-map data-embed={C.map.embed} data-title={C.map.iframeTitle}>
+          <svg class="ct-drawing" aria-hidden="true" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice"><rect width="800" height="450" fill="#F3ECE1" /><g fill="none" stroke="#E2D6C6" stroke-width="14" stroke-linecap="round"><path d="M-20 300C160 270 300 240 460 250S720 300 820 280" /><path d="M220 -20C240 120 250 260 230 470" /><path d="M560 -20C540 140 600 300 640 470" /></g><g fill="none" stroke="#EAE0D2" stroke-width="6"><path d="M-20 130H820" /><path d="M380 -20V470" /><path d="M60 -20L300 470" /></g><g fill="#E6EBD9"><rect x="420" y="60" width="110" height="60" rx="6" /><rect x="80" y="330" width="120" height="80" rx="6" /></g><circle cx="400" cy="235" r="34" fill="#7F0305" opacity="0.12" /><path d="M400 250S384 232 384 221A16 16 0 0 1 416 221C416 232 400 250 400 250Z" fill="#7F0305" /><circle cx="400" cy="221" r="5.5" fill="#FFFFFF" /><text x="400" y="290" text-anchor="middle" fill="#5C534D" style="font: 600 15px Manrope, sans-serif">{C.map.drawingLabel}</text></svg>
+          <div class="ct-map-bar" data-map-bar>
+            <p class="ct-map-note">{C.map.note}</p>
+            <button type="button" class="ct-map-btn js-only" data-map-load><Icon name="pin" size={18} />Show interactive map</button>
+            <a class="ct-map-btn no-js-only" href={C.map.directions} target="_blank" rel="noopener"><Icon name="pin" size={18} />Open in Google Maps<span class="vh"> (opens in a new tab)</span></a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section class="ct-write" aria-labelledby="ctFormT">
+    <div class="container ct-write-grid">
+      <div class="ct-write-t">
+        <h2 id="ctFormT" class="ct-h2 ct-h2--xl">{C.form.title}</h2>
+        <p class="ct-write-p">{C.form.intro} <a class="ct-link ct-link--inline" href={enquiry.url} target="_blank" rel="noopener">{C.form.introLink}<Icon name="external" size={15} /><span class="vh"> (opens in a new tab)</span></a> {C.form.introAfter}</p>
+      </div>
+      <div class="ct-form"><ContactForm labelledBy="ctFormT" /></div>
+    </div>
+  </section>
+
+  <section class="ct-short" aria-labelledby="ctShort">
+    <div class="container ct-short-in">
+      <div class="ct-short-head">
+        <h2 id="ctShort" class="ct-h2 ct-h2--lg">Shortcuts</h2>
+        <p class="ct-legend"><Icon name="external" size={15} /> opens another site</p>
+      </div>
+      <ul class="ct-tiles" role="list">
+        {shortcuts.map((s) => (
+          <li>
+            <a class="ct-tile" href={s.url} target="_blank" rel="noopener">
+              <span class="ct-tile-top"><ServiceIcon name={s.icon} /><Icon name="external" size={15} class="ct-tile-ext" /></span>
+              <span class="ct-tile-b">
+                <span class="ct-tile-t">{s.title}</span>
+                <span class="ct-tile-d">{s.desc}</span>
+                <span class="ct-tile-dom">{s.domain}</span>
+              </span>
+              <span class="vh"> (opens in a new tab)</span>
+            </a>
+          </li>
+        ))}
+        <li>
+          <div class="ct-tile ct-tile--follow">
+            <ServiceIcon name="follow" />
+            <span class="ct-tile-t ct-follow-t">Follow the school</span>
+            <span class="ct-chips">
+              <a class="ct-chip" href={school.social.facebook} target="_blank" rel="noopener">Facebook<Icon name="external" size={15} /><span class="vh"> (opens in a new tab)</span></a>
+              <a class="ct-chip" href={school.social.youtube} target="_blank" rel="noopener">YouTube<Icon name="external" size={15} /><span class="vh"> (opens in a new tab)</span></a>
+            </span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import '../scripts/contact.js';
+</script>
+
+<style>
+  .ct-top { display: flex; flex-direction: column; }
+  .ct-photo { position: relative; background: radial-gradient(ellipse 70% 55% at 55% 42%, rgba(150, 110, 70, 0.55) 0%, rgba(59, 20, 22, 0) 72%), radial-gradient(ellipse 50% 30% at 30% 75%, rgba(110, 120, 70, 0.45) 0%, rgba(59, 20, 22, 0) 70%), #4A2A22; color: #E8DCCF; }
+  .ct-photo--sm { aspect-ratio: 4 / 3; }
+  .ct-photo-l { position: absolute; left: 16px; bottom: 14px; font-size: 12px; }
+  .ct-intro { display: flex; flex-direction: column; gap: 0; }
+  .ct-hero { display: flex; flex-direction: column; gap: 10px; padding: 24px var(--margin) 28px; }
+  .ct-h1 { font-family: var(--font-display); font-size: clamp(3.25rem, 2.229rem + 4.19vw, 6rem); font-weight: 500; line-height: 0.98; letter-spacing: -0.015em; }
+  .ct-lead { font-size: 18px; color: var(--text-muted); }
+  .ct-ess { display: flex; flex-direction: column; gap: 24px; padding: 0 var(--margin) 36px; }
+  .ct-k { margin-bottom: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); }
+  .ct-calls { display: flex; flex-direction: column; gap: 8px; }
+  .ct-pair { display: grid; grid-template-columns: 1fr; gap: 8px; }
+  .ct-row { display: flex; align-items: center; gap: 14px; min-height: 60px; padding: 0 16px; border: 1px solid var(--border); background: var(--surface); color: var(--text); text-decoration: none; }
+  .ct-row:hover { border-color: var(--brand); background: var(--surface-raised); color: var(--text); }
+  .ct-row :global(.ct-ico) { color: var(--brand); flex-shrink: 0; }
+  .ct-num { font-size: 22px; font-weight: 700; letter-spacing: 0.01em; }
+  .ct-note { margin-left: auto; font-size: 13px; color: var(--text-muted); }
+  .ct-wa { gap: 8px; font-size: 15px; font-weight: 700; }
+  .ct-row :global(.ct-wa-ico) { color: var(--success); flex-shrink: 0; }
+  .ct-mail { font-size: 16px; font-weight: 700; overflow-wrap: anywhere; }
+  .ct-addr { display: flex; flex-direction: column; gap: 14px; padding: 16px; border: 1px solid var(--border); background: var(--surface); }
+  .ct-address { display: flex; gap: 14px; font-style: normal; font-size: 16px; line-height: 1.55; }
+  .ct-address :global(.ct-ico) { color: var(--brand); flex-shrink: 0; margin-top: 2px; }
+  .ct-dir { display: flex; justify-content: center; align-items: center; gap: 10px; min-height: 52px; border-radius: var(--radius-md); background: var(--brand); color: #FFFFFF; font-size: 16px; font-weight: 700; text-decoration: none; }
+  .ct-dir:hover { background: var(--brand-hover); color: #FFFFFF; }
+
+  .ct-h2 { display: flex; align-items: center; gap: 12px; font-family: var(--font-display); font-size: 28px; font-weight: 500; line-height: 1.1; }
+  .ct-hm-grid { display: flex; flex-direction: column; }
+  .ct-hours-wrap { padding: 0 var(--margin) 36px; }
+  .ct-hours { display: flex; flex-direction: column; gap: 16px; padding: 22px 18px; background: var(--surface); border: 1px solid var(--border); box-shadow: inset 0 4px 0 var(--accent); }
+  .ct-hours-t { width: 100%; border-collapse: collapse; font-size: 17px; }
+  .ct-hours-t tr { border-top: 1px solid var(--border); }
+  .ct-hours-t tr:last-child { border-bottom: 1px solid var(--border); }
+  .ct-hours-t th { padding: 12px 12px 12px 0; text-align: left; font-weight: 600; }
+  .ct-hours-t td { padding: 12px 0; text-align: right; }
+  .ct-muted { color: var(--text-muted); }
+  .ct-meet { padding: 14px 16px; background: var(--accent-tint); font-size: 15px; line-height: 1.55; }
+  .ct-map { display: flex; flex-direction: column; gap: 14px; padding: 36px var(--margin) 48px; }
+  .ct-map-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .ct-link { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 15px; font-weight: 600; color: var(--brand); text-decoration: underline; text-decoration-color: rgba(127, 3, 5, 0.4); text-underline-offset: 5px; }
+  .ct-link:hover { text-decoration-thickness: 2px; text-decoration-color: currentColor; }
+  .ct-link--inline { display: inline; min-height: 0; font-size: inherit; }
+  .ct-link--inline :global(svg) { display: inline; vertical-align: -2px; margin-left: 4px; }
+  .ct-map-box { position: relative; aspect-ratio: 4 / 3; border: 1px solid var(--border); overflow: hidden; background: var(--surface-disabled); }
+  .ct-drawing { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .ct-map-bar { position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; gap: 10px; padding: 12px; background: rgba(255, 253, 248, 0.94); border-top: 1px solid var(--border); }
+  .ct-map-note { font-size: 13px; line-height: 1.45; color: var(--text-muted); }
+  .ct-map-btn { flex-shrink: 0; display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 48px; padding: 0 18px; border: 1.5px solid var(--brand); border-radius: var(--radius-md); background: #FFFFFF; color: var(--brand); font-size: 15px; font-weight: 600; text-decoration: none; }
+  .ct-map-btn:hover { background: var(--brand-tint); color: var(--brand); }
+  .ct-map-box :global(.ct-embed) { position: absolute; inset: 0; }
+  .ct-map-box :global(iframe) { width: 100%; height: 100%; border: 0; display: block; }
+
+  .ct-write { padding: 48px 0 52px; background: var(--surface-raised); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .ct-write-grid { display: flex; flex-direction: column; gap: 18px; }
+  .ct-write-t { display: flex; flex-direction: column; gap: 12px; }
+  .ct-h2.ct-h2--xl { font-size: clamp(2.5rem, 1.943rem + 2.286vw, 3.5rem); line-height: 1; }
+  .ct-write-p { font-size: 16px; line-height: 1.6; }
+
+  .ct-short { padding: 48px 0 56px; }
+  .ct-short-in { display: flex; flex-direction: column; gap: 18px; }
+  .ct-short-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+  .ct-h2.ct-h2--lg { font-size: clamp(2.25rem, 1.821rem + 1.714vw, 3rem); line-height: 1; }
+  .ct-legend { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); }
+  .ct-tiles { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .ct-tile { height: 100%; display: flex; flex-direction: column; gap: 14px; padding: 18px; background: var(--surface); border: 1px solid var(--border); color: var(--text); text-decoration: none; }
+  a.ct-tile:hover { border-color: var(--brand); color: var(--text); }
+  a.ct-tile:hover .ct-tile-t { color: var(--brand); text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px; }
+  .ct-tile-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .ct-tile-top :global(.ct-tile-ext) { color: var(--brand); }
+  .ct-tile-b { display: flex; flex-direction: column; gap: 4px; margin-top: auto; }
+  .ct-tile-t { font-family: var(--font-display); font-size: 24px; font-weight: 500; line-height: 1.05; }
+  .ct-follow-t { margin-top: auto; }
+  .ct-tile-d { font-size: 14px; line-height: 1.45; color: var(--text-muted); }
+  .ct-tile-dom { font-size: 12px; color: var(--text-muted); overflow-wrap: anywhere; }
+  .ct-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ct-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 1px solid var(--border-strong); border-radius: 999px; color: var(--text); text-decoration: none; font-size: 14px; font-weight: 600; }
+  .ct-chip:hover { border-color: var(--brand); color: var(--brand); }
+
+  @media (min-width: 1024px) {
+    .ct-top { display: grid; grid-template-columns: 1fr 1fr; min-height: 860px; border-bottom: 1px solid var(--border); }
+    .ct-photo.only-lg { min-height: 860px; }
+    .ct-intro { padding: 64px 64px 72px; gap: 36px; }
+    .ct-hero { padding: 0; gap: 12px; }
+    .ct-h1 { line-height: 0.92; }
+    .ct-lead { font-size: 20px; }
+    .ct-ess { padding: 0; gap: 28px; }
+    .ct-row { padding: 0 20px; }
+    .ct-num { font-size: 26px; }
+    .ct-pair { grid-template-columns: 1fr auto; }
+    .ct-wa-num { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .ct-mail { font-size: 19px; }
+    .ct-addr { padding: 20px; }
+    .ct-address { font-size: 18px; }
+
+    .ct-hm-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; align-items: start; max-width: var(--page-max); margin: 0 auto; padding: 96px 64px; }
+    .ct-hours-wrap { grid-column: 1 / span 4; padding: 0; }
+    .ct-hours { padding: 32px; }
+    .ct-h2 { font-size: 34px; }
+    .ct-map { grid-column: 5 / span 8; padding: 0; }
+    .ct-map-box { aspect-ratio: 16 / 9; }
+    .ct-map-bar { flex-direction: row; justify-content: space-between; align-items: center; padding: 16px 20px; }
+
+    .ct-write { padding: 104px 0; }
+    .ct-write-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; }
+    .ct-write-t { grid-column: 1 / span 4; gap: 16px; }
+    .ct-write-p { font-size: 17px; }
+    .ct-form { grid-column: 6 / span 7; }
+
+    .ct-short { padding: 96px 0 112px; }
+    .ct-short-in { gap: 28px; }
+    .ct-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+    .ct-tile { padding: 24px; }
+    a.ct-tile { min-height: 176px; }
+    .ct-tile-t { font-size: 28px; }
+  }
+</style>

@@ -1,0 +1,520 @@
+---
+// /admissions (AdmissionsDesktop, AdmissionsMobile, AdmissionsMobileScroll). Status and actions first,
+// then age criteria, the four-step procedure, notes and a printable documents checklist, FAQ, enquiry
+// and the office. Without JS every step and answer is open and the toggles are hidden.
+// Phones get a sticky Enquire bar that rides along and comes to rest above the enquiry section.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/shell/Breadcrumbs.astro';
+import Icon from '../components/ui/Icon.astro';
+import EnquiryForm from '../components/forms/EnquiryForm.astro';
+import { getMain, getSchool, getServices, getSettings } from '../lib/site';
+import { admissionsBanner } from '../lib/admissions-status';
+
+const A = await getMain('admissions');
+const school = await getSchool();
+const services = await getServices();
+const { admissions } = await getSettings();
+const status = admissionsBanner(admissions.state, admissions.statusText);
+const statusIcon = { info: 'M8 7.5V11.5M8 4.6V4.7', check: 'M4.5 8.3L7 10.8L11.5 5.8', clock: 'M8 4.5V8.2L10.4 9.6' }[status.icon];
+const enquiry = services.admissionEnquiry;
+const brochure = services.brochure;
+const [phone1, phone2] = school.phones;
+const steps = A.procedure.steps.map((s, i) => ({ ...s, n: `0${i + 1}` }));
+const tops = [61, 10, 0, 19];
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'Admissions' }];
+---
+<BaseLayout
+  title="Admissions"
+  description="Admissions at KenBridge School, Kalaburagi: age criteria (as on 1 June), the four-step procedure, the documents checklist, FAQs and how to enquire."
+  current="admissions"
+  breadcrumbs={crumbs}
+>
+  <section class="am-first" aria-labelledby="admH1">
+    <div class="container am-first-grid">
+      <div class="am-crumbs only-lg"><Breadcrumbs items={crumbs} /></div>
+      <div class="am-lead">
+        <h1 id="admH1" class="am-h1">{A.title}</h1>
+        <div class="am-status" role="status" style={`--bar:${status.bar}`}>
+          <span class="am-status-icon" aria-hidden="true" style={`background:${status.iconBg}`}>
+            <svg viewBox="0 0 16 16" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={statusIcon} /></svg>
+          </span>
+          <div class="am-status-text">
+            <p class="am-status-label tnum" style={`color:${status.labelColor}`}>{status.label}</p>
+            <p class="am-status-p">{status.text}</p>
+          </div>
+        </div>
+        <div class="am-ctas">
+          <a class="am-btn am-btn--primary" href={enquiry.url} target="_blank" rel="noopener">{A.ctas.enquire}<Icon name="external" size={16} /><span class="vh"> (opens the school’s enquiry form in a new tab)</span></a>
+          <a class="am-btn am-btn--secondary tnum" href={`tel:${phone1.tel}`}><Icon name="phone" size={18} />{A.ctas.call}</a>
+          <a class="am-link am-brochure" href={brochure.url} target="_blank" rel="noopener"><Icon name="download" size={18} />{A.ctas.brochure}<span class="vh">, KenBridge School prospectus (opens in a new tab)</span></a>
+        </div>
+      </div>
+      <aside class="am-glance only-lg" aria-labelledby="glanceTitle">
+        <h2 id="glanceTitle" class="am-glance-title">{A.glance.title}</h2>
+        <ol class="am-glance-list" role="list">
+          {steps.map((s) => (
+            <li><a href={`#step-${s.n}`} class="am-glance-link" data-step-reveal={s.n}><span class="am-glance-num tnum">{s.n}</span><span class="am-glance-text"><span class="am-glance-t">{s.title}</span><span class="am-glance-s">{s.summary}</span></span></a></li>
+          ))}
+        </ol>
+        <p class="am-glance-ages tnum">{A.glance.ages}</p>
+      </aside>
+    </div>
+  </section>
+
+  <nav class="am-jumps only-lg" aria-label="On this page">
+    <div class="container"><ul class="am-jumps-list" role="list">
+      {A.jumps.map((j) => <li><a class="am-jump" href={`#${j.id}`}>{j.label}</a></li>)}
+    </ul></div>
+  </nav>
+
+  <!-- Everything up to the enquiry section: the phone sticky bar lives at the end of this wrapper. -->
+  <div class="am-sticky-scope">
+    <section id="age" class="am-age" aria-labelledby="ageTitle">
+      <div class="container am-age-grid">
+        <div class="am-age-head">
+          <p class="eyebrow-text am-red">{A.age.eyebrow}</p>
+          <h2 id="ageTitle" class="am-h2">{A.age.title}</h2>
+          <p class="am-age-p"><span class="only-lg">{A.age.intro} </span>Ages are as on <strong class="am-nowrap">1 June</strong> of the academic year.</p>
+        </div>
+        <div class="am-age-body">
+          <table class="am-table tnum">
+            <caption class="vh">Minimum age for each class, as on 1 June of the academic year</caption>
+            <thead><tr><th scope="col">Class</th><th scope="col" class="am-right">Age on 1 June</th><th scope="col" class="am-prog only-lg">Programme</th></tr></thead>
+            <tbody>
+              {A.age.ages.map((a) => (
+                <tr>
+                  <th scope="row" class="am-cls">{a.cls}</th>
+                  <td class="am-right am-nowrap"><span class="am-years">{a.years}</span><span class="am-unit">years</span></td>
+                  <td class="am-prog only-lg">{a.programme}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p class="am-strict"><svg aria-hidden="true" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="none" stroke="#7F0305" stroke-width="1.6" /><path d="M10 9V14.5M10 6V6.1" fill="none" stroke="#7F0305" stroke-width="2" stroke-linecap="round" /></svg><span><strong>{A.age.strictLead}</strong> {A.age.strict}</span></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="procedure" class="am-proc" aria-labelledby="procTitle" data-steps>
+      <div class="container">
+        <div class="am-proc-head">
+          <div class="am-proc-title">
+            <p class="eyebrow-text am-red">{A.procedure.eyebrow}</p>
+            <h2 id="procTitle" class="am-h2">{A.procedure.title}</h2>
+            <p class="am-proc-note">{A.procedure.note}</p>
+          </div>
+          <button type="button" class="am-expand js-only only-lg noprint" aria-controls={steps.map((s) => `stepPanel${s.n}`).join(' ')} data-steps-all>Expand all steps</button>
+        </div>
+        <div class="am-steps-wrap">
+          <svg class="am-steps-arc only-lg" aria-hidden="true" focusable="false" viewBox="0 0 1312 100" preserveAspectRatio="none"><path d="M0 90A3108.83 3108.83 0 0 1 1312 90" /><path d="M0 82V100M1312 82V100" /></svg>
+          <svg class="am-steps-curve only-sm" aria-hidden="true" focusable="false" viewBox="0 0 48 100" preserveAspectRatio="none"><path d="M24 0Q40 50 24 100" /></svg>
+          <ol class="am-steps" role="list">
+            {steps.map((s, i) => (
+              <li id={`step-${s.n}`} class="am-step" style={`--top:${tops[i]}px`}>
+                <span class="am-step-n tnum" aria-hidden="true">{s.n}</span>
+                <div class="am-step-body">
+                  <h3 class="am-step-h"><span class="vh">Step {s.n}: </span>{s.title}</h3>
+                  <p class="am-step-s">{s.summary}</p>
+                  <button type="button" class="am-step-toggle js-only noprint" aria-expanded="true" aria-controls={`stepPanel${s.n}`} data-step-toggle>
+                    <Icon name="chevron-down" size={14} class="am-chev" /><span data-step-label>Hide details</span><span class="vh"> for step {s.n}, {s.title}</span>
+                  </button>
+                  <ul id={`stepPanel${s.n}`} class="am-step-panel" role="list" data-step-panel>
+                    {s.details.map((d) => <li>{d.lead && <strong>{d.lead}</strong>}{d.text}</li>)}
+                  </ul>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="am-before" aria-label="Before you apply">
+      <div class="am-before-grid">
+        <div id="notes" class="am-notes">
+          <h2 class="am-notes-h2">{A.notes.title}</h2>
+          <ul class="am-notes-list" role="list">
+            {A.notes.items.map((n) => (
+              <li><svg aria-hidden="true" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8.5" fill="none" stroke="#7F0305" stroke-width="1.6" /><path d="M10 9V14M10 6V6.1" fill="none" stroke="#7F0305" stroke-width="2" stroke-linecap="round" /></svg><span>{n}</span></li>
+            ))}
+          </ul>
+        </div>
+        <section id="docsPrint" class="am-docs" aria-labelledby="docs">
+          <div class="am-docs-head">
+            <div class="am-docs-title">
+              <h2 id="docs" class="am-docs-h2">{A.docs.title}</h2>
+              <p class="am-docs-sub only-lg">{A.docs.subtitle}</p>
+            </div>
+            <button type="button" class="am-print am-print--top js-only only-lg noprint" data-print-docs><Icon name="print" size={16} />{A.docs.print}</button>
+          </div>
+          <ul class="am-docs-list" role="list">
+            {A.docs.items.map((d) => <li><span class="am-box" aria-hidden="true"></span><span class="am-docs-text"><span class="am-docs-t">{d.title}</span><span class="am-docs-n">{d.note}</span></span></li>)}
+          </ul>
+          <p class="am-docs-pending">{A.docs.pending}</p>
+          <button type="button" class="am-print am-print--bottom js-only only-sm noprint" data-print-docs><Icon name="print" size={16} />{A.docs.print}</button>
+        </section>
+      </div>
+    </section>
+
+    <section id="faq" class="am-faq" aria-labelledby="faqTitle" data-faq>
+      <div class="container am-faq-grid">
+        <div class="am-faq-head">
+          <h2 id="faqTitle" class="am-h2 am-faq-h2">{A.faq.title}</h2>
+          <p class="am-faq-intro only-lg">{A.faq.intro}</p>
+        </div>
+        <div class="am-faq-list">
+          {A.faq.items.map((f, i) => (
+            <div class="am-faq-item">
+              <h3 class="am-faq-h">
+                <button type="button" class="am-faq-btn js-only" id={`faqQ${i + 1}`} aria-expanded="true" aria-controls={`faqA${i + 1}`} data-faq-toggle>
+                  <span class="am-faq-q">{f.q}</span>
+                  <svg class="am-faq-icon" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="#7F0305" stroke-width="1.6" stroke-linecap="round"><path d="M3 8H13" /><path class="am-faq-plus" d="M8 3V13" /></svg>
+                </button>
+                <span class="am-faq-static no-js-only">{f.q}</span>
+              </h3>
+              <div id={`faqA${i + 1}`} class="am-faq-a" data-faq-panel>{f.a}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <div class="am-bar only-sm noprint">
+      {admissions.enquiryOnPage ? (
+        <a class="am-bar-cta" href="#enquire">Enquire<Icon name="arrow-down" size={16} /></a>
+      ) : (
+        <a class="am-bar-cta" href={enquiry.url} target="_blank" rel="noopener">Enquire<Icon name="external" size={16} /><span class="vh"> online (opens in a new tab)</span></a>
+      )}
+      <a class="am-bar-call" href={`tel:${phone1.tel}`}><Icon name="phone" size={20} /><span class="vh">Call admissions, {phone1.display}</span></a>
+    </div>
+  </div>
+
+  <section id="enquire" class="am-enq" aria-labelledby="enqTitle">
+    <div class="container am-enq-grid">
+      <div class="am-enq-head">
+        <h2 id="enqTitle" class="am-h2">{A.enquire.title}</h2>
+        <p class="am-enq-p">{A.enquire.intro} <a class="tnum am-strong" href={`tel:${phone1.tel}`}>{phone1.display}</a>.</p>
+      </div>
+      <div class="am-enq-body">
+        {admissions.enquiryOnPage ? (
+          <EnquiryForm labelledBy="enqTitle" />
+        ) : (
+          <div class="am-ext">
+            <p class="am-ext-lead">{A.enquire.externalLead}</p>
+            <p class="am-ext-note">{A.enquire.externalNote}</p>
+            <a class="am-btn am-btn--primary am-ext-cta" href={enquiry.url} target="_blank" rel="noopener">{A.ctas.enquire}<Icon name="external" size={16} /><span class="vh"> (opens in a new tab)</span></a>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="am-office" aria-labelledby="ctTitle">
+    <div class="container">
+      <h2 id="ctTitle" class="am-office-h2">{A.office.title}</h2>
+      <div class="am-office-grid">
+        <div class="am-office-col">
+          <h3 class="am-office-k">Address</h3>
+          <address class="am-addr">
+            <span class="only-lg">{school.address.name}<br />{school.address.street}<br />{school.address.city}<br />{school.address.region}</span>
+            <span class="only-sm">{school.address.name}, Shahabad Road,<br />Opp. Nrupathunga Colony, {school.address.city}, {school.address.region}</span>
+          </address>
+          <a class="am-link am-office-link" href="/contact">Directions</a>
+        </div>
+        <div class="am-office-col">
+          <h3 class="am-office-k">Phone</h3>
+          <ul class="am-phones tnum" role="list">
+            <li><a class="am-link am-phone" href={`tel:${phone1.tel}`}>{phone1.display}</a> <span class="am-tag">admissions</span></li>
+            <li><a class="am-link am-phone" href={`tel:${phone2.tel}`}>{phone2.display}</a></li>
+            <li><a class="am-link am-phone" href={school.whatsapp.href}>{school.phones[2].display}</a> <span class="am-tag">WhatsApp</span></li>
+          </ul>
+        </div>
+        <div class="am-office-col">
+          <h3 class="am-office-k">Email</h3>
+          <a class="am-link am-mail" href={`mailto:${school.email}`}>{school.email}</a>
+        </div>
+        <div class="am-office-col">
+          <h3 class="am-office-k">Office hours</h3>
+          <table class="am-hours tnum">
+            <caption class="vh">Office working hours</caption>
+            <tbody>{school.hours.map((h) => <tr><th scope="row">{h.days}</th><td class:list={[h.time === 'Holiday' && 'am-muted']}>{h.time}</td></tr>)}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import '../scripts/admissions.js';
+  import '../scripts/enquiry.js';
+</script>
+
+<style>
+  .am-red { color: var(--brand); }
+  .am-muted { color: var(--text-muted); }
+  .am-nowrap { white-space: nowrap; }
+  .am-strong { font-weight: 700; }
+  .am-link { display: inline-flex; align-items: center; gap: 8px; color: var(--brand); font-weight: 600; text-decoration: underline; text-decoration-color: var(--link-underline); text-underline-offset: 5px; }
+  .am-link:hover { text-decoration-thickness: 2px; text-decoration-color: currentColor; }
+  .am-h2 { font-family: var(--font-display); font-size: clamp(2.75rem, 2.229rem + 2.095vw, 4rem); font-weight: 500; line-height: 1; }
+
+  /* ---------- first viewport ---------- */
+  .am-first { padding: 20px 0 40px; border-bottom: 1px solid var(--border); }
+  .am-lead { display: flex; flex-direction: column; gap: 18px; }
+  .am-h1 { font-family: var(--font-display); font-size: clamp(3.75rem, 2.4rem + 5.714vw, 7.5rem); font-weight: 500; line-height: 0.95; letter-spacing: -0.015em; }
+  .am-status { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; padding: 18px 18px 18px 20px; background: var(--surface); border: 1px solid var(--border); box-shadow: inset 5px 0 0 var(--bar); }
+  .am-status-icon { margin-top: 1px; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .am-status-icon svg { width: 14px; height: 14px; }
+  .am-status-text { display: flex; flex-direction: column; gap: 6px; }
+  .am-status-label { font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+  .am-status-p { font-size: 17px; line-height: 1.5; font-weight: 500; }
+  .am-ctas { display: flex; flex-direction: column; gap: 10px; }
+  .am-btn { display: flex; align-items: center; gap: 10px; min-height: 56px; border-radius: var(--radius-md); font-size: 16px; font-weight: 600; text-decoration: none; }
+  .am-btn--primary { justify-content: space-between; min-height: 58px; padding: 0 18px 0 20px; background: var(--brand); color: #FFFFFF; font-size: 17px; font-weight: 700; }
+  .am-btn--primary:hover { background: var(--brand-hover); color: #FFFFFF; }
+  .am-btn--secondary { justify-content: center; border: 1.5px solid var(--brand); color: var(--brand); }
+  .am-btn--secondary:hover { background: var(--brand-tint); color: var(--brand); }
+  .am-brochure { align-self: center; min-height: 48px; font-size: 16px; }
+
+  .am-jumps { position: sticky; top: var(--mobile-header-h); z-index: 10; background: var(--bg); border-bottom: 1px solid var(--border); }
+  .am-jumps-list { list-style: none; margin: 0; padding: 0; display: flex; gap: 36px; }
+  .am-jump { display: inline-flex; align-items: center; height: 60px; color: var(--text); font-size: 15px; font-weight: 600; text-decoration: none; }
+  .am-jump:hover { color: var(--brand); box-shadow: inset 0 -2px 0 var(--brand); }
+
+  /* ---------- age ---------- */
+  .am-age { padding: 48px 0 52px; }
+  .am-age-grid { display: flex; flex-direction: column; gap: 18px; }
+  .am-age-head { display: flex; flex-direction: column; gap: 18px; }
+  .am-age-head .eyebrow-text { font-size: 12px; }
+  .am-age-p { font-size: 16px; line-height: 1.6; }
+  .am-age-body { display: flex; flex-direction: column; gap: 18px; }
+  .am-table { width: 100%; border-collapse: collapse; }
+  .am-table thead tr { border-bottom: 1px solid var(--text); }
+  .am-table thead th { padding: 0 0 10px; text-align: left; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .am-table tbody tr { border-bottom: 1px solid var(--border); }
+  .am-table .am-right { text-align: right; }
+  .am-cls { padding: 14px 0; text-align: left; font-family: var(--font-display); font-size: 28px; font-weight: 500; }
+  .am-table td { padding: 14px 0; }
+  .am-years { font-family: var(--font-display); font-size: 44px; font-weight: 500; line-height: 1; color: var(--brand); }
+  .am-unit { margin-left: 6px; font-size: 15px; color: var(--text-muted); }
+  .am-strict { display: grid; grid-template-columns: 22px 1fr; gap: 12px; padding: 16px 18px; background: var(--surface-raised); border: 1px solid var(--border); font-size: 16px; line-height: 1.55; }
+  .am-strict svg { width: 20px; height: 20px; margin-top: 2px; }
+
+  /* ---------- procedure ---------- */
+  .am-proc { padding: 52px 0 56px; background: var(--surface-raised); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .am-proc-title { display: flex; flex-direction: column; gap: 12px; }
+  .am-proc-title .eyebrow-text { font-size: 12px; }
+  .am-proc-note { margin-top: -2px; font-size: 15px; line-height: 1.5; color: var(--text-muted); }
+  .am-steps-wrap { position: relative; margin-top: 32px; }
+  .am-steps-curve { position: absolute; left: 0; top: 24px; width: 48px; height: calc(100% - 48px); }
+  .am-steps-curve path, .am-steps-arc path { fill: none; stroke: var(--brand); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+  .am-steps { position: relative; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 28px; }
+  .am-step { display: grid; grid-template-columns: 48px 1fr; column-gap: 16px; scroll-margin-top: 80px; }
+  .am-step-n { width: 48px; height: 48px; border-radius: 50%; background: var(--brand); color: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 5px var(--surface-raised); font-family: var(--font-display); font-size: 22px; font-weight: 600; }
+  .am-step-body { display: flex; flex-direction: column; gap: 8px; padding-top: 6px; }
+  .am-step-h { font-family: var(--font-display); font-size: 28px; font-weight: 500; line-height: 1.1; }
+  .am-step-s { font-size: 16px; line-height: 1.5; color: var(--text-muted); }
+  .am-step-toggle { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 12px; border: 1px solid var(--border-strong); border-radius: 6px; background: transparent; color: var(--text); font-size: 15px; font-weight: 600; }
+  .am-step-toggle:hover { background: var(--brand-tint); }
+  .am-step-toggle[aria-expanded='true'] :global(.am-chev) { transform: rotate(180deg); }
+  .am-step-panel { list-style: none; margin: 4px 0 0; padding: 0; border-top: 1px solid var(--text); }
+  .am-step-panel li { padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 16px; line-height: 1.55; }
+  .am-step-panel strong { display: block; }
+  .am-expand { display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 18px; border: 1.5px solid var(--brand); border-radius: var(--radius-md); background: transparent; color: var(--brand); font-size: 15px; font-weight: 600; }
+  .am-expand:hover { background: var(--brand-tint); }
+
+  /* ---------- notes + documents ---------- */
+  .am-before { padding: 52px 0 0; }
+  .am-before-grid { display: flex; flex-direction: column; }
+  .am-notes { padding: 0 var(--margin) 24px; }
+  .am-notes-h2 { font-family: var(--font-display); font-size: clamp(2.25rem, 1.821rem + 1.714vw, 3rem); font-weight: 500; line-height: 1; }
+  .am-notes-list { list-style: none; margin: 18px 0 0; padding: 4px 18px; background: var(--brand-tint); border-radius: var(--radius-sm); }
+  .am-notes-list li { display: grid; grid-template-columns: 22px 1fr; gap: 12px; padding: 16px 0; border-bottom: 1px solid rgba(127, 3, 5, 0.18); font-size: 16px; line-height: 1.55; }
+  .am-notes-list li:last-child { border-bottom: 0; }
+  .am-notes-list svg { width: 20px; height: 20px; margin-top: 2px; }
+  .am-docs { margin: 28px var(--margin) 0; padding: 24px 20px; background: var(--surface); border: 1px solid var(--border); }
+  .am-docs-h2 { font-family: var(--font-display); font-size: clamp(2.125rem, 1.871rem + 1.016vw, 2.75rem); font-weight: 500; line-height: 1.05; }
+  .am-docs-sub { font-size: 15px; color: var(--text-muted); }
+  .am-docs-list { list-style: none; margin: 18px 0 0; padding: 0; border-top: 1px solid var(--text); }
+  .am-docs-list li { display: grid; grid-template-columns: 26px 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .am-box { margin-top: 2px; width: 20px; height: 20px; border: 1.5px solid var(--text); border-radius: 3px; background: var(--surface); }
+  .am-docs-text { display: flex; flex-direction: column; gap: 2px; }
+  .am-docs-t { font-size: 16px; font-weight: 600; line-height: 1.4; }
+  .am-docs-n { font-size: 14px; line-height: 1.5; color: var(--text-muted); }
+  .am-docs-pending { margin-top: 14px; font-size: 13px; line-height: 1.5; color: var(--text-muted); }
+  .am-print { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 16px; border: 1.5px solid var(--brand); border-radius: var(--radius-md); background: transparent; color: var(--brand); font-size: 15px; font-weight: 600; }
+  .am-print:hover { background: var(--brand-tint); }
+  .am-print--bottom { margin-top: 16px; width: 100%; height: auto; min-height: 52px; font-size: 16px; }
+
+  /* ---------- FAQ ---------- */
+  .am-faq { padding: 56px 0 48px; }
+  .am-faq-h2 { font-size: clamp(2.5rem, 1.857rem + 2.571vw, 4rem); line-height: 1.02; }
+  .am-faq-list { margin-top: 20px; border-top: 1px solid var(--text); }
+  .am-faq-item { border-bottom: 1px solid var(--border); }
+  .am-faq-btn { width: 100%; display: grid; grid-template-columns: 1fr 20px; gap: 16px; align-items: center; min-height: 60px; padding: 14px 0; border: 0; background: transparent; color: var(--text); text-align: left; }
+  .am-faq-btn:hover .am-faq-q { color: var(--brand); }
+  .am-faq-q, .am-faq-static { font-size: 17px; font-weight: 600; line-height: 1.4; }
+  .am-faq-static { display: block; padding: 14px 0 8px; }
+  :global(html:not(.js)) .am-faq-static { display: block; }
+  .am-faq-icon { width: 18px; height: 18px; }
+  .am-faq-btn[aria-expanded='true'] .am-faq-plus { display: none; }
+  .am-faq-a { padding: 0 24px 18px 0; font-size: 16px; line-height: 1.65; }
+
+  /* ---------- phone sticky bar ---------- */
+  .am-sticky-scope { position: relative; }
+  .am-bar { position: sticky; bottom: 0; z-index: 20; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: rgba(251, 247, 240, 0.97); border-top: 1px solid var(--border); box-shadow: 0 -10px 24px -18px rgba(31, 26, 23, 0.5); display: grid; grid-template-columns: 1fr 56px; gap: 10px; }
+  .am-bar-cta { display: flex; justify-content: center; align-items: center; gap: 10px; min-height: 56px; border-radius: var(--radius-md); background: var(--brand); color: #FFFFFF; font-size: 17px; font-weight: 700; text-decoration: none; }
+  .am-bar-cta:hover { background: var(--brand-hover); color: #FFFFFF; }
+  .am-bar-call { display: flex; justify-content: center; align-items: center; min-height: 56px; border: 1.5px solid var(--brand); border-radius: var(--radius-md); color: var(--brand); }
+
+  /* ---------- enquire ---------- */
+  .am-enq { padding: 52px 0 56px; background: var(--surface-raised); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .am-enq-grid { display: flex; flex-direction: column; gap: 16px; }
+  .am-enq-head { display: flex; flex-direction: column; gap: 16px; }
+  .am-enq-p { font-size: 16px; line-height: 1.6; }
+  .am-enq-p a { color: var(--brand); }
+  .am-ext { display: flex; flex-direction: column; gap: 14px; padding: 22px 20px; background: var(--surface); border: 1px solid var(--border); }
+  .am-ext-lead { font-family: var(--font-display); font-size: clamp(1.5rem, 1.286rem + 0.857vw, 2rem); font-weight: 500; line-height: 1.25; }
+  .am-ext-note { font-size: 15px; line-height: 1.55; color: var(--text-muted); }
+  .am-ext-cta { font-size: 16px; min-height: 56px; }
+
+  /* ---------- office ---------- */
+  .am-office { padding: 52px 0 56px; }
+  .am-office-h2 { padding-bottom: 16px; border-bottom: 1px solid var(--text); font-family: var(--font-display); font-size: clamp(2.25rem, 1.821rem + 1.714vw, 3rem); font-weight: 500; line-height: 1; }
+  .am-office-grid { margin-top: 24px; display: flex; flex-direction: column; gap: 24px; }
+  .am-office-col { display: flex; flex-direction: column; gap: 6px; }
+  .am-office-k { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .am-addr { font-style: normal; font-size: 16px; line-height: 1.6; }
+  .am-office-link { align-self: flex-start; min-height: 44px; font-size: 15px; }
+  .am-phones { list-style: none; margin: 0; padding: 0; font-size: 17px; }
+  .am-phone { min-height: 44px; }
+  .am-tag { margin-left: 4px; font-size: 14px; color: var(--text-muted); }
+  .am-mail { align-self: flex-start; min-height: 44px; font-size: 16px; overflow-wrap: anywhere; }
+  .am-hours { border-collapse: collapse; font-size: 16px; }
+  .am-hours th { padding: 6px 24px 6px 0; text-align: left; font-weight: 600; }
+  .am-hours td { padding: 6px 0; }
+
+  @media (min-width: 1024px) {
+    .am-first { padding: 28px 0 64px; }
+    .am-first-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; }
+    .am-crumbs { grid-column: 1 / -1; }
+    .am-lead { grid-column: 1 / span 7; gap: 28px; padding-top: 28px; }
+    .am-h1 { line-height: 0.92; letter-spacing: -0.02em; }
+    .am-status { gap: 18px; padding: 22px 26px; }
+    .am-status-icon { margin-top: 2px; width: 28px; height: 28px; }
+    .am-status-icon svg { width: 16px; height: 16px; }
+    .am-status-label { font-size: 13px; letter-spacing: 0.14em; }
+    .am-status-p { font-size: 21px; }
+    .am-ctas { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 16px; }
+    .am-btn { display: inline-flex; height: 60px; }
+    .am-btn--primary { padding: 0 26px; font-size: 18px; justify-content: center; }
+    .am-btn--secondary { padding: 0 24px 0 20px; font-size: 17px; }
+    .am-brochure { align-self: auto; padding: 0 4px; }
+    .am-glance { grid-column: 9 / span 4; align-self: end; display: flex; flex-direction: column; padding: 28px 28px 20px; background: var(--surface-raised); border: 1px solid var(--border); }
+    .am-glance-title { margin-bottom: 8px; font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+    .am-glance-list { list-style: none; margin: 0; padding: 0; }
+    .am-glance-link { display: grid; grid-template-columns: 40px 1fr; align-items: baseline; min-height: 52px; padding: 12px 0; border-bottom: 1px solid var(--border); color: var(--text); text-decoration: none; }
+    .am-glance-link:hover { color: var(--text); }
+    .am-glance-link:hover .am-glance-t { color: var(--brand); text-decoration: underline; text-underline-offset: 4px; }
+    .am-glance-num { font-family: var(--font-display); font-size: 24px; color: var(--brand); }
+    .am-glance-text { display: flex; flex-direction: column; gap: 2px; }
+    .am-glance-t { font-size: 16px; font-weight: 700; }
+    .am-glance-s { font-size: 14px; color: var(--text-muted); }
+    .am-glance-ages { margin-top: 14px; font-size: 14px; line-height: 1.5; color: var(--text-muted); }
+
+    .am-age { padding: 112px 0; }
+    .am-age-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; }
+    .am-age-head { grid-column: 1 / span 4; gap: 20px; }
+    .am-age-head .eyebrow-text { font-size: 13px; }
+    .am-age-p { font-size: 18px; line-height: 1.65; }
+    .am-age-body { grid-column: 6 / span 7; gap: 24px; }
+    .am-table thead th { padding-bottom: 14px; font-size: 13px; }
+    .am-table thead th.am-prog { padding-left: 48px; }
+    .am-cls { padding: 22px 0; font-size: 36px; }
+    .am-table td { padding: 22px 0; }
+    .am-table td.am-prog { padding-left: 48px; font-size: 16px; color: var(--text-muted); }
+    .am-years { font-size: 56px; }
+    .am-unit { margin-left: 8px; font-size: 16px; }
+    .am-strict { grid-template-columns: 24px 1fr; gap: 14px; padding: 20px 24px; font-size: 17px; line-height: 1.6; }
+    .am-strict svg { width: 22px; height: 22px; }
+
+    .am-proc { padding: 112px 0 120px; }
+    .am-proc-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; }
+    .am-proc-title { gap: 16px; }
+    .am-proc-title .eyebrow-text { font-size: 13px; }
+    .am-proc-note { margin: 0; font-size: 16px; }
+    .am-steps-wrap { margin-top: 56px; }
+    .am-steps-arc { display: block; width: 100%; height: 100px; overflow: visible; }
+    .am-steps { margin-top: -100px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 32px; align-items: start; }
+    .am-step { display: flex; flex-direction: column; gap: 16px; padding-top: var(--top); }
+    .am-step-n { font-size: 24px; box-shadow: 0 0 0 6px var(--surface-raised); }
+    .am-step-body { gap: 16px; padding: 0; }
+    .am-step-h { margin-top: 8px; font-size: 34px; line-height: 1.05; }
+    .am-step-s { font-size: 17px; }
+    .am-step-panel { margin: 0; padding-top: 4px; }
+    .am-step-panel li { padding: 14px 0; }
+    .am-step-panel strong { margin-bottom: 2px; }
+
+    .am-before { padding: 112px 0; }
+    .am-before-grid { width: 100%; max-width: var(--page-max); margin-inline: auto; padding-inline: var(--margin); display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; align-items: start; }
+    .am-notes { grid-column: 1 / span 5; padding: 0; display: flex; flex-direction: column; gap: 24px; }
+    .am-notes-list { margin: 0; padding: 8px 28px; }
+    .am-notes-list li { grid-template-columns: 24px 1fr; gap: 14px; padding: 20px 0; font-size: 18px; }
+    .am-notes-list svg { margin-top: 3px; }
+    .am-docs { grid-column: 7 / span 6; margin: 0; padding: 40px; display: flex; flex-direction: column; gap: 24px; }
+    .am-docs-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
+    .am-docs-title { display: flex; flex-direction: column; gap: 8px; }
+    .am-docs-h2 { line-height: 1; }
+    .am-print--top { flex-shrink: 0; }
+    .am-docs-list { margin: 0; }
+    .am-docs-list li { grid-template-columns: 28px 1fr; gap: 16px; padding: 16px 0; }
+    .am-box { width: 22px; height: 22px; }
+    .am-docs-t { font-size: 17px; }
+    .am-docs-n { font-size: 15px; }
+    .am-docs-pending { margin: 0; font-size: 14px; }
+
+    .am-faq { padding: 112px 0; background: var(--surface-raised); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .am-faq-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; }
+    .am-faq-head { grid-column: 1 / span 4; display: flex; flex-direction: column; gap: 16px; }
+    .am-faq-h2 { line-height: 1; }
+    .am-faq-intro { font-size: 16px; line-height: 1.6; color: var(--text-muted); }
+    .am-faq-list { grid-column: 6 / span 7; margin: 0; }
+    .am-faq-btn { grid-template-columns: 1fr 24px; gap: 24px; min-height: 72px; padding: 18px 0; }
+    .am-faq-q, .am-faq-static { font-size: 19px; }
+    .am-faq-icon { width: 20px; height: 20px; }
+    .am-faq-a { padding: 0 48px 24px 0; font-size: 17px; line-height: 1.7; }
+
+    .am-enq { padding: 112px 0; background: transparent; border: 0; }
+    .am-enq-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; }
+    .am-enq-head { grid-column: 1 / span 4; }
+    .am-enq-p { font-size: 18px; }
+    .am-enq-body { grid-column: 6 / span 7; }
+    .am-ext { gap: 20px; padding: 40px; }
+    .am-ext-note { font-size: 16px; line-height: 1.6; }
+    .am-ext-cta { align-self: flex-start; height: 56px; padding: 0 24px; font-size: 17px; }
+
+    .am-office { padding: 96px 0 112px; background: var(--surface-raised); border-top: 1px solid var(--border); }
+    .am-office-h2 { padding-bottom: 28px; }
+    .am-office-grid { margin-top: 36px; display: grid; grid-template-columns: 1.15fr 1fr 1.1fr 1.2fr; column-gap: 40px; }
+    .am-office-col { gap: 10px; }
+    .am-office-k { font-size: 13px; }
+    .am-addr { font-size: 17px; }
+    .am-mail { font-size: 17px; }
+    .am-hours { font-size: 17px; }
+  }
+
+  /* The jump bar sits under the sticky header; anchors land below both. */
+  @media (min-width: 1024px) { :global(html) { scroll-padding-top: calc(var(--mobile-header-h) + 76px); } }
+  @media (min-width: 1280px) {
+    .am-jumps { top: calc(var(--header-h) + 1px); }
+    :global(html) { scroll-padding-top: calc(var(--header-h) + 77px); }
+  }
+
+  @media print {
+    :global(html.printing-docs body *) { visibility: hidden !important; }
+    :global(html.printing-docs #docsPrint), :global(html.printing-docs #docsPrint *) { visibility: visible !important; }
+    :global(html.printing-docs #docsPrint) { position: absolute; left: 0; top: 0; width: 100%; margin: 0; border: 0 !important; padding: 0 !important; }
+    .noprint { display: none !important; }
+  }
+</style>

@@ -1,0 +1,116 @@
+---
+// HomeDesktop §8 / HomeMobile campus. Learn / Play / Create / Gather are tabs (arrow keys,
+// Home, End). Without JS the tab row is hidden and all four scenes are listed.
+import Icon from '../ui/Icon.astro';
+import { getHome } from '../../lib/site';
+const { campusScenes, campusPhoto, campusPhotoSm } = await getHome();
+---
+<section class="campus on-dark" aria-labelledby="campusTitle">
+  <div class="campus-photo" role="img" aria-label="Placeholder: full-bleed aerial photograph of the campus (DJI_0401)">
+    <div class="campus-shade" aria-hidden="true"></div>
+    <span class="campus-corner campus-corner--l only-lg" aria-hidden="true"></span>
+    <span class="campus-corner campus-corner--r only-lg" aria-hidden="true"></span>
+    <span class="campus-ph"><span class="only-lg">{campusPhoto}</span><span class="only-sm">{campusPhotoSm}</span></span>
+  </div>
+  <div class="container campus-grid">
+    <div class="campus-intro">
+      <span class="campus-eyebrow eyebrow-text">Campus</span>
+      <h2 id="campusTitle" class="campus-title">A modern campus set in five acres of lush green, pollution-free land.</h2>
+      <a class="campus-btn only-lg arrow-nudge" href="/campus">Explore the campus<span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
+    </div>
+    <div class="campus-scenes" data-tabs>
+      <div role="tablist" aria-label="Campus scenes" class="campus-tabs js-only">
+        {campusScenes.map((s, i) => (
+          <button type="button" role="tab" id={`campusTab${i}`} aria-selected={i === 0 ? 'true' : 'false'} aria-controls={`campusPanel${i}`} tabindex={i === 0 ? undefined : '-1'} class="campus-tab">{s.verb}</button>
+        ))}
+      </div>
+      <div class="campus-panels">
+        {campusScenes.map((s, i) => (
+          <div id={`campusPanel${i}`} role="tabpanel" aria-labelledby={`campusTab${i}`} class="campus-panel" data-tab-panel>
+            <div class="campus-thumb" role="img" aria-label={`Placeholder for a photograph: ${s.photo}`}>
+              <span class="only-lg">[{s.photo}]</span><span class="only-sm">[{s.photoSm ?? s.photo}]</span>
+            </div>
+            <div class="campus-panel-text">
+              <span class="campus-verb">{s.verb}</span>
+              <strong class="campus-places">{s.places}</strong>
+              <a class="campus-link" href={s.href}><span class="only-lg">{s.cta} →</span><span class="only-sm">Visit →</span></a>
+            </div>
+          </div>
+        ))}
+      </div>
+      <a class="campus-btn campus-btn--full only-sm" href="/campus">Explore the campus →</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .campus { position: relative; background: var(--surface-dark); color: var(--text-on-dark); display: grid; grid-template-columns: minmax(0, 1fr); }
+  .campus-photo {
+    position: relative; grid-row: 1; grid-column: 1; aspect-ratio: 4 / 5;
+    background: radial-gradient(ellipse 70% 50% at 55% 40%, rgba(96, 110, 60, 0.45) 0%, rgba(59, 20, 22, 0) 70%), #3B1416;
+  }
+  .campus-shade { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(42, 10, 11, 0.92) 0%, rgba(42, 10, 11, 0) 60%); }
+  .campus-ph { position: absolute; left: 20px; top: 20px; font-size: 12px; color: var(--text-on-dark-muted); }
+  .campus-grid { display: contents; }
+  .campus-intro { position: relative; grid-row: 1; grid-column: 1; align-self: end; display: flex; flex-direction: column; gap: 10px; padding: 24px 20px; }
+  .campus-eyebrow { font-size: 12px; color: var(--accent); }
+  .campus-title { font-family: var(--font-display); font-size: clamp(2.125rem, 1.614rem + 2.095vw, 3.5rem); font-weight: 500; line-height: 1.1; }
+  .campus-scenes { display: flex; flex-direction: column; gap: 16px; padding: 24px 20px 56px; }
+  .campus-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid rgba(251, 247, 240, 0.3); }
+  .campus-tab { height: 48px; padding: 0; border: 0; background: transparent; color: var(--text-on-dark-muted); font-size: 15px; font-weight: 600; }
+  .campus-tab[aria-selected='true'] { color: var(--text-on-dark); font-weight: 700; box-shadow: inset 0 -2px 0 var(--accent); }
+  .campus-tab:focus-visible { outline-offset: -2px; }
+  .campus-panels { display: flex; flex-direction: column; gap: 12px; }
+  .campus-panel { display: grid; grid-template-columns: 128px 1fr; gap: 14px; padding: 12px; background: var(--bg); color: var(--text); --focus-ring: var(--focus); }
+  .campus-thumb { aspect-ratio: 1 / 1; background: var(--ph-1); display: flex; align-items: flex-end; padding: 6px; font-size: 10px; line-height: 1.3; color: var(--text-muted); }
+  .campus-panel-text { display: flex; flex-direction: column; gap: 4px; justify-content: center; }
+  .campus-verb { font-size: 11px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brand); }
+  .campus-places { font-family: var(--font-display); font-size: 22px; font-weight: 600; line-height: 1.1; }
+  .campus-link {
+    align-self: flex-start; display: inline-flex; align-items: center; min-height: 36px;
+    color: var(--brand); font-size: 14px; font-weight: 600;
+    text-decoration: underline; text-decoration-color: var(--link-underline); text-underline-offset: 6px;
+  }
+  .campus-link:hover { color: var(--brand); text-decoration-thickness: 2px; }
+  .campus-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 52px;
+    border: 1.5px solid var(--text-on-dark); border-radius: var(--radius-md);
+    color: var(--text-on-dark); font-size: 16px; font-weight: 600; text-decoration: none;
+  }
+  .campus-btn:hover { color: var(--text-on-dark); background: rgba(251, 247, 240, 0.08); }
+  .campus-btn--full { display: flex; width: 100%; }
+  .campus .arrow { display: inline-flex; }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html.js) .campus-panel:not([hidden]) { animation: kb-panel 320ms var(--ease-out) both; }
+  }
+
+  @media (min-width: 1024px) {
+    .campus { display: block; height: 900px; overflow: hidden; background: #3B1416; }
+    .campus-photo {
+      position: absolute; inset: 0; aspect-ratio: auto;
+      background: radial-gradient(ellipse 60% 50% at 55% 40%, rgba(96, 110, 60, 0.45) 0%, rgba(59, 20, 22, 0) 70%), radial-gradient(ellipse 40% 30% at 30% 70%, rgba(140, 100, 60, 0.35) 0%, rgba(59, 20, 22, 0) 70%), #3B1416;
+    }
+    .campus-shade { background: linear-gradient(0deg, rgba(42, 10, 11, 0.9) 0%, rgba(42, 10, 11, 0.2) 55%, rgba(42, 10, 11, 0.35) 100%); }
+    .campus-corner { position: absolute; top: 32px; width: 24px; height: 24px; border: 0 solid var(--text-on-dark-muted); }
+    .campus-corner--l { left: 32px; border-left-width: 1px; border-top-width: 1px; }
+    .campus-corner--r { right: 32px; border-right-width: 1px; border-top-width: 1px; }
+    .campus-ph { left: var(--margin); top: 72px; font-size: 13px; }
+    .campus-grid {
+      position: absolute; left: 0; right: 0; bottom: 72px; max-width: var(--page-max); margin-inline: auto; padding-inline: var(--margin);
+      display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; align-items: end;
+    }
+    .campus-intro { grid-column: span 6; grid-row: auto; padding: 0; gap: 24px; }
+    .campus-eyebrow { font-size: 13px; }
+    .campus-title { line-height: 1.08; }
+    .campus-btn { align-self: flex-start; padding: 0 22px 0 24px; }
+    .campus-scenes { grid-column: 8 / span 5; padding: 0; }
+    .campus-grid { display: grid; }
+    .campus-tab { height: 52px; font-size: 16px; }
+    .campus-panel { grid-template-columns: 180px 1fr; gap: 20px; padding: 16px; }
+    .campus-thumb { aspect-ratio: 3 / 2; padding: 8px; font-size: 11px; }
+    .campus-panel-text { gap: 6px; }
+    .campus-verb { font-size: 12px; }
+    .campus-places { font-size: 26px; }
+    .campus-link { font-size: 15px; }
+  }
+</style>

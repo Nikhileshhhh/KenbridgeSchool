@@ -1,0 +1,46 @@
+# Verified school facts and contacts (KENBRIDGE_SCREEN_PROMPTS_FROM_LIVE_SITE.md, A1 and A4).
+main:
+  name: KenBridge School
+  fullName: KenBridge School Gulbarga
+  tagline: Inspiring to Learn
+  affiliationNo: '830594'
+  schoolCode: '45527'
+  founded: 2011
+  trust: Homi Educational Trust
+  url: https://kenbridgegulbarga.com
+  address:
+    name: KenBridge School
+    street: Shahabad Road, Opp. Nrupathunga Colony
+    city: Kalaburagi (Gulbarga) – 585105
+    region: Karnataka
+    postalCode: '585105'
+    # The official disclosure gives a fuller address. Both are shown where the design shows them.
+    disclosure: Sy. No 21/2, Rajapur, Opp. Nrupathunga Colony, Shahabad Road, Kusnoor, Kalaburagi – 585105
+  # TODO(content): OPEN-QUESTIONS #4. The disclosure lists 98866 99966; everywhere else shows
+  # 98869 99660, which the design uses.
+  phones:
+    - display: 98869 99660
+      tel: '+919886999660'
+    - display: 88844 44952
+      tel: '+918884444952'
+    - display: 88844 44942
+      tel: '+918884444942'
+  whatsapp:
+    display: +91 88844 44942
+    href: https://wa.me/918884444942
+  # TODO(content): OPEN-QUESTIONS #3. The address shown is @kenbridgegulbarga.com, but the live
+  # header link opens @kenbridgeschool.com. The design uses the address shown.
+  email: kbsglb@kenbridgegulbarga.com
+  hours:
+    - days: Mon – Fri
+      daysLong: Monday – Friday
+      time: 8:30 AM – 4:30 PM
+    - days: Saturday
+      time: 8:30 AM – 2:00 PM
+    - days: Sunday
+      time: Holiday
+  principalMeeting: Parents may meet the Principal or Vice Principal Monday to Friday, 3–4 PM, by appointment.
+  social:
+    facebook: https://www.facebook.com/kbsglb
+    youtube: https://www.youtube.com/@kbsglb
+  values: [Integrity, Compassion, Commitment]

@@ -1,0 +1,43 @@
+{
+  "name": "kenbridge-website",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "description": "KenBridge School Gulbarga website (static Astro build of the design in ../design-handoff)",
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && node scripts/pagefind.mjs",
+    "preview": "astro preview",
+    "qa": "node scripts/qa-shots.mjs",
+    "a11y": "node scripts/a11y.mjs",
+    "check:shell": "node scripts/shell-check.mjs",
+    "check:home": "node scripts/home-check.mjs",
+    "check:about": "node scripts/about-check.mjs",
+    "check:learning": "node scripts/learning-check.mjs",
+    "check:campus": "node scripts/campus-check.mjs",
+    "check:admissions": "node scripts/admissions-check.mjs",
+    "check:achievements": "node scripts/achievements-check.mjs",
+    "check:gallery": "node scripts/gallery-check.mjs",
+    "check:information": "node scripts/information-check.mjs",
+    "check:print": "node scripts/print-check.mjs",
+    "check:contact": "node scripts/contact-check.mjs",
+    "check:search": "node scripts/search-check.mjs",
+    "check:placeholders": "node scripts/check-placeholders.mjs",
+    "check:redirects": "node scripts/check-redirects.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/manrope": "^5.3.0",
+    "astro": "^7.3.5",
+    "sharp": "^0.35.5",
+    "three": "0.158.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@lhci/cli": "^0.15.1",
+    "pagefind": "^1.5.2",
+    "playwright": "^1.63.0"
+  }
+}

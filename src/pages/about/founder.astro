@@ -1,0 +1,114 @@
+---
+// /about/founder (FounderDesktop / FounderMobile). A dignified, typographic tribute: no portrait
+// exists, so none is invented. The only motion is one fade (none under reduced motion).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/shell/Breadcrumbs.astro';
+import FlameMark from '../../components/ui/FlameMark.astro';
+import NextLinks from '../../components/ui/NextLinks.astro';
+import { getMain } from '../../lib/site';
+
+const f = await getMain('founder');
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'About', href: '/about' }, { label: 'Our Founder' }];
+---
+<BaseLayout
+  title="Our Founder"
+  description={`A tribute to ${f.honorific} ${f.name}, founder of KenBridge School, Kalaburagi: ${f.roles.join(', ').toLowerCase()}.`}
+  current="about"
+  breadcrumbs={crumbs}
+>
+  <div class="container fd-crumbs"><Breadcrumbs items={crumbs} /></div>
+
+  <section class="fd-portrait fade-once" aria-labelledby="founderH1">
+    <FlameMark size={40} class="fd-flame" />
+    <h1 id="founderH1" class="fd-h1">Our Founder</h1>
+    <p class="fd-name"><span class="fd-honorific">{f.honorific}</span>{f.name}</p>
+    <div class="fd-rule" aria-hidden="true"></div>
+    <p class="fd-roles">
+      {f.roles.map((r, i) => <>{r}{i < f.roles.length - 1 && <> <span aria-hidden="true" class="fd-dot">·</span> </>}</>)}
+    </p>
+  </section>
+
+  <figure class="fd-motto">
+    <blockquote class="fd-motto-q">{f.motto}</blockquote>
+    <figcaption class="fd-motto-cap"><span aria-hidden="true" class="fd-dash"></span>{f.mottoCaption}<span aria-hidden="true" class="fd-dash"></span></figcaption>
+  </figure>
+
+  <section class="fd-body" aria-label="Tribute">
+    <div class="container fd-body-grid">
+      <div class="fd-text">
+        <p class="fd-lead">{f.lead}</p>
+        {f.paragraphs.map((p) => <p class="fd-p">{p}</p>)}
+        <p class="fd-closing">{f.closing}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="fd-words on-dark" aria-label="Guiding words">
+    <FlameMark size={24} onDark class="fd-flame-sm" />
+    <p class="fd-words-p">{f.words.map((w) => <span>{w}</span>)}</p>
+  </section>
+
+  <NextLinks
+    label="Related"
+    compact
+    divided
+    items={[
+      { eyebrow: 'About', label: 'Our Story', href: '/about' },
+      { eyebrow: 'About', label: 'Principal’s Message', href: '/about/principal' }
+    ]}
+  />
+</BaseLayout>
+
+<style>
+  .fd-crumbs { padding-top: 12px; }
+  .fade-once { animation: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    .fade-once { animation: kb-fade 1200ms ease-out 150ms both; }
+  }
+  .fd-portrait { padding: 64px var(--margin) 72px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .fd-portrait :global(.fd-flame) { width: 32px; height: 32px; }
+  .fd-h1 { margin-top: 20px; font-size: 13px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color: var(--brand); }
+  .fd-name { margin-top: 20px; font-family: var(--font-display); font-size: clamp(3.5rem, 2.2rem + 5.333vw, 7rem); font-weight: 500; line-height: 1; letter-spacing: -0.015em; }
+  .fd-honorific { display: block; margin-bottom: 8px; font-size: clamp(1.625rem, 1.3rem + 1.333vw, 2.5rem); font-style: italic; font-weight: 400; letter-spacing: 0; color: var(--text-muted); }
+  .fd-rule { margin-top: 32px; width: 112px; height: 1px; background: var(--brand); }
+  .fd-roles { margin-top: 24px; max-width: 760px; font-size: 13px; font-weight: 600; letter-spacing: 0.12em; line-height: 2; text-transform: uppercase; color: var(--text-muted); }
+  .fd-dot { color: var(--accent); }
+  .fd-motto { margin: 0; padding: 64px var(--margin); background: var(--surface-raised); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px; }
+  .fd-motto-q { margin: 0; font-family: var(--font-display); font-size: clamp(3.75rem, 2.229rem + 6.248vw, 8rem); font-style: italic; font-weight: 400; line-height: 1; letter-spacing: -0.02em; color: var(--brand); }
+  .fd-motto-cap { display: flex; align-items: center; gap: 12px; font-size: 14px; color: var(--text-muted); }
+  .fd-dash { width: 28px; height: 1px; background: var(--border-strong); }
+  .fd-body { padding: 64px 0; }
+  .fd-text { display: flex; flex-direction: column; gap: 24px; }
+  .fd-lead { font-family: var(--font-display); font-size: clamp(1.625rem, 1.486rem + 0.571vw, 1.875rem); font-weight: 500; line-height: 1.45; }
+  .fd-p { font-size: 18px; line-height: 1.85; }
+  .fd-closing { padding-top: 24px; border-top: 1px solid var(--border); font-family: var(--font-display); font-size: clamp(1.5rem, 1.443rem + 0.229vw, 1.75rem); font-style: italic; font-weight: 400; line-height: 1.5; color: var(--brand-strong); }
+  .fd-words { padding: 64px var(--margin); background: var(--surface-dark); color: var(--text-on-dark); display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center; }
+  .fd-words :global(.fd-flame-sm) { width: 20px; height: 20px; }
+  .fd-words-p { display: flex; flex-direction: column; font-family: var(--font-display); font-size: clamp(2.5rem, 2.057rem + 1.829vw, 3.5rem); font-weight: 500; line-height: 1.1; }
+  .fd-words-p span { padding: 10px 0; }
+  .fd-words-p span:nth-child(2) { border-top: 1px solid rgba(251, 247, 240, 0.22); border-bottom: 1px solid rgba(251, 247, 240, 0.22); }
+  @media (min-width: 1024px) {
+    .fd-crumbs { padding-top: 32px; }
+    .fd-portrait { padding: 120px var(--margin) 136px; }
+    .fd-portrait :global(.fd-flame) { width: 40px; height: 40px; }
+    .fd-h1 { margin-top: 28px; font-size: 14px; }
+    .fd-name { margin-top: 28px; line-height: 0.98; }
+    .fd-honorific { margin-bottom: 14px; }
+    .fd-rule { margin-top: 44px; width: 160px; }
+    .fd-roles { margin-top: 32px; font-size: 15px; letter-spacing: 0.14em; }
+    .fd-motto { padding: 120px var(--margin); gap: 24px; }
+    .fd-motto-cap { gap: 16px; font-size: 15px; }
+    .fd-dash { width: 40px; }
+    .fd-body { padding: 136px 0; }
+    .fd-body-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; }
+    .fd-text { grid-column: 4 / span 6; gap: 32px; }
+    .fd-lead { line-height: 1.5; }
+    .fd-p { font-size: 20px; }
+    .fd-closing { padding-top: 32px; font-size: 28px; line-height: 1.55; }
+    .fd-words { padding: 112px var(--margin); gap: 36px; }
+    .fd-words :global(.fd-flame-sm) { width: 24px; height: 24px; }
+    .fd-words-p { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; max-width: 1180px; }
+    .fd-words-p span { padding: 8px 24px; }
+    .fd-words-p span:nth-child(2) { border: 0; border-left: 1px solid rgba(251, 247, 240, 0.22); border-right: 1px solid rgba(251, 247, 240, 0.22); }
+  }
+</style>

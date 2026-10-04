@@ -1,0 +1,41 @@
+# /achievements · Results & Achievements (AchievementsDesktop, AchievementsMobile; P14). Page copy only:
+# every figure comes from src/data/results.yaml, so Home and this page can never disagree.
+main:
+  title: Results & Achievements
+  lead: Class X CBSE Board outcomes since our first batch in 2016-17.
+  howTo:
+    title: How to read this page
+    text: 'Every figure names its source: the CBSE Mandatory Public Disclosure or the school’s own result banner.'
+  achievers:
+    eyebrow: 01 · CBSE Board, Class X
+    source: 'Source: school result banner, 2026 (2026BannerREV.jpg)'
+    sourceSm: 'Source: school result banner, 2026.'
+    portrait: '[Portrait · crop from the 2026 banner, with consent]'
+    portraitSm: '[Portrait, with consent]'
+    distTitle: How the 2026 batch scored
+    distSub: Number of students in each percentage band
+    distSource: 'Source: school result banner, 2026 (result analysis panel).'
+  annual:
+    eyebrow: 02 · Year by year
+    title: Annual Class X results
+    source: 'Source: CBSE Mandatory Public Disclosure (2023–2025); school history (2016-17). “—” means the figure is not in the source.'
+    chartTitle: Pass % by year
+    chartSub: Scale runs from 90% to 100%.
+    chartSource: 'Source: CBSE Mandatory Public Disclosure; school history for 2016-17. Same figures as the table.'
+    chartSourceSm: 'Source: CBSE Mandatory Public Disclosure; school history for 2016-17.'
+  archive:
+    eyebrow: 03 · Archive
+    title: Toppers archive
+    intro: The school’s original result banners, with every name and score typed out as text so it can be read, searched and translated.
+    introSm: The school’s original result banners, with every name and score typed out as text.
+  beyond:
+    eyebrow: 04 · From the gallery
+    title: Beyond academics
+    # Albums are not imported yet (only Annual Day 2025-26 has photos), so the tiles open the year in the gallery.
+    albums:
+      - { name: Sports Day, year: 2024-25, count: '[n] photos', href: /gallery/2024-25 }
+      - { name: Interschool Dance, year: 2024-25, count: '[n] photos', href: /gallery/2024-25 }
+      - { name: Math Art Competition, year: 2024-25, count: '[n] photos', href: /gallery/2024-25 }
+      - { name: Robotic Lab, year: 2024-25, count: '[n] photos', href: /gallery/2024-25 }
+      - { name: IPL-KBS, year: '[year]', count: '[n] photos', href: /gallery }
+    namedLabel: Named on the school’s site

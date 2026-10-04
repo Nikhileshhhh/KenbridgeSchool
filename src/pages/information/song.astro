@@ -1,0 +1,105 @@
+---
+// /information/song (SongDesktop, SongMobile). A printed "programme sheet": the rays motif, the title,
+// verses with the refrain in maroon italic. The recording block appears only when
+// settings.songRecording is set; it never autoplays (preload="none").
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/shell/Breadcrumbs.astro';
+import FlameMark from '../../components/ui/FlameMark.astro';
+import RelatedLinks from '../../components/info/RelatedLinks.astro';
+import { getMain, getSettings } from '../../lib/site';
+
+const { song: S } = await getMain('info');
+const { songRecording } = await getSettings();
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'School Information', href: '/information' }, { label: 'School Song' }];
+const rays = ['M277.7 303.7L66.8 249.6', 'M283.4 287.3L138.5 223.3', 'M291.7 272.0L109.7 152.4', 'M302.5 258.3L186.1 150.8', 'M315.3 246.6L181.8 74.5', 'M329.9 237.1L254.6 97.7', 'M345.8 230.1L275.2 24.0', 'M362.7 225.8L336.7 69.6', 'M380.0 224.4L380.0 6.6', 'M397.3 225.8L423.3 69.6', 'M414.2 230.1L484.8 24.0', 'M430.1 237.1L505.4 97.7', 'M444.7 246.6L578.2 74.5', 'M457.5 258.3L573.9 150.8', 'M468.3 272.0L650.3 152.4', 'M476.6 287.3L621.5 223.3', 'M482.3 303.7L693.2 249.6'];
+---
+<BaseLayout
+  title="School Song"
+  description="The KenBridge School song, “For us no mountain too high”, with every verse and the chorus."
+  current="information"
+  breadcrumbs={crumbs}
+>
+  <div class="container sh-crumbs noprint"><Breadcrumbs items={crumbs} /></div>
+  <div class="sh-wrap">
+    <article class="sh-sheet" aria-labelledby="songTitle">
+      <header class="sh-head sh-head--rays">
+        <svg class="sh-rays" aria-hidden="true" focusable="false" viewBox="0 0 760 330" fill="none" stroke="#F5C400" stroke-linecap="round" opacity="0.42"><g stroke-width="2.5">{rays.map((d) => <path d={d} />)}</g></svg>
+        <p class="sh-kicker">{S.kicker}</p>
+        <h1 id="songTitle" class="sh-h1">{S.title}</h1>
+        <div class="sh-orn" aria-hidden="true"><span></span><FlameMark size={20} /><span></span></div>
+      </header>
+
+      {songRecording && (
+        <figure class="sh-audio noprint">
+          <figcaption class="sh-audio-cap"><strong>Listen to the school song</strong><span class="tnum">{S.recording.meta}</span></figcaption>
+          <audio controls preload="none" src={songRecording}>Your browser cannot play this recording. <a href={songRecording}>Download the recording</a>.</audio>
+          <p class="sh-audio-note">Plays only when you press play.</p>
+        </figure>
+      )}
+
+      <div class="sh-verses">
+        {S.stanzas.map((st) => (
+          <section class:list={['sh-stanza', st.chorus && 'sh-stanza--chorus']} aria-label={st.label}>
+            {st.closing ? <p class="sh-rule" aria-hidden="true"><span></span></p> : <p class="sh-label">{st.label}</p>}
+            <p class="sh-lines">{st.lines.map((line, i) => <span class:list={['sh-line', st.refrain.includes(i) && 'sh-line--refrain']}>{line}</span>)}</p>
+          </section>
+        ))}
+      </div>
+      <div class="sh-orn sh-orn--end" aria-hidden="true"><span></span><FlameMark size={16} /><span></span></div>
+    </article>
+  </div>
+  <RelatedLinks class="noprint" items={[
+    { title: 'School Prayer', desc: '“Where the mind is without fear…”', href: '/information/prayer' },
+    { title: 'School Information', desc: 'Timings, rules, decorum and downloads', href: '/information' }
+  ]} />
+</BaseLayout>
+
+<style>
+  .sh-crumbs { padding-top: 12px; }
+  .sh-wrap { padding: 20px 0 0; }
+  .sh-sheet { width: 100%; margin: 0 auto; padding: 40px 20px 48px; background: var(--surface-raised); border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 32px; }
+  .sh-head { position: relative; width: 100%; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+  .sh-head--rays { padding-top: 54px; }
+  .sh-rays { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: 400px; max-width: none; height: auto; pointer-events: none; }
+  .sh-kicker { position: relative; font-size: 12px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color: var(--text-muted); }
+  .sh-h1 { position: relative; font-family: var(--font-display); font-size: clamp(3.25rem, 1.786rem + 6vw, 6.5rem); font-weight: 500; line-height: 0.95; letter-spacing: -0.01em; }
+  .sh-orn { position: relative; display: flex; align-items: center; gap: 14px; margin-top: 6px; }
+  .sh-orn span { width: 56px; height: 1px; background: var(--brand); }
+  .sh-orn--end { margin: 0; }
+  .sh-orn--end span { width: 40px; background: var(--border-strong); }
+  .sh-audio { margin: 0; width: 100%; display: flex; flex-direction: column; gap: 10px; padding: 16px; background: var(--bg); border: 1px solid var(--border); }
+  .sh-audio-cap { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 15px; }
+  .sh-audio-cap span { font-size: 13px; color: var(--text-muted); }
+  .sh-audio audio { width: 100%; }
+  .sh-audio-note { font-size: 13px; color: var(--text-muted); }
+  .sh-verses { width: 100%; display: flex; flex-direction: column; gap: 32px; }
+  .sh-stanza { display: flex; flex-direction: column; align-items: center; }
+  .sh-stanza--chorus { padding: 18px 0; border-top: 1px solid rgba(127, 3, 5, 0.25); border-bottom: 1px solid rgba(127, 3, 5, 0.25); }
+  .sh-label { margin-bottom: 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color: var(--text-muted); }
+  .sh-stanza--chorus .sh-label { color: var(--brand); }
+  .sh-rule { margin-bottom: 14px; display: flex; justify-content: center; }
+  .sh-rule span { width: 40px; height: 1px; background: var(--border-strong); }
+  .sh-lines { font-family: var(--font-display); font-size: 22px; line-height: 1.6; text-align: center; }
+  .sh-line { display: block; }
+  .sh-line--refrain { font-style: italic; font-weight: 500; color: var(--brand); }
+
+  @media (min-width: 1024px) {
+    .sh-crumbs { padding-top: 28px; }
+    .sh-wrap { padding: 40px var(--margin) 112px; }
+    .sh-sheet { width: 820px; padding: 72px 80px 80px; gap: 44px; box-shadow: 0 1px 0 var(--border), 0 24px 48px -36px rgba(42, 10, 11, 0.35); }
+    .sh-head--rays { padding-top: 96px; }
+    .sh-rays { width: 760px; }
+    .sh-verses { gap: 40px; }
+    .sh-lines { font-size: 28px; }
+  }
+  @media print {
+    @page { size: A4; margin: 16mm; }
+    .sh-wrap { padding: 0 !important; }
+    .sh-sheet { width: auto !important; padding: 0 !important; border: 0 !important; gap: 16pt !important; }
+    .sh-h1 { font-size: 36pt !important; }
+    .sh-lines { font-size: 13pt !important; }
+    .sh-verses { gap: 12pt !important; }
+    .sh-head--rays { padding-top: 40pt !important; }
+    .sh-rays { width: 300pt !important; }
+  }
+</style>

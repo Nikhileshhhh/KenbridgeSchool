@@ -1,0 +1,263 @@
+---
+// Footer (1440) and MobileFooter (390) boards: one markup, two layouts (switch at 1024px).
+import { Image } from 'astro:assets';
+import logo from '../../assets/brand/logo-official-transparent.png';
+import Icon from '../ui/Icon.astro';
+import Rays from '../ui/Rays.astro';
+import { getNavigation, getServices, getSchool, resolveLink } from '../../lib/site';
+
+const nav = await getNavigation();
+const services = await getServices();
+const school = await getSchool();
+const ourSchool = nav.footer.ourSchool.map((l) => resolveLink(l, services));
+const quick = nav.footer.quickLinks.map((l) => resolveLink(l, services));
+const year = new Date().getFullYear();
+---
+<footer class="site-footer on-dark">
+  <Rays class="f-rays f-rays--desk" />
+  <Rays class="f-rays f-rays--mob" longOnly />
+
+  <div class="f-main">
+    <div class="f-brand">
+      <a href="/" aria-label="KenBridge School Gulbarga, home" class="f-home">
+        <Image src={logo} alt="" width={72} height={72} densities={[1, 2]} format="png" class="f-logo" />
+        <span class="wordmark f-word">KenBridge School</span>
+      </a>
+      <span class="f-motto">Inspiring <span class="em">to</span> Learn</span>
+      <ul role="list" aria-label="Our values" class="f-values">
+        <li>{school.values[0]}</li><li aria-hidden="true" class="f-dot">·</li><li>{school.values[1]}</li><li aria-hidden="true" class="f-dot">·</li><li>{school.values[2]}</li>
+      </ul>
+      <p class="f-codes tnum">
+        <span>CBSE Affiliation No. {school.affiliationNo}</span><span class="f-codes-sep"> · </span><span>School Code {school.schoolCode}</span>
+      </p>
+    </div>
+
+    <div class="f-contact">
+      <h2 class="f-h">Get in touch</h2>
+      <address class="f-address">
+        <strong>{school.address.name}</strong><br />{school.address.street}<br />{school.address.city}<span class="f-addr-comma">, </span><br class="f-addr-br" />{school.address.region}
+      </address>
+      <ul role="list" aria-label="Phone and email" class="f-calls tnum">
+        {school.phones.map((p) => (
+          <li><a class="f-call" href={`tel:${p.tel}`}><Icon name="phone" size={16} /><span><span class="vh">Call </span>{p.display}</span></a></li>
+        ))}
+        <li><a class="f-call f-mail" href={`mailto:${school.email}`}><Icon name="mail" size={16} /><span>{school.email}</span></a></li>
+      </ul>
+      <div class="f-hours">
+        <span class="f-hours-label eyebrow-text">Working hours</span>
+        <dl class="f-hours-list tnum">
+          {school.hours.map((h) => (<><dt>{h.days}</dt><dd>{h.time}</dd></>))}
+        </dl>
+      </div>
+    </div>
+
+    <nav aria-labelledby="fOurSchool" class="f-nav f-nav--school">
+      <h2 id="fOurSchool" class="f-h">Our School</h2>
+      <ul role="list">
+        {ourSchool.map((l) => (
+          <li>
+            <a class="f-link" href={l.href} target={l.newTab ? '_blank' : undefined} rel={l.kind === 'ext' ? 'noopener' : undefined}>
+              {l.label}{l.kind === 'ext' && <Icon name="external" size={12} class="f-ext" />}{l.srNote && <span class="vh">{l.srNote}</span>}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <nav aria-labelledby="fQuick" class="f-nav f-nav--quick">
+      <h2 id="fQuick" class="f-h">Quick links</h2>
+      <ul role="list">
+        {quick.map((l) => (
+          <li>
+            <a class="f-link" href={l.href} target={l.newTab ? '_blank' : undefined} rel={l.kind === 'ext' ? 'noopener' : undefined}>
+              {l.label}{l.kind === 'ext' && <Icon name="external" size={12} class="f-ext" />}{l.kind === 'pdf' && <span class="f-pdf">PDF</span>}{l.srNote && <span class="vh">{l.srNote}</span>}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+
+  <div class="f-bottom">
+    <span class="f-copy tnum">© {year} KenBridge School Gulbarga</span>
+    <div class="f-social">
+      <a class="f-link f-soc" href={school.social.facebook} target="_blank" rel="noopener"><Icon name="people" size={16} class="f-soc-icon" />Facebook<span class="vh"> (opens in a new tab)</span></a>
+      <a class="f-link f-soc" href={school.social.youtube} target="_blank" rel="noopener"><Icon name="youtube" size={16} class="f-soc-icon" />YouTube<span class="vh"> (opens in a new tab)</span></a>
+      <span aria-hidden="true" class="f-divider"></span>
+      <a class="f-link f-soc f-top" href="#top">Back to top<Icon name="arrow-up" size={16} class="f-up" /></a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    overflow: hidden;
+    background: var(--surface-dark);
+    color: var(--text-on-dark);
+    display: flex;
+    flex-direction: column;
+    min-height: 1600px;
+  }
+  .site-footer a { color: var(--text-on-dark); text-decoration: none; }
+  .site-footer a:hover { color: #FFFFFF; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--accent); }
+  .site-footer :global(.f-rays) { position: absolute; pointer-events: none; }
+  .site-footer :global(.f-rays--desk) { display: none; right: -240px; top: 120px; width: 1200px; height: 400px; opacity: 0.16; }
+  .site-footer :global(.f-rays--mob) { left: -15px; top: 40px; width: 420px; height: 140px; opacity: 0.18; }
+
+  /* ----- mobile first (MobileFooter) ----- */
+  .f-main { position: relative; display: flex; flex-direction: column; }
+  .f-brand {
+    padding: 200px 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+  }
+  .f-home { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .f-home:hover { text-decoration: none !important; }
+  .f-home :global(.f-logo) { width: 64px; height: 64px; filter: brightness(0) invert(1); }
+  .f-word { font-size: 28px; line-height: 1; }
+  .f-motto { font-family: var(--font-display); font-size: 36px; font-weight: 500; line-height: 1.05; }
+  .f-values {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 6px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1.35;
+    color: var(--accent);
+  }
+  .f-dot { color: var(--text-on-dark-muted); }
+  .f-codes { font-size: 14px; line-height: 1.6; color: var(--text-on-dark-muted); }
+
+  .f-contact {
+    margin: 40px 20px 0;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule-on-dark);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .f-h { margin: 0; line-height: 1.35; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+  .f-address { font-size: 16px; line-height: 1.6; }
+  .f-addr-br { display: none; }
+  .f-calls { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; font-size: 17px; font-weight: 600; }
+  .f-call {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 56px;
+    border-top: 1px solid var(--rule-on-dark);
+  }
+  .f-call :global(svg) { color: var(--accent); width: 18px; height: 18px; flex-shrink: 0; }
+  .f-mail { font-size: 15px; font-weight: 500; border-bottom: 1px solid var(--rule-on-dark); }
+  .f-hours { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; }
+  .f-hours-label { line-height: 1.35; font-size: 12px; color: var(--text-on-dark-muted); }
+  .f-hours-list { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: 15px; line-height: 1.5; }
+  .f-hours-list dt { color: var(--text-on-dark-muted); }
+  .f-hours-list dd { margin: 0; }
+
+  .f-nav { display: flex; flex-direction: column; gap: 12px; }
+  .f-nav ul { list-style: none; margin: 0; padding: 0; font-size: 15px; font-weight: 500; }
+  .f-link { display: flex; align-items: center; gap: 6px; min-height: 44px; line-height: 1.3; }
+  .f-link :global(.f-ext) { color: var(--accent); flex-shrink: 0; }
+  .f-pdf {
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+    padding: 0 6px;
+    border: 1px solid rgba(251, 247, 240, 0.3);
+    border-radius: var(--radius-sm);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--text-on-dark-muted);
+  }
+  .f-main { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 16px; }
+  .f-brand, .f-contact { grid-column: 1 / -1; }
+  .f-nav { margin-top: 40px; }
+  .f-nav--school { margin-left: 20px; }
+  .f-nav--quick { margin-right: 20px; }
+
+  .f-bottom {
+    position: relative;
+    margin: auto 20px 0;
+    padding: 24px 0 40px;
+    border-top: 1px solid var(--rule-on-dark);
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text-on-dark-muted);
+  }
+  .f-social { display: flex; align-items: center; gap: 24px; }
+  .f-soc { display: inline-flex; gap: 8px; font-weight: 600; }
+  .f-social :global(.f-soc-icon) { display: none; }
+  .f-divider { display: none; }
+  .f-top { margin-left: auto; }
+  .f-top :global(.f-up) { color: var(--accent); }
+
+  /* ----- desktop (Footer board) ----- */
+  @media (min-width: 1024px) {
+    .site-footer { min-height: 820px; }
+    .site-footer :global(.f-rays--desk) { display: block; }
+    .site-footer :global(.f-rays--mob) { display: none; }
+    .f-main {
+      width: 100%;
+      max-width: var(--page-max);
+      margin-inline: auto;
+      padding: 96px var(--margin) 64px;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 32px;
+    }
+    .f-brand { grid-column: span 4; padding: 0 32px 0 0; align-items: flex-start; text-align: left; gap: 24px; }
+    .f-home { flex-direction: row; gap: 16px; }
+    .f-home :global(.f-logo) { width: 72px; height: 72px; }
+    .f-word { font-size: 32px; }
+    .f-motto { font-size: 44px; }
+    .f-values { justify-content: flex-start; gap: 8px 14px; font-size: 13px; }
+    .f-codes { padding-top: 16px; border-top: 1px solid var(--rule-on-dark); align-self: stretch; }
+    .f-codes span { display: block; }
+    .f-codes .f-codes-sep { display: none; }
+    .f-contact { grid-column: span 3; margin: 0; padding: 0; border: 0; gap: 20px; }
+    .f-h { font-size: 13px; }
+    .f-address { font-size: 15px; }
+    .f-addr-comma { display: none; }
+    .f-addr-br { display: inline; }
+    .f-calls { font-size: 15px; }
+    .f-call { flex-direction: row; justify-content: flex-start; gap: 10px; min-height: 44px; border-top: 0; }
+    .f-call :global(svg) { width: 16px; height: 16px; }
+    .f-mail { border-bottom: 0; }
+    .f-hours { padding-top: 16px; border-top: 1px solid var(--rule-on-dark); }
+    .f-hours-list { font-size: 14px; }
+    .f-nav { margin: 0; gap: 20px; }
+    .f-nav--school { grid-column: 9 / span 2; margin: 0; }
+    .f-nav--quick { grid-column: 11 / span 2; margin: 0; }
+    .f-link { gap: 8px; }
+    .f-bottom {
+      width: calc(100% - 2 * var(--margin));
+      max-width: calc(var(--page-max) - 128px);
+      margin: auto auto 0;
+      padding: 24px 0 32px;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .f-social { gap: 28px; }
+    .f-social :global(.f-soc-icon) { display: block; }
+    .f-divider { display: block; width: 1px; height: 20px; background: rgba(251, 247, 240, 0.2); }
+    .f-top { margin-left: 0; }
+  }
+</style>

@@ -1,0 +1,214 @@
+---
+// /services (ServicesDesktop, ServicesMobile). Plain links only: every service signs in on its own site
+// and opens in a new tab, and says so. A PDF with no file yet (Fee Structure, Academic Calendar) is
+// shown without a link and says "[File to be supplied]" until the school supplies it.
+// Phones: Parent Login and Admission enquiry move up into two large "Most used" buttons (and leave the
+// lists); the app card sits after Families. Desktop: the app card is a sticky column with the QR code.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/shell/Breadcrumbs.astro';
+import Icon from '../components/ui/Icon.astro';
+import ServiceIcon from '../components/ui/ServiceIcon.astro';
+import AppQr from '../components/services/AppQr.astro';
+import { getMain, getServices } from '../lib/site';
+
+const { services: S } = await getMain('contact');
+const services = await getServices();
+const crumbs = [{ label: 'Home', href: '/' }, { label: S.title }];
+
+const groups = S.groups.map((g) => ({
+  ...g,
+  items: g.items.map((it) => {
+    const s = it.service ? services[it.service] : undefined;
+    const kind = it.kind ?? (s?.kind === 'pdf' ? 'pdf' : 'external');
+    return {
+      title: it.title ?? s!.label,
+      desc: it.desc ?? s!.description,
+      domain: it.domain ?? s!.domain,
+      url: s?.url,
+      kind,
+      icon: it.icon,
+      dup: !!it.service && S.mostUsed.includes(it.service)
+    };
+  })
+}));
+const mostUsed = S.mostUsed.map((k) => services[k]);
+---
+<BaseLayout
+  title="Services"
+  description="Online services at KenBridge School, Kalaburagi: parent login, CBSE transfer certificate, staff login, careers, admission enquiry, brochure and the school app."
+  breadcrumbs={crumbs}
+>
+  <section class="sv-hero" aria-labelledby="svH1">
+    <div class="container sv-hero-in">
+      <div class="only-lg"><Breadcrumbs items={crumbs} /></div>
+      <div class="sv-hero-row">
+        <h1 id="svH1" class="sv-h1">{S.title}</h1>
+        <p class="sv-lead">{S.lead}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sv-most only-sm" aria-label="Most used" data-pagefind-ignore="all">
+    {mostUsed.map((s, i) => (
+      <a class:list={['sv-big', i === 0 ? 'sv-big--primary' : 'sv-big--secondary']} href={s.url} target="_blank" rel="noopener">
+        <span class="sv-big-t"><span class="sv-big-l">{s.label}</span><span class="sv-big-m">External · {s.domain}</span></span>
+        <Icon name="external" size={20} /><span class="vh"> (opens in a new tab)</span>
+      </a>
+    ))}
+  </section>
+
+  <div class="container sv-body">
+    {groups.map((g, gi) => (
+      <>
+        <section class="sv-group" aria-labelledby={g.id}>
+          <div class="sv-group-head">
+            <h2 id={g.id} class="sv-h2">{g.title}</h2>
+            <p class="sv-group-note">{g.note}</p>
+          </div>
+          <ul class="sv-list" role="list">
+            {g.items.map((it) => {
+              const tag = <span class:list={['sv-tag', it.kind === 'pdf' && 'sv-tag--pdf']}>{it.kind === 'pdf' ? 'PDF' : 'EXTERNAL'}</span>;
+              const body = (
+                <>
+                  <ServiceIcon name={it.icon} class="sv-ico" />
+                  <span class="sv-txt">
+                    <span class="sv-t">{it.title}{it.url && <span class="vh"> ({it.kind === 'pdf' ? 'PDF' : 'external site'}, {it.domain}, opens in a new tab)</span>}</span>
+                    <span class="sv-d">{it.desc}</span>
+                    <span class="sv-meta sv-meta--sm" data-pagefind-ignore>{tag}{it.domain}</span>
+                  </span>
+                  <span class="sv-meta sv-meta--lg">{tag}{it.domain}</span>
+                </>
+              );
+              return (
+                <li class:list={[it.dup && 'sv-dup']}>
+                  {it.url ? (
+                    <a class="sv-row" href={it.url} target="_blank" rel="noopener">{body}<span class="sv-go"><Icon name={it.kind === 'pdf' ? 'download' : 'external'} size={18} /></span></a>
+                  ) : (
+                    <div class="sv-row sv-row--off">{body}<span class="sv-pending">[File to be supplied]</span></div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+        {gi === 0 && (
+          <aside id="app" class="sv-app" aria-labelledby="appT">
+            <div class="sv-app-head">
+              <ServiceIcon name="app" />
+              <div class="sv-app-t">
+                <h2 id="appT" class="sv-app-h">{S.app.title}</h2>
+                <p class="sv-app-p">{S.app.lead}</p>
+              </div>
+            </div>
+            <div class="sv-badges">
+              <a class="sv-badge" href={services.androidApp.url} target="_blank" rel="noopener"><span aria-hidden="true">{S.app.playBadge}</span><span class="vh">KBS Gulbarga on Google Play (play.google.com, opens in a new tab)</span></a>
+              <a class="sv-badge" href={services.iosApp.url} target="_blank" rel="noopener"><span aria-hidden="true">{S.app.appleBadge}</span><span class="vh">KBS Gulbarga on the App Store (apps.apple.com, opens in a new tab)</span></a>
+            </div>
+            <div class="sv-qr only-lg">
+              <div class="sv-qr-box" role="img" aria-label="QR code that opens the KBS Gulbarga app page"><AppQr /></div>
+              <div class="sv-qr-t">
+                <p class="sv-qr-h">{S.app.qrTitle}</p>
+                <p class="sv-qr-p">{S.app.qrNote}</p>
+              </div>
+            </div>
+          </aside>
+        )}
+      </>
+    ))}
+    <p class="sv-legend">
+      <span><Icon name="external" size={13} /> {S.legend.external}</span>
+      <span><Icon name="download" size={13} /> {S.legend.pdf}</span>
+      <span>{S.legend.signins}</span>
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .sv-hero { padding: 20px 0 28px; }
+  .sv-hero-in { display: flex; flex-direction: column; gap: 20px; }
+  .sv-hero-row { display: flex; flex-direction: column; gap: 10px; }
+  .sv-h1 { font-family: var(--font-display); font-size: clamp(3.5rem, 2.571rem + 3.81vw, 6rem); font-weight: 500; line-height: 0.98; }
+  .sv-lead { font-size: 17px; line-height: 1.5; color: var(--text-muted); }
+
+  .sv-most { display: flex; flex-direction: column; gap: 10px; padding: 0 var(--margin) 36px; }
+  .sv-big { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 72px; padding: 0 18px; border-radius: var(--radius-md); text-decoration: none; }
+  .sv-big--primary { background: var(--brand); color: #FFFFFF; }
+  .sv-big--primary:hover { background: var(--brand-hover); color: #FFFFFF; }
+  .sv-big--secondary { border: 1.5px solid var(--brand); background: #FFFFFF; color: var(--brand); }
+  .sv-big--secondary:hover { background: var(--brand-tint); color: var(--brand); }
+  .sv-big-t { display: flex; flex-direction: column; gap: 2px; }
+  .sv-big-l { font-size: 18px; font-weight: 700; }
+  .sv-big-m { font-size: 13px; }
+
+  .sv-body { display: flex; flex-direction: column; gap: 40px; padding-bottom: 64px; }
+  .sv-group { display: flex; flex-direction: column; }
+  .sv-group-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--text); }
+  .sv-h2 { font-family: var(--font-display); font-size: 32px; font-weight: 500; line-height: 1; }
+  .sv-group-note { font-size: 13px; color: var(--text-muted); text-align: right; }
+  .sv-list { list-style: none; margin: 0; padding: 0; }
+  .sv-dup { display: none; }
+  .sv-row { display: grid; grid-template-columns: 28px 1fr 20px; gap: 14px; align-items: center; min-height: 84px; padding: 14px 0; border-bottom: 1px solid var(--border); color: var(--text); text-decoration: none; }
+  a.sv-row:hover { background: var(--surface-raised); color: var(--text); }
+  a.sv-row:hover .sv-t { color: var(--brand); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 6px; }
+  .sv-row :global(.sv-ico) { width: 28px; height: 28px; }
+  .sv-row--off { grid-template-columns: 28px 1fr; }
+  .sv-txt { display: flex; flex-direction: column; gap: 4px; }
+  .sv-t { font-family: var(--font-display); font-size: 24px; font-weight: 500; line-height: 1.1; }
+  .sv-d { font-size: 14px; line-height: 1.45; color: var(--text-muted); }
+  .sv-meta { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
+  .sv-meta--sm { margin-top: 2px; }
+  .sv-meta--lg { display: none; }
+  .sv-tag { display: inline-flex; align-items: center; height: 22px; padding: 0 6px; border: 1px solid var(--border-strong); border-radius: 3px; background: #FFFFFF; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; color: var(--text); }
+  .sv-tag--pdf { background: var(--brand-tint); }
+  .sv-go { color: var(--brand); display: inline-flex; }
+  .sv-pending { grid-column: 2; font-size: 13px; font-weight: 600; color: var(--text-muted); }
+
+  .sv-app { display: flex; flex-direction: column; gap: 20px; padding: 22px 18px; background: var(--surface); border: 1px solid var(--border); box-shadow: inset 0 4px 0 var(--accent); scroll-margin-top: 96px; }
+  .sv-app-head { display: flex; gap: 14px; align-items: flex-start; }
+  .sv-app-head :global(svg) { flex-shrink: 0; }
+  .sv-app-t { display: flex; flex-direction: column; gap: 6px; }
+  .sv-app-h { font-family: var(--font-display); font-size: 28px; font-weight: 500; line-height: 1.1; }
+  .sv-app-p { font-size: 15px; line-height: 1.55; color: var(--text-muted); }
+  .sv-badges { display: flex; flex-direction: column; gap: 10px; }
+  .sv-badge { display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 56px; padding: 0 10px; border-radius: var(--radius-md); background: var(--text); color: #FFFFFF; text-decoration: none; font-size: 12px; line-height: 1.3; text-align: center; }
+  .sv-badge:hover { background: #000000; color: #FFFFFF; }
+  .sv-qr { grid-template-columns: 150px 1fr; gap: 18px; align-items: center; padding-top: 20px; border-top: 1px solid var(--border); }
+  .sv-qr-box { width: 150px; padding: 8px; background: #FFFFFF; border: 1px solid var(--border); }
+  .sv-qr-t { display: flex; flex-direction: column; gap: 8px; }
+  .sv-qr-h { font-size: 16px; font-weight: 700; }
+  .sv-qr-p { font-size: 14px; line-height: 1.55; color: var(--text-muted); }
+
+  .sv-legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 13px; color: var(--text-muted); }
+  .sv-legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+  @media (min-width: 1024px) {
+    .sv-hero { padding: 28px 0 56px; border-bottom: 1px solid var(--border); }
+    .sv-hero-row { flex-direction: row; justify-content: space-between; align-items: flex-end; gap: 32px; padding-top: 12px; }
+    .sv-h1 { line-height: 0.92; }
+    .sv-lead { max-width: 420px; margin-bottom: 10px; font-size: 18px; }
+    .sv-body { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; row-gap: 56px; align-items: start; padding-top: 64px; padding-bottom: 112px; }
+    .sv-group, .sv-legend { grid-column: 1 / span 8; }
+    .sv-h2 { font-size: 40px; }
+    .sv-dup { display: list-item; }
+    .sv-row { grid-template-columns: 36px 1fr auto 24px; gap: 20px; min-height: 92px; padding: 18px 8px 18px 0; }
+    .sv-row--off { grid-template-columns: 36px 1fr auto auto; }
+    .sv-row :global(.sv-ico) { width: 30px; height: 30px; }
+    .sv-t { font-size: 28px; }
+    .sv-d { font-size: 15px; }
+    .sv-meta--sm { display: none; }
+    .sv-meta--lg { display: inline-flex; gap: 10px; font-size: 14px; white-space: nowrap; }
+    .sv-pending { grid-column: auto; }
+    .sv-app { grid-column: 9 / span 4; grid-row: 1 / span 4; position: sticky; top: calc(var(--header-h) + 24px); padding: 32px; }
+    .sv-app-h { font-size: 32px; }
+    .sv-badges { flex-direction: row; flex-wrap: wrap; }
+    .sv-badge { width: 190px; }
+    .sv-qr { display: grid; }
+  }
+  /* The card column is narrow below 1280: the QR sits above its caption and the badges fill the card. */
+  @media (min-width: 1024px) and (max-width: 1279px) {
+    .sv-app { padding: 24px; }
+    .sv-qr { grid-template-columns: minmax(0, 1fr); }
+    .sv-qr-t { min-width: 0; }
+    .sv-badge { width: 100%; }
+  }
+</style>

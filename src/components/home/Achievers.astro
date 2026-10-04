@@ -1,0 +1,105 @@
+---
+// HomeDesktop §7 / HomeMobile "Class X 2026: Our Achievers". Portraits stay placeholders until
+// supplied with consent. The distribution chart is a real table with each value printed by its bar.
+import TextLink from '../ui/TextLink.astro';
+import { getResults } from '../../lib/site';
+const { achievers, distribution } = await getResults();
+const total = distribution.bands.reduce((a, b) => a + b.students, 0);
+---
+<section class="ach" aria-labelledby="achieversTitle">
+  <div class="container ach-grid">
+    <div class="ach-head">
+      <span class="ach-eyebrow eyebrow-text tnum">Results · Class X {achievers.year}</span>
+      <h2 id="achieversTitle" class="ach-title">Class X {achievers.year}: Our Achievers</h2>
+    </div>
+    <ol role="list" class="ach-list">
+      {achievers.list.map((a) => (
+        <li>
+          <figure class="ach-fig">
+            <div class="ach-portrait" role="img" aria-label={`Placeholder: portrait of ${a.name}`}><span class="only-lg">[Portrait · {a.name}]</span></div>
+            <figcaption class="ach-cap">
+              <span class="ach-score tnum">{a.score}%</span>
+              <strong class="ach-name">{a.name}</strong>
+            </figcaption>
+          </figure>
+        </li>
+      ))}
+    </ol>
+    <figure class="ach-chart">
+      <table class="bars tnum">
+        <caption class="bars-cap">
+          <span class="bars-title">Class X {distribution.year} result distribution</span>
+          <span class="bars-sub">Students per percentage band · {total} students<span class="only-lg"> across these bands</span></span>
+        </caption>
+        <thead class="only-lg-table"><tr><th scope="col" class="bars-th">Band</th><th scope="col" class="bars-th">Students</th></tr></thead>
+        <tbody>
+          {distribution.bands.map((b) => (
+            <tr class="bar-row">
+              <th scope="row" class="bar-band">{b.band}</th>
+              <td class="bar-cell">
+                <div class="bar-track">
+                  <span class="bar-fill" style={`--w:${(b.students / 60) * 100}%`}></span>
+                  <span class="bar-n">{b.students}</span>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div class="bars-axis tnum only-lg" aria-hidden="true"><span>0</span><span>15</span><span>30</span><span>45</span><span>60</span></div>
+      <TextLink href="/achievements" class="ach-link">See all results</TextLink>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .ach { padding: 64px 0; }
+  .ach-grid { display: flex; flex-direction: column; gap: 28px; }
+  .ach-head { display: flex; flex-direction: column; gap: 10px; }
+  .ach-eyebrow { font-size: 12px; color: var(--brand); }
+  .ach-title { font-family: var(--font-display); font-size: clamp(2.5rem, 1.943rem + 2.286vw, 4rem); font-weight: 500; line-height: 1.05; }
+  .ach-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .ach-fig { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+  .ach-portrait { aspect-ratio: 4 / 5; background: var(--ph-1); display: flex; align-items: flex-end; padding: 12px; font-size: 12px; color: var(--text-muted); }
+  .ach-cap { display: flex; flex-direction: column; gap: 8px; }
+  .ach-score { font-family: var(--font-display); font-size: clamp(1.75rem, 1.075rem + 2.771vw, 2.75rem); font-weight: 500; line-height: 1; color: var(--brand); }
+  .ach-name { font-size: 14px; line-height: 1.3; }
+
+  .ach-chart { margin: 0; display: flex; flex-direction: column; gap: 20px; }
+  .bars { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+  .bars-cap { caption-side: top; text-align: left; padding-bottom: 4px; }
+  .bars-title { display: block; font-family: var(--font-display); font-size: 24px; font-weight: 600; line-height: 1.2; }
+  .bars-sub { display: block; margin-top: 4px; font-size: 13px; color: var(--text-muted); }
+  .only-lg-table { display: none; }
+  .bars-th { padding: 0 0 4px; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); text-align: left; }
+  .bar-band { width: 80px; padding: 0; text-align: left; font-size: 14px; font-weight: 600; white-space: nowrap; }
+  .bar-cell { padding: 0; }
+  .bar-track { display: flex; align-items: center; gap: 8px; height: 24px; }
+  .bar-fill { display: block; height: 20px; width: calc(var(--w) * 0.8); background: var(--brand); border-radius: 0 4px 4px 0; transition: background 120ms; }
+  .bar-row:hover .bar-fill { background: var(--brand-strong); }
+  .bar-n { font-size: 14px; font-weight: 700; }
+  .ach-chart :global(.ach-link) { align-self: flex-start; font-size: 16px; }
+
+  @media (min-width: 1024px) {
+    .ach { padding: 128px 0; }
+    .ach-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; row-gap: 48px; }
+    .ach-head { grid-column: 1 / -1; gap: 14px; }
+    .ach-eyebrow { font-size: 13px; }
+    .ach-list { grid-column: 1 / span 7; gap: 24px; }
+    .ach-fig { gap: 14px; }
+    .ach-cap { gap: 4px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .ach-name { font-size: 17px; }
+    .ach-chart { grid-column: 9 / span 4; }
+    .bars { border-spacing: 0 10px; }
+    .bars-cap { padding-bottom: 6px; }
+    .bars-title { font-size: 28px; }
+    .bars-sub { margin-top: 6px; font-size: 14px; }
+    .only-lg-table { display: table-header-group; }
+    .bar-band { width: 92px; font-size: 15px; }
+    .bar-track { gap: 10px; height: 28px; background-image: linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 25% 100%; }
+    .bar-fill { height: 24px; width: var(--w); }
+    .bar-n { font-size: 15px; }
+    .bars-axis { display: flex; justify-content: space-between; margin-left: 92px; font-size: 12px; color: var(--text-muted); }
+    .ach-chart :global(.ach-link) { font-size: 17px; }
+  }
+</style>

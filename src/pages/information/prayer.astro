@@ -1,0 +1,70 @@
+---
+// /information/prayer (PrayerDesktop, PrayerMobile). The same "programme sheet" as the school song:
+// Tagore's poem with hanging indents, credited beneath.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/shell/Breadcrumbs.astro';
+import RelatedLinks from '../../components/info/RelatedLinks.astro';
+import { getMain } from '../../lib/site';
+
+const { prayer: P } = await getMain('info');
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'School Information', href: '/information' }, { label: 'School Prayer' }];
+---
+<BaseLayout
+  title="School Prayer"
+  description="The KenBridge School prayer: “Where the mind is without fear” by Rabindranath Tagore."
+  current="information"
+  breadcrumbs={crumbs}
+>
+  <div class="container pr-crumbs noprint"><Breadcrumbs items={crumbs} /></div>
+  <div class="pr-wrap">
+    <article class="pr-sheet" aria-labelledby="prayerTitle">
+      <header class="pr-head">
+        <p class="pr-kicker">{P.kicker}</p>
+        <h1 id="prayerTitle" class="pr-h1">{P.title}</h1>
+        <p class="pr-sub">{P.subtitle}</p>
+        <div class="pr-rule" aria-hidden="true"></div>
+      </header>
+      <figure class="pr-poem">
+        <blockquote class="pr-q"><p>{P.lines.map((l) => <span class="pr-line">{l}</span>)}</p></blockquote>
+        <figcaption class="pr-by">— {P.author}</figcaption>
+      </figure>
+    </article>
+  </div>
+  <RelatedLinks class="noprint" items={[
+    { title: 'School Song', desc: '“For us no mountain too high…”', href: '/information/song' },
+    { title: 'School Information', desc: 'Timings, rules, decorum and downloads', href: '/information' }
+  ]} />
+</BaseLayout>
+
+<style>
+  .pr-crumbs { padding-top: 12px; }
+  .pr-wrap { padding: 20px 0 0; }
+  .pr-sheet { width: 100%; margin: 0 auto; padding: 48px 20px 56px; background: var(--surface-raised); border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 36px; }
+  .pr-head { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+  .pr-kicker { font-size: 12px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color: var(--text-muted); }
+  .pr-h1 { font-family: var(--font-display); font-size: clamp(3.25rem, 1.957rem + 5.305vw, 6rem); font-weight: 500; line-height: 0.95; letter-spacing: -0.01em; }
+  .pr-sub { margin-top: 4px; font-family: var(--font-display); font-size: 24px; font-style: italic; font-weight: 400; color: var(--text-muted); }
+  .pr-rule { margin-top: 14px; width: 72px; height: 2px; background: var(--accent); }
+  .pr-poem { margin: 0; width: 100%; display: flex; flex-direction: column; gap: 24px; }
+  .pr-q { margin: 0; font-family: var(--font-display); font-size: 21px; font-weight: 400; line-height: 1.75; }
+  .pr-line { display: block; padding-left: 1.2em; text-indent: -1.2em; }
+  .pr-by { font-family: var(--font-display); font-size: 22px; font-weight: 500; }
+
+  @media (min-width: 1024px) {
+    .pr-crumbs { padding-top: 28px; }
+    .pr-wrap { padding: 40px var(--margin) 112px; }
+    .pr-sheet { width: 820px; padding: 96px 64px 104px; gap: 56px; }
+    .pr-sub { font-size: 30px; }
+    .pr-rule { margin-top: 22px; width: 96px; }
+    .pr-poem { max-width: 692px; gap: 32px; }
+    .pr-q { font-size: 26px; line-height: 1.85; }
+    .pr-by { font-size: 24px; }
+  }
+  @media print {
+    @page { size: A4; margin: 16mm; }
+    .pr-wrap { padding: 0 !important; }
+    .pr-sheet { width: auto !important; padding: 0 !important; border: 0 !important; gap: 16pt !important; }
+    .pr-h1 { font-size: 34pt !important; }
+    .pr-q { font-size: 13pt !important; }
+  }
+</style>

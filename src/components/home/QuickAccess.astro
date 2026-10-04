@@ -1,0 +1,71 @@
+---
+// HomeDesktop §12 / HomeMobile quick access tiles. External tiles open in a new tab and say so.
+import { getServices } from '../../lib/site';
+const services = await getServices();
+const icons: Record<string, string> = {
+  tour: '<rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M10 9.5V14.5L14.5 12Z" fill="#7F0305"/>',
+  enquire: '<path d="M4 5H20V16H9L5 19.5V16H4Z"/><path d="M8 9.5H16M8 12.5H13"/>',
+  tc: '<path d="M6 2.5H14L18.5 7V21.5H6Z"/><path d="M12 10V17M9 14L12 17L15 14"/>',
+  brochure: '<path d="M3 5.5C6 4.5 9 4.5 12 6.5C15 4.5 18 4.5 21 5.5V19C18 18 15 18 12 20C9 18 6 18 3 19Z"/><path d="M12 6.5V20"/>',
+  parent: '<circle cx="12" cy="8" r="3.5"/><path d="M4.5 20.5A7.5 7.5 0 0 1 19.5 20.5"/>',
+  app: '<rect x="6.5" y="2.5" width="11" height="19" rx="2"/><path d="M10.5 18.5H13.5"/>'
+};
+const tiles = [
+  { key: 'tour', title: 'Virtual Tour', sub: 'Campus video', titleSm: 'Virtual Tour', href: services.virtualTour.url, ext: true, tour: true },
+  { key: 'enquire', title: 'Enquire', sub: 'External ↗', titleSm: 'Enquire ↗', href: services.admissionEnquiry.url, ext: true },
+  { key: 'tc', title: 'Download CBSE TC', sub: 'External ↗', titleSm: 'Download CBSE TC ↗', href: services.tc.url, ext: true },
+  { key: 'brochure', title: 'Brochure', sub: `PDF · ${services.brochure.size ?? '[size]'}`, titleSm: 'Brochure · PDF', href: services.brochure.url, pdf: true },
+  { key: 'parent', title: 'Parent Login', sub: 'External ↗', titleSm: 'Parent Login ↗', href: services.parentLogin.url, ext: true },
+  { key: 'app', title: 'Mobile App', sub: 'Android · iOS', titleSm: 'Mobile App', href: '/services#app' }
+];
+---
+<section class="qa" aria-labelledby="quickTitle">
+  <div class="container">
+    <h2 id="quickTitle" class="qa-h eyebrow-text">Quick access</h2>
+    <ul role="list" class="qa-grid">
+      {tiles.map((t) => (
+        <li>
+          <a
+            class="qa-tile"
+            href={t.href}
+            target={t.ext || t.pdf ? '_blank' : undefined}
+            rel={t.ext ? 'noopener' : undefined}
+            data-tour-open={t.tour ? '' : undefined}
+          >
+            <svg class="qa-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="#7F0305" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" set:html={icons[t.key]} />
+            <span class="qa-text">
+              <strong class="qa-title"><span class="only-lg">{t.title}</span><span class="only-sm">{t.titleSm}</span></strong>
+              <span class="qa-sub only-lg">{t.sub}</span>
+            </span>
+            {t.ext && <span class="vh" data-tour-note>{t.tour ? ' (opens YouTube in a new tab)' : ' (opens in a new tab)'}</span>}
+            {t.pdf && <span class="vh"> (PDF, opens in a new tab)</span>}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .qa { padding: 56px 0; background: var(--surface-raised); border-top: 1px solid var(--border); }
+  .qa-h { margin: 0 0 20px; font-size: 12px; color: var(--brand); }
+  .qa-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .qa-tile {
+    height: 116px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; padding: 16px;
+    border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); color: var(--text); text-decoration: none; text-align: left;
+  }
+  .qa-tile:hover { border-color: var(--brand); background: var(--brand-tint); color: var(--text); }
+  .qa-tile:active { background: var(--brand-tint); }
+  .qa-icon { width: 24px; height: 24px; }
+  .qa-text { display: flex; flex-direction: column; gap: 2px; }
+  .qa-title { font-size: 16px; }
+  .qa-sub { font-size: 13px; color: var(--text-muted); }
+  @media (min-width: 1024px) {
+    .qa { padding: 96px 0; }
+    .qa-h { margin-bottom: 32px; font-size: 13px; }
+    .qa-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; }
+    .qa-tile { height: 148px; padding: 20px; }
+    .qa-icon { width: 28px; height: 28px; }
+    .qa-title { font-size: 17px; }
+  }
+</style>

@@ -1,0 +1,20 @@
+# Principal's message (P05, verbatim from the live site). No portrait or signature: the page is typographic.
+main:
+  name: Mrs. Neeta Purohit
+  role: Principal, KenBridge School, Kalaburagi
+  qualifications: M.Sc, B.Ed
+  opening: Greetings of the season! I feel deeply proud to be a part of
+  openingEm: KenBridge School
+  paragraphs:
+    - The school was started to cater to the need of Kalaburgi, a town to which I am deeply attached. The Homi Educational Trust laid foundation to this CBSE Institution in the year 2011. Today, KenBridge School stands for excellence in school education in this part of Kalyana Karnataka Region.
+    - We enrich the young minds, broaden the horizons and enable them to discover the hidden talents and also develop the skills. Since 2015 we have become a full-fledged CBSE affiliated school of the country and are empowered to run the classes up to X. The management chooses to grow class wise through the process of up-gradation.
+    - 2016-17 was our first batch of X standard which gave cent percent result. Smart classrooms, digitalized system of functioning, special focus to games and sports and extracurricular activities have become the routine of the academic schedule.
+    - I wish all my students and parents the very best in their future endeavour and reiterate that I am committed to make KenBridge School the most trusted education brand, and this is possible only through whole-hearted support of parents and passion shown by teachers in the teaching–learning endeavour.
+  quote: If you want to go fast, go alone; but if you want to go far, go together.
+  quoteCaption: Indeed, we want to work together.
+  signOff: I wish all the success to my dear Students and Parents!
+  excerpt: We enrich the young minds, broaden the horizons and enable them to discover the hidden talents and also develop the skills.
+  facts:
+    - { label: Founded, value: '2011' }
+    - { label: CBSE affiliated, value: '2015' }
+    - { label: First Class X batch, value: 2016–17, note: 100% }

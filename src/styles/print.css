@@ -1,0 +1,14 @@
+/* Shared print rules. Page-specific sheets (timings, song, prayer, admissions checklist) add their own. */
+@media print {
+  .no-print,
+  .noprint,
+  .utility,
+  .site-header,
+  .site-footer,
+  .skip-link,
+  .breadcrumbs,
+  #mobile-menu { display: none !important; }
+  body { background: #FFFFFF; }
+  a { color: inherit; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; }
+}

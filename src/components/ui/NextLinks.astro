@@ -1,0 +1,56 @@
+---
+// "Continue" / "Related" link pairs at the foot of a page (AboutDesktop, FounderDesktop,
+// PrincipalDesktop and their mobile boards). Desktop: two large tiles side by side.
+// Phones: stacked; `compact` drops the eyebrow and uses tall single-line rows (Founder, Principal).
+import Icon from './Icon.astro';
+
+interface Item { eyebrow: string; label: string; href: string; tone?: 'maroon' | 'raised' | 'plain' | 'brand' }
+interface Props { items: Item[]; label?: string; size?: 'l' | 'm'; compact?: boolean; divided?: boolean }
+const { items, label = 'Continue', size = 'm', compact = false, divided = false } = Astro.props;
+---
+<nav aria-label={label} class:list={['next', `next--${size}`, compact && 'next--compact', divided && 'next--divided']}>
+  {items.map((it) => (
+    <a class:list={['next-tile', `next-tile--${it.tone ?? 'plain'}`]} href={it.href}>
+      <span class="next-eyebrow">{it.eyebrow}</span>
+      <span class="next-row">
+        <span class="next-label">{it.label}</span>
+        <Icon name="arrow" size={24} class="next-arrow" />
+      </span>
+    </a>
+  ))}
+</nav>
+
+<style>
+  .next { display: flex; flex-direction: column; border-bottom: 1px solid var(--border); }
+  .next-tile { display: flex; flex-direction: column; gap: 10px; padding: 40px var(--margin); color: var(--text); text-decoration: none; }
+  .next-tile--maroon { background: var(--brand); color: #FFFFFF; --focus-ring: var(--focus-on-dark); }
+  .next-tile--raised { background: var(--surface-raised); color: var(--brand); }
+  .next-tile--plain { color: var(--text); }
+  .next-tile--brand { color: var(--brand); }
+  .next-tile--maroon:hover { color: #FFFFFF; }
+  .next-tile--raised:hover, .next-tile--brand:hover { color: var(--brand); }
+  .next-tile--plain:hover { color: var(--text); }
+  .next-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .next-tile--maroon .next-eyebrow { color: #F3C9C0; }
+  .next-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .next-label { font-family: var(--font-display); font-size: 36px; font-weight: 500; line-height: 1; }
+  .next-tile:hover .next-label { text-decoration: underline; text-underline-offset: 8px; text-decoration-thickness: 1px; }
+  .next--l .next-tile:hover .next-label { text-decoration-thickness: 2px; }
+  .next :global(.next-arrow) { flex-shrink: 0; }
+  .next--compact .next-tile { justify-content: center; min-height: 96px; padding-block: 0; border-bottom: 1px solid var(--border); }
+  .next--compact .next-tile--maroon { min-height: 104px; border-bottom: 0; }
+  .next--compact .next-tile:last-child { border-bottom: 0; }
+  .next--compact .next-eyebrow { display: none; }
+  .next--compact .next-label { font-size: 32px; }
+
+  @media (min-width: 1024px) {
+    .next { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--border); }
+    .next-tile, .next--compact .next-tile { min-height: 0; justify-content: flex-start; gap: 14px; padding: 72px var(--margin); border-bottom: 0; }
+    .next--compact .next-eyebrow { display: block; }
+    .next-eyebrow { font-size: 13px; }
+    .next-label, .next--compact .next-label { font-size: 48px; }
+    .next--l .next-tile { gap: 16px; padding-block: 80px; }
+    .next--l .next-label { font-size: 56px; }
+    .next--divided .next-tile:first-child { border-right: 1px solid var(--border); }
+  }
+</style>

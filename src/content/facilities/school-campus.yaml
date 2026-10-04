@@ -1,0 +1,13 @@
+# Facility data from the FacilityDetail and CampusDesktop board scripts. Only school-approved copy goes in
+# what / how / features; anything not yet approved goes in pending (shown only when facilityDrafts is on).
+num: '01'
+name: School Campus
+short: campus
+group: grow
+descriptor: Modern architecture, landscaped gardens and lush green surroundings.
+atlasDesc: Modern architecture, landscaped gardens and lush green surroundings.
+homePhoto: Drone-Front.jpg
+atlasPhoto: Drone-Front.jpg / DJI_0401
+photos: [Drone-Front.jpg, DJI_0401.jpg]
+facts:
+  - { value: '20,234', unit: sq m, label: Campus area, source: CBSE Mandatory Public Disclosure }

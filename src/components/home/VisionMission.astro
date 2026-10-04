@@ -1,0 +1,51 @@
+---
+// HomeDesktop §4 / HomeMobile vision and mission (reused on About).
+import FlameMark from '../ui/FlameMark.astro';
+import Rays from '../ui/Rays.astro';
+import { getHome } from '../../lib/site';
+const { vision, mission } = await getHome();
+---
+<section class="vm on-dark" aria-labelledby="visionTitle">
+  <Rays class="vm-rays only-lg" longOnly />
+  <div class="container vm-grid">
+    <h2 id="visionTitle" class="vm-h eyebrow-text">Our vision</h2>
+    <blockquote class="vm-quote">“{vision}”</blockquote>
+    <h2 class="vm-h vm-h--mission eyebrow-text">Our mission</h2>
+    <ol role="list" class="vm-list">
+      {mission.map((m, i) => (
+        <li class="vm-item">
+          <span class="vm-num"><FlameMark size={16} onDark class="vm-flame" /><span class="tnum">{String(i + 1).padStart(2, '0')}</span></span>
+          <span class="vm-text">{m}</span>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .vm { position: relative; overflow: hidden; padding: 64px 0; background: var(--surface-dark); color: var(--text-on-dark); }
+  .vm :global(.vm-rays) { position: absolute; right: -300px; top: -60px; width: 1200px; height: 400px; opacity: 0.16; max-width: none; }
+  .vm-grid { position: relative; display: flex; flex-direction: column; gap: 24px; }
+  .vm-h { margin: 0; font-size: 12px; color: var(--accent); }
+  .vm-h--mission { margin-top: 32px; }
+  .vm-quote { margin: 0; font-family: var(--font-display); font-size: clamp(1.875rem, 1.364rem + 2.095vw, 3.25rem); font-weight: 400; font-style: italic; line-height: 1.2; }
+  .vm-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .vm-item { display: grid; grid-template-columns: 64px 1fr; gap: 8px; padding: 20px 0; border-top: 1px solid rgba(251, 247, 240, 0.25); }
+  .vm-item:last-child { border-bottom: 1px solid rgba(251, 247, 240, 0.25); }
+  .vm-num { display: flex; align-items: center; gap: 6px; align-self: start; font-family: var(--font-display); font-size: clamp(1.75rem, 1.471rem + 1.143vw, 2.5rem); line-height: 1; color: var(--accent); }
+  .vm-num :global(.vm-flame) { width: 12px; height: 12px; }
+  .vm-text { font-size: 16px; line-height: 1.6; }
+  @media (min-width: 1024px) {
+    .vm { padding: 128px 0; }
+    .vm-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; row-gap: 32px; }
+    .vm-h { grid-column: 1 / -1; font-size: 13px; }
+    .vm-h--mission { margin-top: 72px; }
+    .vm-quote { grid-column: 1 / span 10; line-height: 1.15; }
+    .vm-list { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; }
+    .vm-item { display: flex; flex-direction: column; gap: 16px; padding: 20px 0 0; }
+    .vm-item:last-child { border-bottom: 0; }
+    .vm-num { gap: 10px; }
+    .vm-num :global(.vm-flame) { width: 16px; height: 16px; }
+    .vm-text { font-size: 18px; }
+  }
+</style>

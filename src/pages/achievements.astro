@@ -1,0 +1,443 @@
+---
+// /achievements · Results & Achievements (AchievementsDesktop, AchievementsMobile). Every figure comes
+// from src/data/results.yaml and names its source. Toppers archive: year tabs (JS) over the school's
+// result banners; a banner is shown with its typed transcription, or flagged until one exists.
+// Without JS every year is listed and the "View full size" control is hidden.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/shell/Breadcrumbs.astro';
+import Icon from '../components/ui/Icon.astro';
+import Placeholder from '../components/ui/Placeholder.astro';
+import NextLinks from '../components/ui/NextLinks.astro';
+import PassChart from '../components/achievements/PassChart.astro';
+import { getMain, getResults } from '../lib/site';
+
+const P = await getMain('achievements');
+const R = await getResults();
+const about = await getMain('about');
+const named = [...about.beyond.sports, ...about.beyond.activities].join(' · ');
+const total = R.distribution.bands.reduce((s, b) => s + b.students, 0);
+const longest = Math.ceil(Math.max(...R.distribution.bands.map((b) => b.students)) / 10) * 10;
+const rows = [
+  ...[...R.classX].sort((a, b) => b.year - a.year).map((d) => ({ year: String(d.year), registered: String(d.registered), passed: String(d.passed), pct: `${d.passPct}%`, remarks: d.remarks || '—' })),
+  { year: R.firstBatch.year, registered: '—', passed: '—', pct: `${R.firstBatch.passPct}%`, remarks: 'First batch' }
+];
+const banners = R.banners;
+const current = banners.length - 1; // the latest year opens first
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'Results & Achievements' }];
+---
+<BaseLayout
+  title="Results & Achievements"
+  description="Class X CBSE results at KenBridge School, Kalaburagi: 97.75% in 2025, 100% in 2024 and 2023, 100% for the first batch (2016-17), and the 2026 achievers."
+  current="information"
+  breadcrumbs={crumbs}
+>
+  <section class="ac-hero" aria-labelledby="achH1">
+    <div class="container ac-hero-grid">
+      <div class="ac-crumbs"><Breadcrumbs items={crumbs} collapse /></div>
+      <div class="ac-hero-copy">
+        <h1 id="achH1" class="ac-h1">{P.title}</h1>
+        <p class="ac-lead">{P.lead}</p>
+      </div>
+      <div class="ac-howto">
+        <p class="ac-howto-k only-lg">{P.howTo.title}</p>
+        <p class="ac-howto-p">{P.howTo.text}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ac-sec" aria-labelledby="s1Title">
+    <div class="container">
+      <div class="ac-head">
+        <div class="ac-head-t">
+          <p class="eyebrow-text ac-red tnum">{P.achievers.eyebrow}</p>
+          <h2 id="s1Title" class="ac-h2">Class X {R.achievers.year} Achievers</h2>
+        </div>
+        <p class="ac-src only-lg">{P.achievers.source}</p>
+      </div>
+      <div class="ac-s1-grid">
+        <div class="ac-achievers-wrap">
+          <ul class="ac-achievers" aria-label={`Highest scores, Class X ${R.achievers.year}`} role="list">
+            {R.achievers.list.map((a) => (
+              <li class="ac-achiever">
+                <span class="only-lg"><Placeholder label={P.achievers.portrait} ratio="4 / 5" alt={`Placeholder for a portrait of ${a.name}`} class="ac-portrait" /></span>
+                <span class="only-sm"><Placeholder label={P.achievers.portraitSm} ratio="4 / 5" alt={`Placeholder for a portrait of ${a.name}`} class="ac-portrait ac-portrait--sm" /></span>
+                <p class="ac-achiever-p"><span class="ac-score tnum">{a.score}<span class="ac-pct">%</span></span><span class="ac-name">{a.name}</span></p>
+              </li>
+            ))}
+          </ul>
+          <p class="ac-src only-sm ac-src--sm">{P.achievers.sourceSm}</p>
+        </div>
+        <div class="ac-dist">
+          <table class="ac-dist-table tnum">
+            <caption class="ac-dist-cap"><span class="ac-dist-t">How the {R.distribution.year} batch scored</span><span class="ac-dist-s">{P.achievers.distSub}</span></caption>
+            <thead class="vh"><tr><th scope="col">Percentage band</th><th scope="col">Students</th></tr></thead>
+            <tbody>
+              {R.distribution.bands.map((b) => (
+                <tr class="ac-bar-row">
+                  <th scope="row">{b.band}</th>
+                  <td><span class="ac-bar-cell"><span class="ac-bar" aria-hidden="true"><span class="ac-bar-fill" style={`width:${((b.students / longest) * 100).toFixed(1)}%`}></span></span><span class="ac-bar-val">{b.students}<span class="only-lg ac-bar-unit"> students</span></span></span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p class="ac-dist-total"><span><strong class="tnum">{total}</strong> students across the five bands<span class="only-sm">. Bars drawn to scale.</span></span><span class="ac-src only-lg">Bars drawn to scale; longest = {longest}</span></p>
+          <p class="ac-src">{P.achievers.distSource}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ac-sec ac-sec--raised" aria-labelledby="s2Title">
+    <div class="container">
+      <div class="ac-head ac-head--stack">
+        <p class="eyebrow-text ac-red">{P.annual.eyebrow}</p>
+        <h2 id="s2Title" class="ac-h2">{P.annual.title}</h2>
+      </div>
+      <div class="ac-s2-grid">
+        <div class="ac-annual">
+          <table class="ac-table tnum only-lg">
+            <caption class="vh">Class X CBSE Board results by year</caption>
+            <thead><tr><th scope="col">Year</th><th scope="col" class="ac-r">Registered</th><th scope="col" class="ac-r">Passed</th><th scope="col" class="ac-r">Pass %</th><th scope="col" class="ac-rem">Remarks</th></tr></thead>
+            <tbody>
+              {rows.map((d) => (
+                <tr>
+                  <th scope="row" class="ac-year">{d.year}</th>
+                  <td class:list={['ac-r', 'ac-n', d.registered === '—' && 'ac-muted']}>{d.registered}</td>
+                  <td class:list={['ac-r', 'ac-n', d.passed === '—' && 'ac-muted']}>{d.passed}</td>
+                  <td class="ac-r ac-pctcell">{d.pct}</td>
+                  <td class="ac-rem ac-muted">{d.remarks}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <ul class="ac-cards tnum only-sm" role="list">
+            {rows.map((d) => (
+              <li class="ac-card">
+                <h3 class="ac-card-y">{d.year}</h3>
+                <p class="ac-card-pct"><span class="vh">Pass percentage </span>{d.pct}</p>
+                <dl class="ac-card-dl">
+                  <div><dt>Registered</dt><dd class="ac-strong">{d.registered}</dd></div>
+                  <div><dt>Passed</dt><dd class="ac-strong">{d.passed}</dd></div>
+                  <div><dt>Remarks</dt><dd class="ac-muted">{d.remarks}</dd></div>
+                </dl>
+              </li>
+            ))}
+          </ul>
+          <p class="ac-src">{P.annual.source}</p>
+        </div>
+        <figure class="ac-chart">
+          <figcaption class="ac-chart-cap"><span class="ac-chart-t">{P.annual.chartTitle}</span><span class="ac-chart-s">{P.annual.chartSub}</span></figcaption>
+          <span class="only-lg"><PassChart size="lg" /></span>
+          <span class="only-sm"><PassChart size="sm" /></span>
+          <p class="ac-src"><span class="only-lg">{P.annual.chartSource}</span><span class="only-sm">{P.annual.chartSourceSm}</span></p>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="ac-sec" aria-labelledby="s3Title">
+    <div class="container" data-tabs>
+      <div class="ac-head ac-head--wide">
+        <div class="ac-head-t">
+          <p class="eyebrow-text ac-red">{P.archive.eyebrow}</p>
+          <h2 id="s3Title" class="ac-h2">{P.archive.title}</h2>
+        </div>
+        <p class="ac-intro"><span class="only-lg">{P.archive.intro}</span><span class="only-sm">{P.archive.introSm}</span></p>
+      </div>
+      <div role="tablist" aria-label="Result year" class="ac-years js-only">
+        {banners.map((b, i) => (
+          <button type="button" role="tab" id={`yrTab${b.year}`} aria-selected={i === current ? 'true' : 'false'} aria-controls={`yrPanel${b.year}`} tabindex={i === current ? undefined : '-1'} class="ac-yr tnum">{b.year}</button>
+        ))}
+      </div>
+      <div class="ac-panels">
+        {banners.map((b) => (
+          <div id={`yrPanel${b.year}`} role="tabpanel" aria-labelledby={`yrTab${b.year}`} tabindex="0" class="ac-panel">
+            <div class="ac-banner">
+              <Placeholder label={`[Result banner · ${b.file}]`} ratio="16 / 9" alt={`Placeholder for the ${b.year} result banner (${b.file})`} class="ac-banner-ph" />
+              <button type="button" class="ac-zoom js-only" aria-haspopup="dialog" data-banner-open data-year={b.year} data-file={b.file}><Icon name="expand" size={14} /><span class="only-lg">View full size</span><span class="only-sm">Full size</span><span class="vh">: {b.year} result banner</span></button>
+            </div>
+            <div class="ac-trans">
+              <p class="ac-trans-k tnum">Transcription · {b.year}</p>
+              {b.rows.length > 0 ? (
+                <ol class="ac-trans-list tnum" role="list">
+                  {b.rows.map((r) => <li><span class="ac-trans-name">{r.name}</span><span class="ac-trans-score">{r.score}</span></li>)}
+                </ol>
+              ) : (
+                <div class="ac-pending">
+                  <p class="ac-pending-k">Transcription needed before release</p>
+                  <p class="ac-pending-p">Type every name and score from the {b.year} banner here. The banner is not published until it has a text version.</p>
+                </div>
+              )}
+              <p class="ac-src">Source: school result banner, {b.year} ({b.file}).</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="ac-sec ac-sec--raised" aria-labelledby="s4Title">
+    <div class="container">
+      <div class="ac-head">
+        <div class="ac-head-t">
+          <p class="eyebrow-text ac-red">{P.beyond.eyebrow}</p>
+          <h2 id="s4Title" class="ac-h2">{P.beyond.title}</h2>
+        </div>
+        <a class="ac-link only-lg" href="/gallery">Open the gallery<Icon name="arrow" size={16} /></a>
+      </div>
+      <ul class="ac-albums" role="list">
+        {P.beyond.albums.map((a) => (
+          <li>
+            <a class="ac-album" href={a.href}>
+              <span class="only-lg"><Placeholder label="[Album cover]" ratio="4 / 5" alt={`Placeholder for the album cover: ${a.name}`} class="ac-cover" /></span>
+              <span class="only-sm"><Placeholder label="[Album cover]" ratio="1 / 1" alt={`Placeholder for the album cover: ${a.name}`} class="ac-cover ac-cover--sm" /></span>
+              <span class="ac-album-text"><span class="ac-album-name">{a.name}</span><span class="ac-album-meta tnum">{a.year} · {a.count}</span></span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <a class="ac-link only-sm ac-link--sm" href="/gallery">Open the gallery<Icon name="arrow" size={16} /></a>
+      <div class="ac-named">
+        <p class="ac-named-k">{P.beyond.namedLabel}</p>
+        <p class="ac-named-p">{named}</p>
+      </div>
+    </div>
+  </section>
+
+  <NextLinks
+    label="Next"
+    divided
+    items={[
+      { eyebrow: 'Pre-KG to Class X', label: 'Explore learning', href: '/learning', tone: 'plain' },
+      { eyebrow: 'Ages, steps and documents', label: 'Admissions', href: '/admissions', tone: 'maroon' }
+    ]}
+    compact
+  />
+
+  <dialog class="ac-box on-dark" aria-labelledby="boxTitle" data-banner-dialog>
+    <div class="ac-box-head">
+      <h2 id="boxTitle" class="ac-box-title">Result banner, <span data-banner-year>{banners[current]?.year}</span></h2>
+      <button type="button" class="ac-box-close" data-banner-close autofocus>Close<Icon name="close" size={14} /></button>
+    </div>
+    <div class="ac-box-img" role="img" data-banner-img>
+      <span><span class="only-lg">[Result banner · <span data-banner-file>{banners[current]?.file}</span> · full size]</span><span class="only-sm">[Result banner · <span data-banner-file-sm>{banners[current]?.file}</span> · pinch to zoom]</span></span>
+    </div>
+    <p class="ac-box-note"><span class="only-lg">The names and scores are also typed out beside the banner on the page. Press Esc to close.</span><span class="only-sm">The names and scores are typed out under the banner on the page.</span></p>
+  </dialog>
+</BaseLayout>
+
+<script>
+  import '../scripts/achievements.js';
+</script>
+
+<style>
+  .ac-red { color: var(--brand); }
+  .ac-muted { color: var(--text-muted); }
+  .ac-strong { font-weight: 600; }
+  .ac-src { font-size: 13px; line-height: 1.45; color: var(--text-muted); }
+  .ac-link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--brand); font-size: 16px; font-weight: 600; text-decoration: underline; text-decoration-color: var(--link-underline); text-underline-offset: 6px; }
+  .ac-link:hover { text-decoration-thickness: 2px; text-decoration-color: currentColor; }
+  .ac-h2 { font-family: var(--font-display); font-size: clamp(2.5rem, 1.857rem + 2.571vw, 4rem); font-weight: 500; line-height: 1; }
+
+  /* ---------- hero ---------- */
+  .ac-hero { padding: 12px 0 48px; border-bottom: 1px solid var(--border); }
+  .ac-hero-grid { display: flex; flex-direction: column; gap: 18px; }
+  .ac-hero-copy { display: flex; flex-direction: column; gap: 18px; }
+  .ac-h1 { font-family: var(--font-display); font-size: clamp(3.5rem, 2.2rem + 5.333vw, 7rem); font-weight: 500; line-height: 0.98; letter-spacing: -0.015em; }
+  .ac-lead { font-family: var(--font-display); font-size: clamp(1.5rem, 1.268rem + 0.952vw, 2.125rem); font-weight: 500; line-height: 1.3; }
+  .ac-howto { margin-top: 6px; padding-left: 14px; border-left: 2px solid var(--border); }
+  .ac-howto-p { font-size: 14px; line-height: 1.55; color: var(--text-muted); }
+
+  /* ---------- sections ---------- */
+  .ac-sec { padding: 52px 0 56px; }
+  .ac-sec--raised { background: var(--surface-raised); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .ac-head { padding-bottom: 18px; border-bottom: 1px solid var(--text); }
+  .ac-head-t, .ac-head--stack { display: flex; flex-direction: column; gap: 12px; }
+  .ac-head .eyebrow-text { font-size: 12px; }
+  .ac-head--wide { padding-bottom: 0; border-bottom: 0; }
+  .ac-intro { margin-top: 12px; font-size: 15px; line-height: 1.55; color: var(--text-muted); }
+
+  /* section 1 */
+  .ac-achievers { list-style: none; margin: 24px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .ac-achiever { display: flex; flex-direction: column; gap: 10px; }
+  .ac-achiever > span { display: block; }
+  .ac-achiever :global(.ac-portrait) { padding: 10px; font-size: 11px; line-height: 1.35; }
+  .ac-achiever :global(.ac-portrait--sm) { padding: 6px; font-size: 9px; line-height: 1.3; }
+  .ac-achiever-p { display: flex; flex-direction: column; gap: 4px; }
+  .ac-score { font-family: var(--font-display); font-size: 34px; font-weight: 500; line-height: 0.9; color: var(--brand); }
+  .ac-pct { font-size: 18px; }
+  .ac-name { font-size: 14px; font-weight: 700; line-height: 1.3; }
+  .ac-src--sm { margin-top: 14px; }
+  .ac-dist { margin-top: 40px; display: flex; flex-direction: column; gap: 8px; }
+  .ac-dist-table { width: 100%; border-collapse: collapse; }
+  .ac-dist-cap { padding-bottom: 16px; text-align: left; }
+  .ac-dist-t { display: block; font-family: var(--font-display); font-size: 26px; font-weight: 500; line-height: 1.1; }
+  .ac-dist-s { display: block; margin-top: 4px; font-size: 14px; color: var(--text-muted); }
+  .ac-bar-row { border-top: 1px solid var(--border); line-height: 1.35; }
+  .ac-bar-row:last-child { border-bottom: 1px solid var(--text); }
+  .ac-bar-row th { width: 80px; padding: 10px 10px 10px 0; text-align: left; font-size: 14px; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+  .ac-bar-row td { padding: 10px 0; }
+  .ac-bar-cell { display: grid; grid-template-columns: 1fr 34px; align-items: center; gap: 10px; }
+  .ac-bar { display: block; height: 18px; }
+  .ac-bar-fill { display: block; height: 100%; background: var(--brand); border-radius: 0 4px 4px 0; }
+  .ac-bar-val { font-size: 16px; font-weight: 700; text-align: right; white-space: nowrap; }
+  .ac-bar-unit { font-weight: 500; color: var(--text-muted); }
+  .ac-bar-row:hover .ac-bar-fill { background: var(--brand-strong); }
+  .ac-bar-row:hover th { color: var(--text); }
+  .ac-dist-total { margin-top: 4px; font-size: 14px; }
+
+  /* section 2 */
+  .ac-cards { list-style: none; margin: 0; padding: 0; }
+  .ac-card { padding: 18px 0; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr auto; row-gap: 10px; align-items: baseline; }
+  .ac-card-y { line-height: 1.2; font-family: var(--font-display); font-size: 30px; font-weight: 500; }
+  .ac-card-pct { line-height: 1.2; font-family: var(--font-display); font-size: 34px; font-weight: 500; color: var(--brand); }
+  .ac-card-dl { grid-column: 1 / -1; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; font-size: 15px; }
+  .ac-card-dl dt { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+  .ac-card-dl dd { margin: 2px 0 0; }
+  .ac-annual > .ac-src { margin-top: 12px; }
+  .ac-chart { margin: 36px 0 0; display: flex; flex-direction: column; gap: 10px; }
+  .ac-chart > span { display: block; }
+  .ac-chart-cap { display: flex; flex-direction: column; gap: 2px; }
+  .ac-chart-t { font-family: var(--font-display); font-size: 24px; font-weight: 500; line-height: 1.1; }
+  .ac-chart-s { font-size: 13px; color: var(--text-muted); }
+
+  /* section 3 */
+  .ac-years { margin-top: 22px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .ac-yr { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0; border: 1px solid var(--border); border-radius: 6px; background: transparent; font-family: var(--font-display); font-size: 22px; font-weight: 500; color: var(--text-muted); }
+  .ac-yr:hover { color: var(--text); }
+  .ac-yr[aria-selected='true'] { border-color: var(--brand); background: var(--brand-tint); color: var(--brand); box-shadow: inset 0 -3px 0 var(--brand); }
+  .ac-panels { display: flex; flex-direction: column; gap: 56px; }
+  .ac-panel { margin-top: 20px; display: flex; flex-direction: column; gap: 16px; }
+  .ac-banner { position: relative; border: 1px solid var(--border); background: var(--surface); }
+  .ac-banner :global(.ac-banner-ph) { aspect-ratio: 16 / 10 !important; padding: 12px; font-size: 12px; }
+  .ac-zoom { position: absolute; right: 10px; top: 10px; display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 12px; border: 0; border-radius: 6px; background: var(--bg); color: var(--brand); font-size: 14px; font-weight: 700; }
+  .ac-zoom:hover { background: var(--brand); color: #FFFFFF; }
+  .ac-trans { display: flex; flex-direction: column; gap: 16px; }
+  .ac-trans-k { margin-top: 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .ac-trans-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--text); }
+  .ac-trans-list li { line-height: 1.3; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .ac-trans-name { font-size: 16px; font-weight: 600; }
+  .ac-trans-score { font-family: var(--font-display); font-size: 26px; font-weight: 500; color: var(--brand); }
+  .ac-pending { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px; border: 1.5px dashed var(--warning-text); border-radius: var(--radius-sm); background: var(--accent-tint); }
+  .ac-pending-k { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--warning-text); }
+  .ac-pending-p { font-size: 15px; line-height: 1.55; }
+
+  /* section 4 */
+  .ac-albums { list-style: none; margin: 24px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 14px; }
+  .ac-album { display: flex; flex-direction: column; gap: 10px; color: var(--text); text-decoration: none; }
+  .ac-album > span:not(.ac-album-text) { display: block; }
+  .ac-album:hover { color: var(--text); }
+  .ac-album:hover .ac-album-name { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 1px; }
+  .ac-album :global(.ac-cover) { padding: 10px; font-size: 11px; line-height: 1.35; }
+  .ac-album :global(.ac-cover--sm) { padding: 8px; font-size: 10px; }
+  .ac-album-text { display: flex; flex-direction: column; gap: 2px; min-height: 44px; }
+  .ac-album-name { font-family: var(--font-display); font-size: 22px; font-weight: 500; line-height: 1.1; }
+  .ac-album-meta { font-size: 13px; color: var(--text-muted); }
+  .ac-link--sm { margin-top: 20px; }
+  .ac-named { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
+  .ac-named-k { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .ac-named-p { font-family: var(--font-display); font-size: 22px; font-weight: 500; line-height: 1.45; }
+
+  /* banner dialog */
+  .ac-box { width: 100%; max-width: 100%; margin: 80px 0 auto; padding: 16px; border: 0; background: var(--surface-dark); color: var(--text-on-dark); --focus-ring: var(--focus-on-dark); }
+  .ac-box[open] { display: flex; flex-direction: column; gap: 14px; }
+  .ac-box::backdrop { background: rgba(31, 26, 23, 0.9); }
+  .ac-box-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .ac-box-title { font-family: var(--font-display); font-size: 24px; font-weight: 500; }
+  .ac-box-close { display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 12px; border: 1px solid rgba(251, 247, 240, 0.45); border-radius: var(--radius-md); background: transparent; color: var(--text-on-dark); font-size: 15px; font-weight: 600; }
+  .ac-box-img { aspect-ratio: 4 / 5; background: var(--ph-dark); display: flex; align-items: flex-end; padding: 12px; font-size: 12px; color: var(--text-on-dark-muted); }
+  .ac-box-note { font-size: 13px; color: var(--text-on-dark-muted); }
+  @media (prefers-reduced-motion: no-preference) { .ac-box[open] { animation: kb-sheet 320ms var(--ease-out) both; } }
+
+  @media (min-width: 1024px) {
+    .ac-hero { padding: 28px 0 88px; }
+    .ac-hero-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; }
+    .ac-crumbs { grid-column: 1 / -1; }
+    .ac-hero-copy { grid-column: 1 / span 9; gap: 24px; padding-top: 40px; }
+    .ac-h1 { line-height: 0.95; letter-spacing: -0.02em; }
+    .ac-lead { max-width: 760px; }
+    .ac-howto { grid-column: 10 / span 3; align-self: end; margin: 0; padding: 20px 0 6px 24px; border-left: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
+    .ac-howto-k { font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+    .ac-howto-p { font-size: 15px; line-height: 1.6; color: var(--text); }
+
+    .ac-sec { padding: 112px 0 120px; }
+    .ac-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; padding-bottom: 28px; }
+    .ac-head-t, .ac-head--stack { gap: 14px; }
+    .ac-head--stack { display: flex; flex-direction: column; justify-content: flex-start; align-items: flex-start; }
+    .ac-head .eyebrow-text { font-size: 13px; }
+    .ac-head--wide { padding-bottom: 28px; border-bottom: 1px solid var(--text); }
+    .ac-intro { margin: 0; max-width: 420px; font-size: 15px; line-height: 1.6; }
+
+    .ac-s1-grid { margin-top: 48px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; align-items: start; }
+    .ac-achievers-wrap { grid-column: 1 / span 6; }
+    .ac-achievers { margin: 0; gap: 24px; }
+    .ac-achiever { gap: 14px; }
+    .ac-achiever-p { gap: 6px; }
+    .ac-score { font-size: 56px; }
+    .ac-pct { font-size: 28px; }
+    .ac-name { font-size: 17px; }
+    .ac-dist { grid-column: 8 / span 5; margin: 0; gap: 18px; }
+    .ac-dist-cap { padding-bottom: 20px; }
+    .ac-dist-t { font-size: 30px; }
+    .ac-dist-s { margin-top: 6px; font-size: 15px; }
+    .ac-bar-row th { width: 96px; padding: 12px 16px 12px 0; font-size: 15px; }
+    .ac-bar-row td { padding: 12px 0; }
+    .ac-bar-cell { grid-template-columns: 1fr 104px; gap: 14px; }
+    .ac-bar { height: 22px; }
+    .ac-bar-val { text-align: left; }
+    .ac-dist-total { margin: 0; display: flex; justify-content: space-between; gap: 16px; font-size: 15px; }
+
+    .ac-s2-grid { margin-top: 48px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; align-items: start; }
+    .ac-annual { grid-column: 1 / span 7; display: flex; flex-direction: column; gap: 16px; }
+    .ac-annual > .ac-src { margin: 0; }
+    .ac-table { width: 100%; border-collapse: collapse; line-height: 1.2; }
+    .ac-table thead tr { border-bottom: 1px solid var(--text); }
+    .ac-table thead th { padding: 0 0 14px; text-align: left; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+    .ac-table thead th.ac-r { text-align: right; }
+    .ac-table thead th.ac-rem, .ac-table td.ac-rem { padding-left: 32px; }
+    .ac-table tbody tr { border-bottom: 1px solid var(--border); }
+    .ac-table tbody tr:last-child { border-bottom-color: var(--text); }
+    .ac-year { padding: 22px 0; text-align: left; font-family: var(--font-display); font-size: 32px; font-weight: 500; }
+    .ac-table td { padding: 22px 0; }
+    .ac-r { text-align: right; }
+    .ac-n { font-size: 18px; }
+    .ac-pctcell { font-family: var(--font-display); font-size: 36px; font-weight: 500; color: var(--brand); }
+    .ac-rem { font-size: 16px; }
+    .ac-chart { grid-column: 9 / span 4; margin: 0; gap: 14px; }
+    .ac-chart-cap { gap: 4px; }
+    .ac-chart-t { font-size: 26px; }
+    .ac-chart-s { font-size: 14px; }
+
+    .ac-years { margin-top: 32px; display: flex; gap: 8px; }
+    .ac-yr { min-height: 56px; padding: 0 22px; font-size: 30px; }
+    .ac-panels { gap: 96px; }
+    .ac-panel { margin-top: 32px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; align-items: start; }
+    .ac-banner { grid-column: 1 / span 7; }
+    .ac-banner :global(.ac-banner-ph) { aspect-ratio: 16 / 9 !important; padding: 16px; font-size: 13px; }
+    .ac-zoom { right: 16px; top: 16px; gap: 8px; height: 40px; padding: 0 14px; }
+    .ac-trans { grid-column: 9 / span 4; gap: 18px; }
+    .ac-trans-k { margin: 0; font-size: 13px; }
+    .ac-trans-list li { gap: 16px; padding: 16px 0; }
+    .ac-trans-name { font-size: 17px; }
+    .ac-trans-score { font-size: 30px; }
+    .ac-pending { gap: 10px; padding: 20px 22px; }
+    .ac-pending-k { font-size: 13px; }
+    .ac-pending-p { font-size: 16px; }
+
+    .ac-albums { margin-top: 40px; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 24px; }
+    .ac-album { gap: 14px; }
+    .ac-album-text { gap: 4px; min-height: 0; }
+    .ac-album-name { font-size: 26px; }
+    .ac-album-meta { font-size: 14px; }
+    .ac-named { margin-top: 56px; padding-top: 28px; display: grid; grid-template-columns: 220px 1fr; gap: 32px; }
+    .ac-named-k { font-size: 13px; }
+    .ac-named-p { font-size: 28px; }
+
+    .ac-box { width: 1200px; max-width: calc(100% - 48px); margin: 120px auto auto; padding: 24px 24px 28px; border-radius: var(--radius-md); }
+    .ac-box[open] { gap: 18px; }
+    .ac-box-title { font-size: 32px; }
+    .ac-box-close { gap: 8px; padding: 0 14px; }
+    .ac-box-img { aspect-ratio: 16 / 9; padding: 16px; font-size: 13px; }
+    .ac-box-note { font-size: 14px; }
+  }
+</style>

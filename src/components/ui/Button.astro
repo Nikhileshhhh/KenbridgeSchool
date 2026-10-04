@@ -1,0 +1,73 @@
+---
+// Components board · Buttons. primary (maroon) · secondary (1.5px maroon outline) ·
+// accent (saffron with ink text, on dark only, once per page) · outline-dark (ivory outline on dark).
+// Sizes: l 56 (hero and closing CTA) · m 52/48 (default) · s 44 (header and dense rows; never smaller).
+import Icon from './Icon.astro';
+
+interface Props {
+  variant?: 'primary' | 'secondary' | 'accent' | 'outline-dark';
+  size?: 'l' | 'm' | 's';
+  href?: string;
+  type?: 'button' | 'submit';
+  arrow?: boolean;
+  external?: boolean;
+  full?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+const { variant = 'primary', size = 'm', href, type = 'button', arrow = false, external = false, full = false, class: cls, ...rest } = Astro.props;
+const classes = ['btn', `btn--${variant}`, `btn--${size}`, full && 'btn--full', arrow && 'arrow-nudge', cls];
+---
+{href ? (
+  <a class:list={classes} href={href} target={external ? '_blank' : undefined} rel={external ? 'noopener' : undefined} {...rest}>
+    <slot />
+    {arrow && <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>}
+    {external && <><Icon name="external" size={14} /><span class="vh"> (opens in a new tab)</span></>}
+  </a>
+) : (
+  <button class:list={classes} type={type} {...rest}>
+    <slot />
+    {arrow && <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>}
+  </button>
+)}
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 52px;
+    padding: 0 24px;
+    border: 0;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .btn:active:not(:disabled) { transform: scale(0.98); }
+  .btn:disabled { background: var(--border); color: var(--text-disabled); }
+  .arrow { display: inline-flex; }
+  .btn--l { height: 56px; padding: 0 28px; font-size: 17px; }
+  .btn--s { height: 44px; padding: 0 18px; font-size: 15px; }
+  .btn--full { width: 100%; }
+
+  .btn--primary { background: var(--brand); color: #FFFFFF; }
+  .btn--primary:hover:not(:disabled) { background: var(--brand-hover); color: #FFFFFF; }
+  .btn--primary:active:not(:disabled) { background: var(--brand-strong); }
+  .btn--primary.arrow-nudge { padding-right: 22px; }
+
+  .btn--secondary { border: 1.5px solid var(--brand); background: transparent; color: var(--brand); }
+  .btn--secondary:hover:not(:disabled) { background: var(--brand-tint); color: var(--brand); }
+  .btn--secondary:active:not(:disabled) { border-color: var(--brand-strong); background: var(--brand-pressed-tint); color: var(--brand-strong); }
+  .btn--secondary:disabled { border-color: var(--border); background: transparent; color: var(--text-disabled-soft); }
+
+  .btn--accent { background: var(--accent); color: var(--text); font-weight: 700; }
+  .btn--accent:hover { color: var(--text); }
+  .btn--outline-dark { border: 1.5px solid var(--text-on-dark); background: transparent; color: var(--text-on-dark); }
+  .btn--outline-dark:hover { background: rgba(251, 247, 240, 0.12); color: var(--text-on-dark); }
+  .btn:focus-visible { outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) { .btn:active:not(:disabled) { transform: none; } }
+</style>

@@ -1,0 +1,55 @@
+---
+// Patterns board (desktop trail) and MobileComponents board: below 640px a trail of three or more
+// levels collapses to a back link to the parent page (Founder, Principal); Home › Page stays a trail (AboutMobile).
+import Icon from '../ui/Icon.astro';
+
+export interface Crumb { label: string; href?: string }
+interface Props { items: Crumb[]; onDark?: boolean; /** Collapse a two-level trail too (LearningMobile shows ← Home). */ collapse?: boolean; /** Keep the full trail on phones (GalleryAlbumMobile). */ noCollapse?: boolean }
+const { items, onDark = false, collapse = false, noCollapse = false } = Astro.props;
+const parent = !noCollapse && (items.length > 2 || collapse) ? [...items].reverse().find((c, i) => i > 0 && c.href) : undefined;
+---
+<nav aria-label="Breadcrumb" data-pagefind-ignore class:list={['breadcrumbs', onDark && 'is-dark', !parent && 'is-short']}>
+  <ol role="list" class="crumbs">
+    {items.map((c, i) => (
+      <li class="crumb">
+        {i < items.length - 1 && c.href ? (
+          <>
+            <a href={c.href} class="crumb-link">{c.label}</a>
+            <Icon name="chevron-right" size={12} class="crumb-sep" />
+          </>
+        ) : (
+          <span aria-current="page" class="crumb-current">{c.label}</span>
+        )}
+      </li>
+    ))}
+  </ol>
+  {parent && (
+    <a href={parent.href} class="crumb-back"><Icon name="arrow-left" />{parent.label}</a>
+  )}
+</nav>
+
+<style>
+  .crumbs { list-style: none; margin: 0; padding: 0; display: none; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 15px; }
+  .crumb { display: flex; align-items: center; gap: 10px; }
+  .crumb-link, .crumb-back {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--brand);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--link-underline);
+    text-underline-offset: 4px;
+  }
+  .crumb-back { gap: 8px; font-size: 15px; }
+  .crumbs :global(.crumb-sep) { color: var(--border-strong); }
+  .crumb-current { display: inline-flex; align-items: center; min-height: 44px; color: var(--text-muted); font-weight: 500; }
+  .is-dark .crumb-link, .is-dark .crumb-back { color: var(--text-on-dark); text-decoration-color: rgba(251, 247, 240, 0.4); }
+  .is-dark .crumbs :global(.crumb-sep) { color: var(--text-on-dark-muted); }
+  .is-dark .crumb-current { color: var(--text-on-dark-muted); }
+  .is-short .crumbs { display: flex; }
+  @media (min-width: 640px) {
+    .crumbs { display: flex; }
+    .crumb-back { display: none; }
+  }
+</style>

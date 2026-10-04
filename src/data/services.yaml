@@ -1,0 +1,60 @@
+# External services and files (A5). Every one opens in a new tab and says so.
+# kind: external | pdf | video
+parentLogin:
+  label: Parent Login
+  description: Your child’s account on the school’s parent portal.
+  url: http://login.kenbridgegulbarga.com/
+  kind: external
+  domain: login.kenbridgegulbarga.com
+staffLogin:
+  label: Staff Login
+  description: The school’s staff ERP system.
+  # TODO(content): OPEN-QUESTIONS #5. The live header links to pro.myschoolerp.com and the live
+  # footer to online.kenbridgegulbarga.com. The design's Services page uses pro.myschoolerp.com.
+  url: https://pro.myschoolerp.com/Login.aspx
+  kind: external
+  domain: pro.myschoolerp.com
+admissionEnquiry:
+  label: Admission enquiry
+  description: The school’s online admission enquiry form.
+  url: http://mygallery.mysolution.in/AdmissionEnquiry.aspx?ID=cZjlPsQBgDw=
+  kind: external
+  domain: mygallery.mysolution.in
+careers:
+  label: Careers
+  description: Apply to teach or work at KenBridge.
+  url: http://mygallery.mysolution.in/ResumeUpload.aspx?ID=cZjlPsQBgDw=
+  kind: external
+  domain: mygallery.mysolution.in
+tc:
+  label: Download CBSE Transfer Certificate
+  description: Look up and download a CBSE TC.
+  url: http://mygallery.mysolution.in/StudentTCDetails.aspx?ID=cZjlPsQBgDw=
+  kind: external
+  domain: mygallery.mysolution.in
+brochure:
+  label: Brochure / Prospectus
+  description: The school prospectus to download.
+  # The live file. At launch the same path is served from public/ (PAGE-MAP: keep the brochure URL).
+  url: https://kenbridgegulbarga.com/wp-content/uploads/2023/01/KenBridge-School-Prospectus.pdf
+  kind: pdf
+  domain: kenbridgegulbarga.com
+  size: '[size]'
+virtualTour:
+  label: Virtual campus tour
+  description: A video walk through the campus.
+  url: https://www.youtube.com/watch?v=NA7Ksy1WsnY
+  kind: external
+  domain: youtube.com
+androidApp:
+  label: Android app
+  description: KBS Gulbarga on Google Play.
+  url: https://play.google.com/store/apps/details?id=com.mysolution.kenbridgegulbarga
+  kind: external
+  domain: play.google.com
+iosApp:
+  label: iOS app
+  description: KBS Gulbarga on the App Store.
+  url: https://apps.apple.com/us/app/kbs-gulbarga/id1661410860
+  kind: external
+  domain: apps.apple.com

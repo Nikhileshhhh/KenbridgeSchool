@@ -1,0 +1,106 @@
+---
+// ContactForm (ContactForm board; ContactDesktop/ContactMobile "Write to us"). Same shell and behaviour
+// as EnquiryForm (styles/forms.css, scripts/forms.js): custom validation, a focused error summary,
+// inline errors tied with aria-describedby, values kept. Every state renders on the server for the dev
+// review page. In demo mode a valid submit says plainly that nothing was sent.
+// The board's privacy line mentions reCAPTCHA; nothing here uses reCAPTCHA yet, so the line stops at
+// "Your details are used only to reply." TODO(content): add the reCAPTCHA notice if the live form
+// service uses it.
+import Field from '../ui/Field.astro';
+import Icon from '../ui/Icon.astro';
+import '../../styles/forms.css';
+import { getSchool, getSettings } from '../../lib/site';
+
+type State = 'idle' | 'errors' | 'sending' | 'success' | 'failed';
+interface Values { name?: string; email?: string; subject?: string; msg?: string }
+interface Props { state?: State; values?: Values; compact?: boolean; labelledBy?: string; idPrefix?: string }
+const { state = 'idle', values = {}, compact = false, labelledBy, idPrefix = 'ct' } = Astro.props;
+
+const school = await getSchool();
+const { forms } = await getSettings();
+const phone = school.phones[0];
+const id = (k: string) => `${idPrefix}${k}`;
+
+const M = {
+  name: 'Enter your name',
+  email: 'Enter an email address',
+  emailFormat: 'Enter an email address in the format name@example.com',
+  subject: 'Enter a subject, for example “Visiting the campus”',
+  msg: 'Enter your message'
+};
+// The board's validation rules, run here only to render the "errors" review state.
+function validate(v: Values) {
+  const e: Record<string, string> = {};
+  if (!v.name?.trim()) e.name = M.name;
+  if (!v.email?.trim()) e.email = M.email;
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email.trim())) e.email = M.emailFormat;
+  if (!v.subject?.trim()) e.subject = M.subject;
+  if (!v.msg?.trim()) e.msg = M.msg;
+  return e;
+}
+const errs = state === 'errors' ? validate(values) : {};
+const order: [keyof Values, string][] = [['name', 'Name'], ['email', 'Email'], ['subject', 'Subject'], ['msg', 'Msg']];
+const errorList = order.filter(([k]) => errs[k]).map(([k, s]) => ({ id: id(s), msg: errs[k] }));
+const first = values.name?.split(' ')[0];
+---
+<div class:list={['enq', compact && 'enq--compact']} data-enquiry-root>
+  {state === 'success' ? (
+    <div class="enq-success" role="status" tabindex="-1">
+      <p class="enq-success-k"><Icon name="success" size={22} />Message sent</p>
+      <h3 class="enq-success-h">Thank you{first && `, ${first}`}. Your message has reached the school office.</h3>
+      <dl class="enq-success-dl">
+        <dt>Subject</dt><dd>{values.subject || '—'}</dd>
+        <dt>We’ll reply to</dt><dd class="enq-anywhere">{values.email || '—'}</dd>
+      </dl>
+      <p class="enq-muted">We reply during office hours. For anything urgent, call <a class="tnum" href={`tel:${phone.tel}`}>{phone.display}</a>.</p>
+      <button type="button" class="enq-again">Send another message</button>
+    </div>
+  ) : (
+    <form class="enq-form" method="post" aria-labelledby={labelledBy} data-form data-mode={forms.mode}>
+      <div class="enq-summary" role="alert" tabindex="-1" data-enquiry-summary hidden={!errorList.length}>
+        <strong class="enq-summary-t"><Icon name="error" size={20} /><span data-enquiry-summary-title>{errorList.length === 1 ? 'There is 1 problem with this form' : `There are ${errorList.length} problems with this form`}</span></strong>
+        <ul class="enq-summary-list" data-enquiry-summary-list>
+          {errorList.map((er) => <li><a href={`#${er.id}`}>{er.msg}</a></li>)}
+        </ul>
+      </div>
+
+      {state === 'failed' && (
+        <div class="enq-failed" role="alert">
+          <Icon name="error" size={20} />
+          <p><strong>Your message could not be sent.</strong> Nothing you typed has been lost. Try again, or call the school on <a class="tnum" href={`tel:${phone.tel}`}>{phone.display}</a>.</p>
+        </div>
+      )}
+
+      <div class="enq-demo" role="status" tabindex="-1" data-enquiry-demo hidden>
+        <Icon name="error" size={20} />
+        <p><strong>Preview: this form is not connected yet, so nothing was sent.</strong> Your message is still here. To reach the school now, call <a class="tnum" href={`tel:${phone.tel}`}>{phone.display}</a> or email <a href={`mailto:${school.email}`}>{school.email}</a>.</p>
+      </div>
+
+      <div class="enq-fields">
+        <Field id={id('Name')} name="name" label="Your name" autocomplete="name" value={values.name} error={errs.name} requiredMsg={M.name} />
+        <Field id={id('Email')} name="email" label="Your email" type="email" autocomplete="email" inputmode="email" hint="We reply to this address." value={values.email} error={errs.email} requiredMsg={M.email} formatMsg={M.emailFormat} />
+        <Field id={id('Subject')} name="subject" label="Subject" wide value={values.subject} error={errs.subject} requiredMsg={M.subject} />
+        <Field id={id('Msg')} name="msg" label="Your message" as="textarea" wide value={values.msg} error={errs.msg} requiredMsg={M.msg} />
+      </div>
+
+      <div class="enq-actions">
+        {state === 'sending' ? (
+          <button type="submit" class="enq-submit enq-submit--sending" disabled>
+            <svg class="enq-spin" aria-hidden="true" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M10 2.5A7.5 7.5 0 1 1 2.5 10" /></svg>Sending…
+          </button>
+        ) : (
+          <button type="submit" class:list={['enq-submit', forms.mode === 'demo' && 'js-only']} data-enquiry-submit>{state === 'failed' ? 'Try again' : 'Send message'}</button>
+        )}
+        <p class="enq-muted enq-privacy enq-privacy--sm">Your details are used only to reply.</p>
+      </div>
+      {forms.mode === 'demo' && (
+        <p class="enq-nojs no-js-only">This preview form is not connected yet. To reach the school, call <a class="tnum" href={`tel:${phone.tel}`}>{phone.display}</a> or email <a href={`mailto:${school.email}`}>{school.email}</a>.</p>
+      )}
+      <p class="vh" aria-live="polite" data-enquiry-live>{state === 'sending' ? 'Sending your message' : state === 'failed' ? 'Your message could not be sent' : ''}</p>
+    </form>
+  )}
+</div>
+
+<script>
+  import '../../scripts/forms.js';
+</script>

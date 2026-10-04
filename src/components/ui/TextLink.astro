@@ -1,0 +1,50 @@
+---
+// Components board · Text link (+ arrow) and External link (↗ + hidden "opens in a new tab").
+// The underline is always present. PDFs add their size: "Fee structure (PDF, 240 KB)".
+import Icon from './Icon.astro';
+
+interface Props {
+  href: string;
+  kind?: 'arrow' | 'plain' | 'external' | 'pdf';
+  size?: string;
+  onDark?: boolean;
+  class?: string;
+}
+const { href, kind = 'arrow', size, onDark = false, class: cls } = Astro.props;
+const newTab = kind === 'external' || kind === 'pdf';
+---
+<a
+  class:list={['tlink', kind === 'arrow' && 'arrow-nudge', onDark && 'tlink--dark', cls]}
+  href={href}
+  target={newTab ? '_blank' : undefined}
+  rel={kind === 'external' ? 'noopener' : undefined}
+>
+  <slot />
+  {kind === 'pdf' && <span class="tlink-meta"> (PDF{size ? `, ${size}` : ''})</span>}
+  {kind === 'arrow' && <span class="arrow" aria-hidden="true"><Icon name="arrow" /></span>}
+  {kind === 'external' && <Icon name="external" size={14} />}
+  {newTab && <span class="vh"> (opens in a new tab)</span>}
+</a>
+
+<style>
+  .tlink {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    color: var(--brand);
+    font-size: 17px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--link-underline);
+    text-underline-offset: 6px;
+  }
+  .tlink:hover { color: var(--brand); text-decoration-thickness: 2px; text-decoration-color: currentColor; }
+  .tlink:active { color: var(--brand-strong); }
+  .tlink:focus-visible { border-radius: var(--radius-sm); }
+  .arrow { display: inline-flex; }
+  .tlink-meta { font-weight: 500; }
+  .tlink--dark { color: var(--accent); text-decoration-color: currentColor; }
+  .tlink--dark:hover { color: var(--accent); }
+</style>

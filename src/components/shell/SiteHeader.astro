@@ -1,0 +1,455 @@
+---
+// SiteHeader + ShellHeader + MegaMenu boards. One header for every page:
+// ≥1280 utility bar (44) + 88px header with the full nav; below 1280 a 64px+1px row
+// with logo, Search, Admissions (≥640) and Menu (MobileHeader board).
+// Without JS: nav items are links to the hub pages and Search links to /search.
+import { Image } from 'astro:assets';
+import logo from '../../assets/brand/logo-official-transparent.png';
+import Icon from '../ui/Icon.astro';
+import MegaPanel from './MegaPanel.astro';
+import { getNavigation, getServices, getFacilities, getSchool, resolveLink } from '../../lib/site';
+import { academicYearsSince } from '../../lib/academic-year';
+
+interface Props {
+  variant?: 'solid' | 'hero';
+  current?: string;
+}
+const { variant = 'solid', current = 'none' } = Astro.props;
+
+const nav = await getNavigation();
+const services = await getServices();
+const facilities = await getFacilities();
+const school = await getSchool();
+const years = academicYearsSince();
+
+const panels = nav.sections.map((s) => {
+  let groups = s.groups.map((g) => ({ label: g.label, links: g.links.map((l) => resolveLink(l, services)) }));
+  if (s.facilityGroups.length) {
+    groups = s.facilityGroups.map((fg) => ({
+      label: fg.label,
+      links: facilities
+        .filter((f) => f.data.group === fg.group)
+        .map((f) => resolveLink({ label: f.data.name, href: `/campus/${f.id}` }, services))
+    }));
+  }
+  return { ...s, groups };
+});
+const quick = nav.searchQuickLinks.map((l) => resolveLink(l, services));
+const [phone1, phone2] = school.phones;
+---
+<div class="utility on-dark desktop-only">
+  <div class="container utility-row">
+    <ul role="list" aria-label="Contact the school" class="utility-list">
+      <li class="utility-item">
+        <Icon name="phone" size={14} />
+        <a class="ulink tnum" href={`tel:${phone1.tel}`}><span class="vh">Call </span>{phone1.display}</a>
+        <span aria-hidden="true" class="usep">/</span>
+        <a class="ulink tnum" href={`tel:${phone2.tel}`}><span class="vh">Call </span>{phone2.display}</a>
+      </li>
+      <li class="utility-item">
+        <Icon name="whatsapp" size={14} />
+        <a class="ulink tnum" href={school.whatsapp.href}>WhatsApp {school.whatsapp.display}</a>
+      </li>
+      <li class="utility-item">
+        <Icon name="mail" size={14} />
+        <a class="ulink" href={`mailto:${school.email}`}>{school.email}</a>
+      </li>
+    </ul>
+    <div class="utility-right">
+      <ul role="list" aria-label="School online" class="utility-list utility-list--tight">
+        <li><a class="ulink" href={school.social.facebook} target="_blank" rel="noopener"><Icon name="people" size={14} />Facebook<span class="vh"> (opens in a new tab)</span></a></li>
+        <li><a class="ulink" href={school.social.youtube} target="_blank" rel="noopener"><Icon name="youtube" size={14} />YouTube<span class="vh"> (opens in a new tab)</span></a></li>
+        <li><a class="ulink" href={services.androidApp.url} target="_blank" rel="noopener"><Icon name="mobile" size={14} />Android app<span class="vh"> (opens in a new tab)</span></a></li>
+        <li><a class="ulink" href={services.iosApp.url} target="_blank" rel="noopener"><Icon name="mobile" size={14} />iOS app<span class="vh"> (opens in a new tab)</span></a></li>
+      </ul>
+      <span aria-hidden="true" class="udivider"></span>
+      <div class="utility-logins">
+        <a class="ubtn" href={services.parentLogin.url} target="_blank" rel="noopener"><span class="ubtn-box">Parent Login<Icon name="external" size={12} /></span><span class="vh"> (opens in a new tab)</span></a>
+        <a class="ubtn" href={services.staffLogin.url} target="_blank" rel="noopener"><span class="ubtn-box">Staff Login<Icon name="external" size={12} /></span><span class="vh"> (opens in a new tab)</span></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<header class="site-header" data-site-header data-variant={variant} data-search-key="site-search">
+  <div class="header-bg" aria-hidden="true"></div>
+  <div class="container header-row">
+    <a class="brand" href="/" aria-label="KenBridge School Gulbarga, home">
+      <span class="brand-logo" data-header-logo>
+        <Image class="logo-dark" src={logo} alt="" width={56} height={56} densities={[1, 2]} format="png" loading="eager" />
+        <Image class="logo-light" src={logo} alt="" width={56} height={56} densities={[1, 2]} format="png" loading="eager" />
+      </span>
+      <span class="brand-text">
+        <span class="wordmark brand-word">KenBridge School</span>
+        <span class="brand-tag">Inspiring to Learn</span>
+        <span class="brand-affil tnum desktop-only">CBSE Affiliation No. {school.affiliationNo}</span>
+      </span>
+    </a>
+
+    <nav aria-label="Main" class="main-nav desktop-only">
+      <ul role="list" class="nav-list">
+        {panels.map((s) => {
+          const isCurrent = s.key === current;
+          return (
+            <li class="nav-li">
+              <a class:list={['nav-item no-js-only', isCurrent && 'is-current']} href={s.hub}>
+                {s.label}{isCurrent && <span class="vh"> (current section)</span>}
+              </a>
+              <button
+                type="button"
+                class:list={['nav-item js-only', isCurrent && 'is-current']}
+                aria-expanded="false"
+                aria-controls={`mega-${s.key}`}
+                data-mega-trigger={s.key}
+              >
+                {s.label}{isCurrent && <span class="vh"> (current section)</span>}
+                <Icon name="chevron-down" size={12} class="nav-chev" />
+              </button>
+              <MegaPanel
+                id={`mega-${s.key}`}
+                eyebrow={s.eyebrow}
+                title={s.title}
+                hub={s.hub}
+                intro={s.intro}
+                lead={s.lead}
+                cols={s.cols}
+                groups={s.groups}
+                years={s.years ? years : undefined}
+                photo={s.photo}
+                caption={s.caption}
+              />
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <a class="icon-btn search-btn no-js-only" href="/search" aria-label="Search"><Icon name="search" size={18} /></a>
+      <button type="button" class="icon-btn search-btn js-only" aria-label="Search" aria-expanded="false" aria-controls="site-search" data-search-trigger>
+        <Icon name="search" size={18} class="when-closed" />
+        <Icon name="close" size={18} class="when-open" />
+      </button>
+      <!-- Search panel (desktop, ShellHeader state D) -->
+      <div id="site-search" class="search-panel desktop-only" data-search-panel hidden>
+        <div class="container search-grid">
+          <form role="search" action="/search" method="get" class="search-form">
+            <label for="siteSearchField" class="search-label eyebrow-text">Search the KenBridge website</label>
+            <div class="search-controls">
+              <input id="siteSearchField" name="q" type="search" autocomplete="off" class="search-input" />
+              <button type="submit" class="search-submit">Search</button>
+            </div>
+          </form>
+          <div class="search-quick">
+            <span class="search-quick-label">Quick links</span>
+            {quick.map((q) => <a href={q.href} class="search-quick-link">{q.label}</a>)}
+          </div>
+        </div>
+      </div>
+
+      <!-- Search (below 1280, MobileShell state B2): the field replaces the header row -->
+      <div id="mobile-search" class="msearch mobile-only" data-msearch-panel hidden>
+        <div class="msearch-row">
+          <form role="search" action="/search" method="get" class="msearch-form">
+            <label for="mobileSearchField" class="vh">Search the KenBridge website</label>
+            <input id="mobileSearchField" name="q" type="search" autocomplete="off" class="msearch-input" />
+          </form>
+          <button type="button" class="msearch-cancel" data-msearch-cancel>Cancel</button>
+        </div>
+        <div class="msearch-quick">
+          <span class="msearch-quick-label eyebrow-text">Quick links</span>
+          {quick.map((q) => <a href={q.href} class="msearch-link">{q.label}</a>)}
+        </div>
+      </div>
+      <a class="header-cta" href="/admissions">Admissions</a>
+      <a class="icon-btn menu-btn mobile-only no-js-only" href="#mobile-menu" aria-label="Open menu"><Icon name="menu" size={20} /></a>
+      <button type="button" class="icon-btn menu-btn mobile-only js-only" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu" data-menu-trigger>
+        <Icon name="menu" size={20} />
+      </button>
+    </div>
+  </div>
+</header>
+<div class="page-dim" data-page-dim aria-hidden="true" hidden></div>
+
+<style>
+  /* ---------- utility bar (≥1280) ---------- */
+  .utility { background: var(--brand); color: var(--text-on-dark); }
+  .utility-row {
+    height: var(--utility-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .utility-list { display: flex; align-items: center; gap: 24px; list-style: none; margin: 0; padding: 0; }
+  .utility-list--tight { gap: 16px; }
+  .utility-item { display: flex; align-items: center; gap: 8px; }
+  .utility-right { display: flex; align-items: center; gap: 20px; }
+  .ulink {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    color: var(--text-on-dark);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .ulink:hover { color: var(--text-on-dark); text-decoration: underline; text-underline-offset: 3px; }
+  .usep { color: #E8B8AE; }
+  .udivider { width: 1px; height: 20px; background: rgba(251, 247, 240, 0.3); }
+  .utility-logins { display: flex; align-items: center; gap: 8px; }
+  .ubtn { display: inline-flex; align-items: center; min-height: 44px; color: var(--text-on-dark); text-decoration: none; }
+  .ubtn-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    padding: 0 10px 0 12px;
+    border: 1px solid rgba(251, 247, 240, 0.55);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .ubtn:hover { color: var(--text-on-dark); }
+  .ubtn:hover .ubtn-box { background: rgba(251, 247, 240, 0.14); border-color: var(--text-on-dark); }
+
+  /* ---------- header ---------- */
+  .site-header {
+    --h-ink: var(--text);
+    --h-muted: var(--text-muted);
+    --h-accent: var(--brand);
+    --h-bar: var(--brand);
+    --h-hover-bar: var(--border);
+    --h-line: var(--border-strong);
+    --h-search-hover: var(--brand-tint);
+    --h-cta-border: var(--brand);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    color: var(--h-ink);
+    font-family: var(--font-body);
+  }
+  .header-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    transition: opacity 220ms ease-out;
+  }
+  /* Over the hero: transparent until scrolled past it or a menu opens. Same height, so nothing shifts. */
+  .site-header[data-variant='hero']:not(.is-solid) {
+    --h-ink: var(--text-on-dark);
+    --h-muted: var(--text-on-dark-muted);
+    --h-accent: var(--accent);
+    --h-bar: var(--accent);
+    --h-hover-bar: rgba(251, 247, 240, 0.5);
+    --h-line: rgba(251, 247, 240, 0.45);
+    --h-search-hover: rgba(251, 247, 240, 0.12);
+    --h-cta-border: rgba(251, 247, 240, 0.5);
+    --focus-ring: var(--focus-on-dark);
+  }
+  .site-header[data-variant='hero']:not(.is-solid) .header-bg { opacity: 0; }
+  .site-header[data-variant='hero'] .header-bg { border-bottom-color: var(--border); }
+  /* Without JS the hero header is not sticky: it scrolls away with the hero instead of sitting
+     transparent over the page. */
+  :global(html:not(.js)) .site-header[data-variant='hero'] { position: relative; }
+
+  .header-row {
+    height: 64px;
+    padding-left: 20px;
+    padding-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; min-height: 44px; color: var(--h-ink); text-decoration: none; flex-shrink: 0; }
+  .brand:hover { color: var(--h-ink); }
+  .brand-logo { position: relative; width: 44px; height: 44px; flex-shrink: 0; }
+  .brand-logo :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; transition: opacity 220ms ease-out; }
+  .brand-logo :global(.logo-light) { filter: brightness(0) invert(1); opacity: 0; }
+  .site-header[data-variant='hero']:not(.is-solid) .brand-logo :global(.logo-light) { opacity: 1; }
+  .site-header[data-variant='hero']:not(.is-solid) .brand-logo :global(.logo-dark) { opacity: 0; }
+  .brand-text { display: flex; flex-direction: column; gap: 3px; }
+  .brand-word { font-size: 22px; }
+  .brand-tag { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.1; color: var(--h-accent); }
+  .brand-affil { font-size: 12px; font-weight: 500; line-height: 1.1; color: var(--h-muted); }
+
+  .header-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+  .icon-btn {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--h-ink);
+  }
+  .menu-btn { border: 1px solid var(--h-line); }
+  .search-btn :global(.when-open) { display: none; }
+  .search-btn[aria-expanded='true'] :global(.when-open) { display: block; }
+  .search-btn[aria-expanded='true'] :global(.when-closed) { display: none; }
+  .header-cta {
+    display: none;
+    align-items: center;
+    height: 44px;
+    padding: 0 20px;
+    border: 1px solid var(--h-cta-border);
+    border-radius: var(--radius-md);
+    background: var(--brand);
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 8px;
+    margin-right: 4px;
+  }
+  .header-cta:hover { background: var(--brand-hover); color: #FFFFFF; }
+  .header-cta:active { background: var(--brand-strong); }
+  @media (min-width: 640px) { .header-cta { display: inline-flex; } }
+
+  @media (min-width: 1280px) {
+    .header-row { height: var(--header-h); padding-inline: var(--margin); gap: 32px; }
+    .brand { gap: 14px; }
+    .brand-logo { width: 56px; height: 56px; }
+    .brand-text { gap: 4px; }
+    .brand-word { font-size: 26px; }
+    .brand-tag { letter-spacing: 0.14em; }
+    .header-actions { gap: 12px; }
+    .search-btn { border: 1px solid var(--h-line); }
+    .search-btn:hover, .search-btn[aria-expanded='true'] { background: var(--h-search-hover); }
+    .header-cta { margin: 0; }
+  }
+
+  /* ---------- main nav ---------- */
+  .nav-list { display: flex; align-items: center; gap: 24px; list-style: none; margin: 0; padding: 0; }
+  .nav-li { display: flex; }
+  .nav-item {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: var(--header-h);
+    padding: 0 2px;
+    border: 0;
+    background: transparent;
+    color: var(--h-ink);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .nav-item:hover { color: var(--h-ink); box-shadow: inset 0 -2px 0 var(--h-hover-bar); }
+  .nav-item.is-current, .nav-item[aria-expanded='true'] { font-weight: 700; box-shadow: inset 0 -2px 0 var(--h-bar); }
+  .nav-item[aria-expanded='true'] { color: var(--h-bar); }
+  .nav-item:focus-visible { outline-offset: -2px; }
+  .nav-item :global(.nav-chev) { transition: transform var(--dur-micro) var(--ease-out); }
+  .nav-item[aria-expanded='true'] :global(.nav-chev) { transform: rotate(180deg); }
+  @media (prefers-reduced-motion: reduce) {
+    .nav-item :global(.nav-chev), .header-bg, .brand-logo :global(img) { transition: none; }
+  }
+
+  /* ---------- search panels ---------- */
+  .search-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: 40;
+    background: var(--surface-raised);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-overlay);
+    color: var(--text);
+  }
+  .search-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 32px;
+    row-gap: 20px;
+    padding-top: 40px;
+    padding-bottom: 48px;
+  }
+  .search-form { grid-column: 3 / span 8; display: flex; flex-direction: column; gap: 12px; }
+  .search-label { font-size: 12px; color: var(--brand); }
+  .search-controls { display: flex; gap: 12px; }
+  .search-input {
+    flex: 1;
+    min-width: 0;
+    height: 60px;
+    padding: 0 20px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    font-size: 20px;
+  }
+  .search-input:focus { border-color: var(--text); }
+  .search-submit {
+    height: 60px;
+    padding: 0 28px;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: var(--brand);
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .search-submit:hover { background: var(--brand-hover); }
+  .search-quick { grid-column: 3 / span 8; display: flex; flex-wrap: wrap; align-items: center; gap: 0 24px; }
+  .search-quick-label { font-size: 14px; color: var(--text-muted); }
+  .search-quick-link { display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; font-weight: 600; text-underline-offset: 4px; }
+
+  .msearch { position: absolute; left: 0; right: 0; top: 0; z-index: 60; background: var(--bg); color: var(--text); --focus-ring: var(--focus); }
+  .msearch-row {
+    height: 65px;
+    padding: 0 12px 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .msearch-form { flex: 1; display: flex; }
+  .msearch-input {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--text);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    font-size: 17px;
+  }
+  .msearch-cancel { height: 44px; padding: 0 10px; border: 0; background: transparent; color: var(--brand); font-size: 15px; font-weight: 600; }
+  .msearch-quick {
+    padding: 20px 20px 24px;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-overlay);
+    background: var(--bg);
+  }
+  .msearch-quick-label { padding-bottom: 6px; font-size: 12px; color: var(--text-muted); }
+  .msearch-link {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    border-top: 1px solid var(--border);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .search-panel:not([hidden]), .msearch:not([hidden]) { animation: kb-mega 250ms var(--ease-out) both; }
+  }
+
+  .page-dim { position: fixed; inset: 0; z-index: 45; background: rgba(31, 26, 23, 0.32); }
+  @media (prefers-reduced-motion: no-preference) {
+    .page-dim:not([hidden]) { animation: kb-fade 220ms ease-out both; }
+  }
+</style>

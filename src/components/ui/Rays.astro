@@ -1,0 +1,26 @@
+---
+// Motif 1 · Rays (Content board): 25 rays over 180°, alternating long saffron and short
+// yellow, 1px at any size. `longOnly` draws only the 13 saffron rays (MobileFooter).
+// Decorative; fans in once (1100ms) unless reduced motion is set.
+interface Props { class?: string; longOnly?: boolean; fan?: boolean; style?: string }
+const { class: cls, longOnly = false, fan = false, style } = Astro.props;
+const rays: [number, number, number, number, boolean][] = [
+  [490.0, 400.0, 210.0, 400.0, true], [490.9, 385.6, 302.6, 360.8, false], [493.7, 371.5, 223.3, 299.1, true],
+  [498.4, 357.9, 322.8, 285.2, false], [504.7, 345.0, 262.3, 205.0, true], [512.7, 333.0, 362.0, 217.4, false],
+  [522.2, 322.2, 324.2, 124.2, true], [533.0, 312.7, 417.4, 162.0, false], [545.0, 304.7, 405.0, 62.3, true],
+  [557.9, 298.4, 485.2, 122.8, false], [571.5, 293.7, 499.1, 23.3, true], [585.6, 290.9, 560.8, 102.6, false],
+  [600.0, 290.0, 600.0, 10.0, true], [614.4, 290.9, 639.2, 102.6, false], [628.5, 293.7, 700.9, 23.3, true],
+  [642.1, 298.4, 714.8, 122.8, false], [655.0, 304.7, 795.0, 62.3, true], [667.0, 312.7, 782.6, 162.0, false],
+  [677.8, 322.2, 875.8, 124.2, true], [687.3, 333.0, 838.0, 217.4, false], [695.3, 345.0, 937.7, 205.0, true],
+  [701.6, 357.9, 877.2, 285.2, false], [706.3, 371.5, 976.7, 299.1, true], [709.1, 385.6, 897.4, 360.8, false],
+  [710.0, 400.0, 990.0, 400.0, true]
+];
+const drawn = longOnly ? rays.filter((r) => r[4]) : rays;
+---
+<svg class:list={[cls, fan && 'rays-fan']} style={style} viewBox="0 0 1200 400" aria-hidden="true" focusable="false">
+  <g stroke-width="1" vector-effect="non-scaling-stroke" stroke-linecap="round">
+    {drawn.map(([x1, y1, x2, y2, long]) => (
+      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={long ? '#F89A1C' : '#F5C400'} vector-effect="non-scaling-stroke" />
+    ))}
+  </g>
+</svg>

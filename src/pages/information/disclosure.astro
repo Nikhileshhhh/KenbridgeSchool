@@ -1,0 +1,203 @@
+---
+// /information/disclosure (DisclosureDesktop, DisclosureMobile). CBSE Mandatory Public Disclosure in five
+// sections: real tables on desktop, label / value rows on phones. A PDF with no file yet shows its [size]
+// and "[File to be supplied]" instead of an Open link; "Not applicable" / "Not available" rows say why.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/shell/Breadcrumbs.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { getMain, getResults } from '../../lib/site';
+
+const { disclosure: M } = await getMain('info');
+const R = await getResults();
+const results = [...R.classX].sort((a, b) => b.year - a.year);
+const sections = [
+  { id: 'gen', letter: 'A', title: 'General information' },
+  { id: 'docs', letter: 'B', title: 'Documents' },
+  { id: 'results', letter: 'C', title: 'Results & academics' },
+  { id: 'staff', letter: 'D', title: 'Staff (teaching)' },
+  { id: 'infra', letter: 'E', title: 'Infrastructure' }
+];
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'School Information', href: '/information' }, { label: M.title }];
+type Doc = { title: string; kind: 'pdf' | 'na' | 'unavailable'; note?: string; href?: string };
+---
+<BaseLayout
+  title="Mandatory Public Disclosure"
+  description="KenBridge School’s CBSE Mandatory Public Disclosure (No. 830594): general information, documents, Class X results, teaching staff and infrastructure."
+  current="information"
+  breadcrumbs={crumbs}
+>
+  <section class="md-hero" aria-labelledby="mpdH1">
+    <div class="container md-hero-in">
+      <Breadcrumbs items={crumbs} />
+      <h1 id="mpdH1" class="md-h1">{M.title}</h1>
+      <p class="md-lead">{M.lead}</p>
+      <p class="md-meta tnum"><span>As required by CBSE</span><span>Affiliation No. 830594</span><span>Last updated: {M.updated}</span></p>
+      <nav class="only-sm" aria-label="Sections">
+        <ul class="md-chips" role="list">{sections.map((s) => <li><a class="md-chip" href={`#${s.id}`}><span class="md-l">{s.letter}</span>{s.title}</a></li>)}</ul>
+      </nav>
+    </div>
+  </section>
+
+  <div class="container md-body">
+    <nav class="md-index only-lg" aria-label="Sections">
+      <p class="md-index-k">Sections</p>
+      <ul class="md-index-list" role="list">{sections.map((s) => <li><a class="md-idx" href={`#${s.id}`}><span class="md-l">{s.letter}</span><span class="md-idx-t">{s.title}</span></a></li>)}</ul>
+    </nav>
+
+    <div class="md-sections">
+      <section id="gen" class="md-sec" aria-labelledby="gen-h">
+        <h2 id="gen-h" class="md-h2"><span class="md-l2">A.</span>General information</h2>
+        <dl class="md-dl tnum">
+          {M.general.map((g) => (
+            <div class="md-row">
+              <dt>{g.label}</dt>
+              <dd>
+                {g.href ? <a href={g.href}>{g.value}</a>
+                  : g.phones ? <>{g.phones.map((p, i) => <>{i > 0 && ', '}<a href={`tel:${p.tel}`}>{p.display}</a></>)}{g.note && ` · ${g.note}`}</>
+                  : g.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      {[{ id: 'docs', letter: 'B', title: 'Documents', caption: 'Mandatory documents', rows: M.documents }, { id: 'results', letter: 'C', title: 'Results & academics', caption: 'Results and academics documents', rows: M.academics }].map((s) => (
+        <section id={s.id} class="md-sec" aria-labelledby={`${s.id}-h`}>
+          <h2 id={`${s.id}-h`} class="md-h2"><span class="md-l2">{s.letter}.</span>{s.title}</h2>
+          <p class="md-docs-head only-lg" aria-hidden="true"><span>Document</span><span>File</span></p>
+          <ul class="md-docs" aria-label={s.caption} role="list">
+            {(s.rows as Doc[]).map((d) => (
+              <li class="md-doc">
+                <span class="md-doc-t">{d.title}</span>
+                <span class="md-doc-f">
+                  {d.kind === 'pdf' ? (
+                    <>
+                      <span class="md-chip-pdf">PDF</span><span class="md-size">[size]</span>
+                      {d.href ? <a class="md-open" href={d.href} target="_blank" rel="noopener">Open<Icon name="external" size={14} /><span class="vh"> {d.title} (PDF, opens in a new tab)</span></a>
+                        : <span class="md-pending">[File to be supplied]</span>}
+                    </>
+                  ) : (
+                    <span class="md-na"><svg class="md-na-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="6.25" /><path d="M5.5 8H10.5" /></svg><strong>{d.kind === 'na' ? 'Not applicable' : 'Not available'}</strong> · {d.note}</span>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {s.id === 'results' && (
+            <>
+              <table class="md-table md-results tnum only-lg">
+                <caption class="md-cap">Class X Board results</caption>
+                <thead><tr><th scope="col">Year</th><th scope="col" class="md-r">Registered</th><th scope="col" class="md-r">Passed</th><th scope="col" class="md-r">Pass %</th><th scope="col" class="md-rem">Remarks</th></tr></thead>
+                <tbody>{results.map((r) => <tr><th scope="row">{r.year}</th><td class="md-r">{r.registered}</td><td class="md-r">{r.passed}</td><td class="md-r md-pct">{r.passPct}%</td><td class="md-rem md-muted">{r.remarks || '—'}</td></tr>)}</tbody>
+              </table>
+              <div class="only-sm">
+                <h3 class="md-cap">Class X Board results</h3>
+                <ul class="md-rcards tnum" role="list">
+                  {results.map((r) => <li class="md-rcard"><span class="md-rcard-y">{r.year}</span><span class="md-pct">{r.passPct}%</span><span class="md-rcard-d">{r.passed} of {r.registered} passed{r.remarks && ` · ${r.remarks}`}</span></li>)}
+                </ul>
+              </div>
+              <p class="md-note">“—” means none recorded.</p>
+            </>
+          )}
+        </section>
+      ))}
+
+      <section id="staff" class="md-sec" aria-labelledby="staff-h">
+        <h2 id="staff-h" class="md-h2"><span class="md-l2">D.</span>Staff (teaching)</h2>
+        <table class="md-table md-staff tnum only-lg">
+          <caption class="vh">Teaching staff</caption>
+          <thead><tr><th scope="col">Role</th><th scope="col">Name or number</th><th scope="col">Details</th></tr></thead>
+          <tbody>{M.staff.map((s) => <tr><th scope="row">{s.role}</th><td class="md-val">{s.value}</td><td class="md-muted md-details">{s.details}</td></tr>)}</tbody>
+        </table>
+        <dl class="md-dl tnum only-sm">
+          {M.staff.map((s) => <div class="md-row"><dt>{s.role}</dt><dd>{s.value}{s.details && <span class="md-muted"> · {s.details}</span>}</dd></div>)}
+        </dl>
+      </section>
+
+      <section id="infra" class="md-sec" aria-labelledby="infra-h">
+        <h2 id="infra-h" class="md-h2"><span class="md-l2">E.</span>Infrastructure</h2>
+        <dl class="md-dl tnum">
+          {M.infrastructure.map((r) => <div class="md-row"><dt>{r.label}</dt><dd>{r.value}</dd></div>)}
+        </dl>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .md-muted { color: var(--text-muted); }
+  .md-hero { padding: 12px 0 28px; border-bottom: 1px solid var(--border); }
+  .md-hero-in { display: flex; flex-direction: column; gap: 14px; }
+  .md-h1 { font-family: var(--font-display); font-size: clamp(2.75rem, 1.643rem + 4.543vw, 5rem); font-weight: 500; line-height: 1; }
+  .md-lead { max-width: 760px; font-size: 17px; line-height: 1.6; }
+  .md-meta { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 14px; color: var(--text-muted); }
+  .md-chips { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .md-chip { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 14px; border: 1px solid var(--border-strong); border-radius: 999px; color: var(--text); font-size: 14px; font-weight: 600; text-decoration: none; }
+  .md-l { font-family: var(--font-display); font-size: 20px; color: var(--brand); }
+
+  .md-body { padding-top: 32px; padding-bottom: 64px; }
+  .md-sections { display: flex; flex-direction: column; gap: 44px; }
+  .md-sec { scroll-margin-top: 24px; display: flex; flex-direction: column; gap: 14px; }
+  .md-h2 { display: flex; align-items: baseline; gap: 14px; font-family: var(--font-display); font-size: clamp(2rem, 1.429rem + 2.286vw, 2.75rem); font-weight: 500; line-height: 1; }
+  .md-l2 { color: var(--brand); }
+  .md-dl { margin: 0; border-top: 1px solid var(--text); }
+  .md-row { display: flex; flex-direction: column; gap: 4px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .md-row dt { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+  .md-row dd { margin: 0; font-size: 17px; line-height: 1.5; overflow-wrap: anywhere; }
+  .md-row a { color: var(--brand); font-weight: 600; }
+  .md-docs { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--text); }
+  .md-doc { display: flex; flex-direction: column; gap: 6px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .md-doc-t { font-size: 17px; font-weight: 600; }
+  .md-doc-f { display: inline-flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .md-chip-pdf { display: inline-flex; align-items: center; height: 24px; padding: 0 7px; border: 1px solid var(--border-strong); border-radius: 3px; background: var(--brand-tint); font-size: 11px; font-weight: 800; letter-spacing: 0.08em; }
+  .md-size, .md-pending { font-size: 13px; color: var(--text-muted); }
+  .md-open { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 1.5px solid var(--brand); border-radius: 6px; color: var(--brand); font-size: 15px; font-weight: 600; text-decoration: none; }
+  .md-na { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 15px; color: var(--text-muted); }
+  .md-na strong { font-weight: 500; }
+  .md-docs-head { display: flex; justify-content: space-between; padding-bottom: 12px; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+  .md-na strong { color: var(--text-muted); }
+  .md-cap { margin-top: 18px; padding-bottom: 10px; text-align: left; font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .md-rcards { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--text); }
+  .md-rcard { display: grid; grid-template-columns: 1fr auto; row-gap: 4px; padding: 14px 0; border-bottom: 1px solid var(--border); align-items: baseline; }
+  .md-rcard-y { font-family: var(--font-display); font-size: 26px; font-weight: 500; }
+  .md-pct { font-family: var(--font-display); font-size: 26px; font-weight: 500; color: var(--brand); }
+  .md-rcard-d { grid-column: 1 / -1; font-size: 15px; color: var(--text-muted); }
+  .md-note { font-size: 13px; color: var(--text-muted); }
+
+  @media (min-width: 1024px) {
+    .md-hero { padding: 28px 0 56px; }
+    .md-hero-in { gap: 20px; }
+    .md-h1 { margin-top: 12px; line-height: 0.95; }
+    .md-lead { font-size: 20px; }
+    .md-body { padding-top: 64px; padding-bottom: 112px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; align-items: start; }
+    .md-index { grid-column: 1 / span 3; position: sticky; top: 112px; display: flex; flex-direction: column; gap: 10px; }
+    .md-index-k { font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+    .md-index-list { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--border); }
+    .md-idx { display: flex; align-items: center; gap: 12px; min-height: 48px; padding-left: 18px; color: var(--text); font-size: 16px; font-weight: 600; text-decoration: none; }
+    .md-idx:hover { color: var(--brand); }
+    .md-idx:hover .md-idx-t { text-decoration: underline; text-underline-offset: 5px; }
+    .md-sections { grid-column: 4 / span 9; gap: 72px; }
+    .md-sec { gap: 20px; }
+    .md-row { display: grid; grid-template-columns: 34% 1fr; gap: 24px; padding: 18px 0; }
+    .md-row dt { font-size: 16px; font-weight: 600; letter-spacing: 0; text-transform: none; }
+    .md-row dd { font-size: 18px; line-height: 1.55; }
+    .md-docs-head ~ .md-docs { margin-top: -6px; }
+    .md-doc { flex-direction: row; justify-content: space-between; align-items: center; gap: 24px; min-height: 68px; padding: 12px 0; }
+    .md-doc-f { justify-content: flex-end; }
+    .md-table { width: 100%; border-collapse: collapse; }
+    .md-table thead tr { border-bottom: 1px solid var(--text); }
+    .md-table thead th { padding: 0 16px 12px 0; text-align: left; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+    .md-table tbody tr { border-bottom: 1px solid var(--border); }
+    .md-table tbody th { padding: 16px 24px 16px 0; text-align: left; font-size: 16px; font-weight: 600; color: var(--text-muted); }
+    .md-table td { padding: 16px 16px 16px 0; }
+    .md-r { text-align: right !important; }
+    .md-rem { padding-left: 32px !important; }
+    .md-results tbody th { font-size: 16px; font-weight: 700; color: var(--text); }
+    .md-results td { font-size: 16px; }
+    .md-results .md-pct { font-family: var(--font-body); font-size: 16px; font-weight: 700; }
+    .md-cap { font-size: 17px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--text); }
+    .md-sec .md-docs-head + .md-docs { border-top-color: var(--text); }
+    .md-val { font-size: 18px; font-weight: 500; }
+    .md-details { font-size: 15px; }
+  }
+</style>

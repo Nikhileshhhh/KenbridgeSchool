@@ -1,0 +1,199 @@
+---
+// MegaPanel board. One panel per main-nav section; hidden until its trigger opens it.
+// Panels are plain lists of links (not role="menu"), per ShellHeader › Semantics.
+import FlameMark from '../ui/FlameMark.astro';
+import Icon from '../ui/Icon.astro';
+import type { ResolvedLink } from '../../lib/site';
+
+interface Group { label?: string; links: ResolvedLink[] }
+interface Props {
+  id: string;
+  eyebrow: string;
+  title: string;
+  hub: string;
+  intro: string;
+  lead?: { label: string; href: string };
+  cols: number;
+  groups: Group[];
+  years?: { label: string; slug: string }[];
+  photo: string;
+  caption: string;
+}
+const { id, eyebrow, title, hub, intro, lead, cols, groups, years, photo, caption } = Astro.props;
+---
+<div id={id} class="mega-panel" data-mega-panel hidden>
+  <div class="container mega-grid">
+    <div class="mega-intro">
+      <div class="mega-eyebrow eyebrow-text"><FlameMark size={12} /><span>{eyebrow}</span></div>
+      <a class="mega-title" href={hub}>{title}</a>
+      <p class="mega-text">{intro}</p>
+    </div>
+
+    <div class="mega-links">
+      {lead && (
+        <a class="mega-lead mlink" href={lead.href}>
+          <span class="mlabel">{lead.label}</span>
+          <Icon name="arrow" class="marrow" />
+        </a>
+      )}
+
+      {years && years.length > 0 && (
+        <div class="mega-years">
+          <span class="mega-group-label eyebrow-text">Academic year</span>
+          <ul role="list" class="years-grid">
+            {years.map((y, i) => (
+              <li>
+                <a class="year-link mlink tnum" href={`/gallery/${y.slug}`}>
+                  <span class="mlabel">{y.label}</span>
+                  {i === 0 && <span class="tag-latest">Latest</span>}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {groups.length > 0 && (
+        <div class="mega-groups" style={`--cols:${cols}`}>
+          {groups.map((g) => (
+            <div class="mega-group">
+              {g.label && <span class="mega-group-label eyebrow-text">{g.label}</span>}
+              <ul role="list">
+                {g.links.map((l) => (
+                  <li>
+                    <a
+                      class="mrow mlink"
+                      href={l.href}
+                      target={l.newTab ? '_blank' : undefined}
+                      rel={l.kind === 'ext' ? 'noopener' : undefined}
+                    >
+                      <span class="mrow-text">
+                        <span class="mlabel">{l.label}</span>
+                        {l.meta && <span class="mrow-meta tnum">{l.meta}</span>}
+                      </span>
+                      {l.kind === 'ext' && <span class="mrow-ext"><Icon name="external" size={14} /></span>}
+                      {(l.kind === 'pdf' || l.kind === 'video') && <span class="mrow-tag">{l.kind === 'pdf' ? 'PDF' : 'Video'}</span>}
+                      {l.kind === 'internal' && <Icon name="arrow" class="marrow" />}
+                      {l.srNote && <span class="vh">{l.srNote}</span>}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <figure class="mega-figure">
+      <div class="mega-photo" role="img" aria-label={`Placeholder: ${photo}`}>[Photo · {photo}]</div>
+      <figcaption class="mega-caption">{caption}</figcaption>
+    </figure>
+  </div>
+</div>
+
+<style>
+  .mega-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: 40;
+    background: var(--surface-raised);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-overlay);
+    color: var(--text);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .mega-panel:not([hidden]) { animation: kb-mega 250ms var(--ease-out) both; }
+  }
+  .mega-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 32px;
+    padding-top: 48px;
+    padding-bottom: 56px;
+  }
+  .mega-intro { grid-column: span 3; display: flex; flex-direction: column; gap: 14px; padding-right: 16px; }
+  .mega-eyebrow { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--brand); }
+  .mega-title {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .mega-title:hover { color: var(--brand); text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 1px; }
+  .mega-text { font-size: 15px; line-height: 1.6; color: var(--text-muted); }
+  .mega-links { grid-column: span 6; display: flex; flex-direction: column; gap: 24px; }
+  .mega-figure { grid-column: span 3; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .mega-photo {
+    aspect-ratio: 4 / 3;
+    background: var(--ph-1);
+    display: flex;
+    align-items: flex-end;
+    padding: 14px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--text-muted);
+  }
+  .mega-caption { font-size: 13px; line-height: 1.5; color: var(--text-muted); }
+
+  .mlink { color: var(--text); text-decoration: none; }
+  .mlink:hover .mlabel { color: var(--brand); text-decoration: underline; text-underline-offset: 4px; }
+  .mega-lead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 56px;
+    border-top: 1px solid var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  .mega-lead .mlabel { font-family: var(--font-display); font-size: 26px; font-weight: 600; }
+  .mega-group-label { font-size: 12px; color: var(--text-muted); }
+  .mega-groups { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); column-gap: 32px; row-gap: 24px; }
+  .mega-group, .mega-years { display: flex; flex-direction: column; gap: 8px; }
+  .mrow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 52px;
+    padding: 8px 0;
+    border-top: 1px solid var(--border);
+  }
+  .mrow-text { display: flex; flex-direction: column; gap: 2px; }
+  .mrow .mlabel { font-size: 16px; font-weight: 600; line-height: 1.3; }
+  .mrow-meta { font-size: 14px; line-height: 1.4; color: var(--text-muted); }
+  .mrow-ext { display: inline-flex; color: var(--brand); }
+  .mrow-tag, .tag-latest {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .mrow-tag { border: 1px solid var(--border); color: var(--text-muted); }
+  .tag-latest { background: var(--accent-tint); color: var(--text); }
+  :global(.marrow) { flex-shrink: 0; color: var(--brand); opacity: 0; transform: translateX(-4px); transition: opacity var(--dur-micro), transform var(--dur-micro) var(--ease-out); }
+  .mlink:hover :global(.marrow), .mlink:focus-visible :global(.marrow) { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { :global(.marrow) { transition: none; } }
+
+  .years-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 24px; }
+  .year-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 48px;
+    border-top: 1px solid var(--border);
+    font-size: 16px;
+    font-weight: 600;
+  }
+</style>

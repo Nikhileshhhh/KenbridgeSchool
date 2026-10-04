@@ -1,0 +1,91 @@
+---
+// HomeDesktop §9 / HomeMobile "Ten places on campus". Desktop: an index of links; hover or focus
+// swaps the large preview. Phones: rows are toggle buttons (aria-pressed) that set the preview,
+// whose "Visit" link opens the facility. Without JS every row is a plain link.
+import { getFacilities } from '../../lib/site';
+const facilities = await getFacilities();
+const first = facilities[0];
+const items = facilities.map((f) => ({
+  slug: f.id, num: f.data.num, name: f.data.name, photo: f.data.homePhoto, href: `/campus/${f.id}`
+}));
+---
+<section class="fac" aria-labelledby="facTitle" data-fac>
+  <div class="container fac-grid">
+    <div class="fac-head">
+      <span class="fac-eyebrow eyebrow-text">Facilities</span>
+      <h2 id="facTitle" class="fac-title">Ten places on campus</h2>
+    </div>
+    <figure class="fac-fig">
+      <div class="fac-photo" role="img" aria-label={`Placeholder for a photograph of ${first.data.name}`} data-fac-photo>
+        <span data-fac-photo-label>[Photo · {first.data.homePhoto}]</span>
+      </div>
+      <figcaption class="fac-cap">
+        <strong class="fac-cap-name" data-fac-name>{first.data.name}</strong>
+        <span class="fac-cap-num tnum only-lg"><span data-fac-num>{first.data.num}</span> / 10</span>
+        <a class="fac-visit only-sm" href={`/campus/${first.id}`} data-fac-visit>Visit →</a>
+      </figcaption>
+    </figure>
+    <ol role="list" class="fac-list" aria-label="Choose a facility to preview">
+      {items.map((f, i) => (
+        <li data-fac-item data-name={f.name} data-num={f.num} data-photo={f.photo} data-href={f.href}>
+          <a class:list={['fac-row', 'fac-link', i === 0 && 'is-current']} href={f.href} aria-current={i === 0 ? 'true' : undefined}>
+            <span class="fac-num tnum">{f.num}</span>
+            <span class="fac-name">{f.name}</span>
+            <svg class="fac-arrow" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8H13M9 4L13 8L9 12" /></svg>
+          </a>
+          <button type="button" class:list={['fac-row', 'fac-btn', i === 0 && 'is-current']} aria-pressed={i === 0 ? 'true' : 'false'}>
+            <span class="fac-num tnum">{f.num}</span>
+            <span class="fac-name">{f.name}</span>
+          </button>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .fac { padding: 64px 0; }
+  .fac-grid { display: flex; flex-direction: column; gap: 20px; }
+  .fac-head { display: flex; flex-direction: column; gap: 10px; }
+  .fac-eyebrow { font-size: 12px; color: var(--brand); }
+  .fac-title { font-family: var(--font-display); font-size: clamp(2.5rem, 1.943rem + 2.286vw, 4rem); font-weight: 500; line-height: 1.05; }
+  .fac-fig { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .fac-photo { aspect-ratio: 4 / 3; background: var(--ph-1); display: flex; align-items: flex-end; padding: 12px; font-size: 12px; color: var(--text-muted); }
+  .fac-cap { display: flex; justify-content: space-between; align-items: center; }
+  .fac-cap-name { font-size: 16px; }
+  .fac-visit { display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; font-weight: 600; text-decoration: underline; text-decoration-color: var(--link-underline); text-underline-offset: 6px; }
+  .fac-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .fac-row {
+    width: 100%; display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 4px;
+    border: 0; border-top: 1px solid var(--border); background: transparent; color: var(--text); text-decoration: none; text-align: left;
+  }
+  .fac-num { width: 24px; font-size: 12px; font-weight: 800; color: var(--text-muted); }
+  .fac-name { flex: 1; font-family: var(--font-display); font-size: 22px; font-weight: 500; line-height: 1.1; }
+  .fac-arrow { display: none; }
+  .fac-row.is-current .fac-num { color: var(--brand); }
+  .fac-row.is-current .fac-name { font-weight: 700; }
+  .fac-btn.is-current { background: var(--brand-tint); color: var(--brand); }
+  /* Phones: buttons with JS, links without. Desktop: always links. */
+  .fac-btn { display: none; }
+  :global(html.js) .fac-link { display: none; }
+  :global(html.js) .fac-btn { display: flex; }
+
+  @media (min-width: 1024px) {
+    .fac { padding: 128px 0; }
+    .fac-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; row-gap: 48px; }
+    .fac-head { grid-column: 1 / -1; gap: 14px; }
+    .fac-eyebrow { font-size: 13px; }
+    .fac-fig { grid-column: 1 / span 7; gap: 14px; }
+    .fac-photo { padding: 20px; font-size: 14px; }
+    .fac-cap { padding-top: 12px; border-top: 1px solid var(--border); font-size: 14px; color: var(--text-muted); }
+    .fac-cap-name { font-size: 14px; color: var(--text); }
+    .fac-list { grid-column: 9 / span 4; }
+    :global(html.js) .fac-link { display: flex; }
+    :global(html.js) .fac-btn { display: none; }
+    .fac-row { gap: 16px; min-height: 56px; }
+    .fac-name { font-size: 26px; }
+    .fac-arrow { display: block; opacity: 0; }
+    .fac-link.is-current { color: var(--brand); }
+    .fac-link.is-current .fac-arrow { opacity: 1; }
+  }
+</style>

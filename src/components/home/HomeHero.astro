@@ -1,0 +1,112 @@
+---
+// HomeDesktop §1 / HomeMobile hero. One emblem instance: on phones it sits above the headline
+// (300px), on desktop in the right column (560px). The hero does not clip, so the emblem can
+// travel into the header logo slot; only the background layers are clipped.
+import Emblem from '../emblem/Emblem.astro';
+import Icon from '../ui/Icon.astro';
+import StatusPill from './StatusPill.astro';
+import { getHome, getServices } from '../../lib/site';
+
+const home = await getHome();
+const services = await getServices();
+const h = home.hero;
+---
+<section class="hero on-dark" aria-labelledby="heroTitle">
+  <div class="hero-bg" aria-hidden="true">
+    <div class="hero-photo"></div>
+    <div class="hero-shade"></div>
+  </div>
+  <div class="hero-photo-label" role="img" aria-label={h.photoAlt}><span class="only-lg">{h.photo}</span></div>
+
+  <div class="container hero-grid">
+    <div class="hero-emblem">
+      <Emblem size={560} sizeSm={300} meaning meaningOpen={false} live eager travel />
+    </div>
+    <div class="hero-copy">
+      <span class="hero-eyebrow tnum">{h.eyebrow}</span>
+      <h1 id="heroTitle" class="hero-title">{h.titleLine1}<br /><span class="em">{h.titleEm}</span> {h.titleLine2}</h1>
+      <p class="hero-lead">{h.lead}</p>
+      <div class="hero-actions">
+        <a class="hero-btn hero-btn--accent arrow-nudge" href={h.primary.href}>{h.primary.label}<span class="arrow" aria-hidden="true"><Icon name="arrow" strokeWidth={1.7} /></span></a>
+        <a class="hero-btn hero-btn--outline" href={services.virtualTour.url} target="_blank" rel="noopener" data-tour-open>
+          <Icon name="play" size={16} />{h.tour}<span class="vh" data-tour-note> (opens YouTube in a new tab)</span>
+        </a>
+      </div>
+    </div>
+    <div class="hero-pill">
+      <StatusPill tone="dark" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    background: var(--surface-dark);
+    color: var(--text-on-dark);
+    padding: 80px 0 48px;
+  }
+  .hero-bg { position: absolute; inset: 0; overflow: hidden; }
+  .hero-photo {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 90% 40% at 50% 22%, rgba(150, 92, 52, 0.5) 0%, rgba(42, 10, 11, 0) 75%), #2E1012;
+  }
+  .hero-shade { display: none; }
+  .hero-photo-label { position: absolute; inset: 0; pointer-events: none; }
+  .hero-photo-label span { position: absolute; right: var(--margin); bottom: 40px; font-size: 13px; color: var(--text-on-dark-muted); }
+
+  .hero-grid { position: relative; display: flex; flex-direction: column; gap: 20px; }
+  .hero-emblem { display: flex; justify-content: center; position: relative; z-index: 55; }
+  .hero-copy { display: flex; flex-direction: column; gap: 20px; }
+  .hero-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; line-height: 1.5; text-transform: uppercase; color: var(--accent); }
+  .hero-title { font-family: var(--font-display); font-size: var(--fs-display-l); font-weight: 500; line-height: 1; letter-spacing: -0.01em; }
+  .hero-lead { font-size: 17px; line-height: 1.6; color: var(--text-on-dark-muted); max-width: 540px; }
+  .hero-actions { display: flex; flex-direction: column; gap: 20px; }
+  .hero-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 52px;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    text-decoration: none;
+  }
+  .hero-btn--accent { background: var(--accent); color: var(--text); font-weight: 700; }
+  .hero-btn--accent:hover { color: var(--text); }
+  .hero-btn--outline { border: 1.5px solid var(--text-on-dark); color: var(--text-on-dark); font-weight: 600; }
+  .hero-btn--outline:hover { color: var(--text-on-dark); background: rgba(251, 247, 240, 0.08); }
+  .hero-btn :global(svg) { flex-shrink: 0; }
+  .hero .arrow { display: inline-flex; }
+
+  @media (min-width: 1024px) {
+    .hero { min-height: 900px; padding: 189px 0 128px; }
+    .hero-photo {
+      background:
+        radial-gradient(ellipse 55% 60% at 74% 48%, rgba(150, 92, 52, 0.55) 0%, rgba(90, 40, 28, 0.35) 45%, rgba(42, 10, 11, 0) 75%),
+        radial-gradient(ellipse 80% 40% at 60% 100%, rgba(70, 60, 30, 0.45) 0%, rgba(42, 10, 11, 0) 70%),
+        #2E1012;
+    }
+    .hero-shade { display: block; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(42, 10, 11, 0.92) 0%, rgba(42, 10, 11, 0.7) 42%, rgba(42, 10, 11, 0.15) 100%); }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: 32px;
+      align-items: center;
+      min-height: 583px;
+    }
+    .hero-copy { grid-column: 1 / span 6; grid-row: 1; gap: 28px; }
+    .hero-emblem { grid-column: 7 / span 6; grid-row: 1; }
+    .hero-eyebrow { font-size: 13px; line-height: normal; }
+    .hero-lead { font-size: 19px; }
+    .hero-actions { flex-direction: row; align-items: center; gap: 16px; padding-top: 4px; }
+    .hero-btn { height: 56px; font-size: 17px; }
+    .hero-btn--accent { padding: 0 26px 0 28px; }
+    .hero-btn--outline { padding: 0 24px; }
+    .hero-pill { position: absolute; left: var(--margin); bottom: -84px; z-index: 2; }
+  }
+  @media (min-width: 1024px) and (max-width: 1279px) {
+    .hero { padding-top: 140px; }
+  }
+</style>

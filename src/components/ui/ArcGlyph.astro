@@ -1,0 +1,21 @@
+---
+// Stage glyph (LearningDesktop, ProgramDetail): a four-step arc that fills one more step per stage,
+// so the stage reads from shape and numeral, never from colour alone.
+interface Props { stage: number; width?: number; class?: string }
+const { stage, width = 56, class: cls } = Astro.props;
+const d = [
+  'M3.0 19.0A29.32 29.32 0 0 1 12.35 9.52',
+  'M14.12 8.49A29.32 29.32 0 0 1 26.98 5.02',
+  'M29.02 5.02A29.32 29.32 0 0 1 41.88 8.49',
+  'M43.65 9.52A29.32 29.32 0 0 1 53.0 19.0'
+];
+---
+<svg class:list={['arc-glyph', cls]} aria-hidden="true" focusable="false" width={width} height={Math.round((width * 22) / 56)} viewBox="0 0 56 22" fill="none" style={`--glyph:var(--stage${stage}-text)`}>
+  {d.map((p, i) => <path d={p} class={i < stage ? 'on' : 'off'} />)}
+</svg>
+
+<style>
+  .arc-glyph { flex-shrink: 0; stroke-linecap: round; }
+  .on { stroke: var(--glyph); stroke-width: 3.5; }
+  .off { stroke: var(--border-strong); stroke-width: 1.5; }
+</style>

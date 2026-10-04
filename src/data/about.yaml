@@ -1,0 +1,36 @@
+# About (AboutDesktop / AboutMobile boards). Facts and copy from KENBRIDGE_SCREEN_PROMPTS_FROM_LIVE_SITE.md (P03).
+main:
+  hero:
+    title: Our
+    titleEm: Story
+    lead: Since 2011, a CBSE school built to serve Kalaburagi and the Kalyana Karnataka region.
+    photo: '[Photo · Drone-Front.jpg · school front, architectural]'
+    photoSm: '[Photo · Drone-Front.jpg]'
+    photoAlt: 'Placeholder: architectural drone photograph of the school front'
+    facts:
+      - { label: Founded, value: '2011' }
+      - { label: CBSE affiliated, value: 2015 · No. 830594 }
+      - { label: Trust, value: Homi Educational Trust }
+  intro: KenBridge School has always stood for and promoted the principle of a high academic level of excellence which has supported us in leaving an indelible mark on the society, of which we are an integral part. The high academic levels, coupled with the extra and co-curricular activities, create an impressive individual who can face the formidable challenges of the outside world with panache.
+  # Only verified milestones.
+  milestones:
+    - { year: '2011', text: 'The Homi Educational Trust lays the foundation of KenBridge School, a CBSE institution in Kalaburagi.' }
+    - { year: '2015', text: 'Becomes a full-fledged CBSE-affiliated school (Affiliation No. 830594), empowered to run classes up to X.' }
+    - { year: 2016–17, text: The first Class X batch graduates with a 100% result. }
+    - { year: 2023 & 2024, text: 100% Class X pass results (143/143 and 179/179). }
+    - { year: '2025', text: 97.75% Class X pass (170 of 174). }
+    - { year: '2026', text: 'Class X toppers at 96.8%, 94.8% and 94.4%.' }
+  beyond:
+    sports: [Football, Hockey, Cricket, Basketball, Table tennis, Badminton, Chess]
+    activities: [Debating, Dramatics, Elocution, Quizzing, Music, School band, N.C.C., Scouts]
+    photos:
+      - { label: '[Photo · playground match]', alt: 'Placeholder: students on the playground', caption: '[Caption · sport, class, year]' }
+      - { label: '[Photo · Indoor-Sports-Room-2.jpg]', labelSm: '[Indoor-Sports-Room-2.jpg]', alt: 'Placeholder: indoor sports room', caption: '[Caption]' }
+      - { label: '[Photo · Music-Room-2.jpg]', labelSm: '[Music-Room-2.jpg]', alt: 'Placeholder: school band or music room', altSm: 'Placeholder: music room', caption: '[Caption]' }
+    closing: This mingling of passion and commitment transforms students into knowledgeable, well-informed youngsters ready to take challenges head on.
+  logo:
+    eyebrow: Understand the brand
+    title: What our logo means
+    ken: One’s range of knowledge
+    bridge: A structure carrying a road, a path
+    note: The emblem joins five elements. Hover or tap a part, or use the buttons, to see what each one stands for.

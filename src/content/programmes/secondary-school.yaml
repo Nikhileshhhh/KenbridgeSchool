@@ -1,0 +1,42 @@
+# Stage 4 · Secondary School. Hub copy from LearningDesktop/LearningMobile; page copy from P10 of
+# KENBRIDGE_SCREEN_PROMPTS_FROM_LIVE_SITE.md, set in the ProgramDetail template's chapter types.
+stage: 4
+num: '04'
+name: Secondary School
+range: Classes IX – X
+hub:
+  lead: A launch pad to step out into the world, with sound academic training that readies students for college admissions and professional courses.
+  classes: [IX, X]
+  focus: []
+  next: The CBSE Class X Board examination
+  cta: Explore Secondary School
+  photo: Secondary students in the library (Library-2.jpg)
+  photoSm: Library (Library-2.jpg)
+eyebrow: Learning · Stage 4
+chip: Classes IX – X (CBSE Board)
+lead: The senior wing serves as a launch pad for young citizens ready to step out into the world and shoulder responsibility.
+heroPhoto: Secondary students in the library (Library-2.jpg)
+facts: []
+# The quick-facts row shows the Class X results rail, read from src/data/results.yaml.
+resultsFacts: true
+chapters:
+  - type: subjects
+    title: Academic rigour
+    intro: A more rigorous and demanding curriculum.
+    items:
+      - { name: Science }
+      - { name: Mathematics }
+      - { name: Social Studies }
+      - { name: Languages }
+  # TODO(content): OPEN-QUESTIONS #9. P10 asks for this wording to be confirmed by the school (workshops, seminars, career guidance).
+  - type: statement
+    title: Ready for what’s next
+    intro: Workshops, seminars and career guidance.
+    statement: Sound academic training that readies students for college admissions and professional courses.
+  - type: activities
+    title: Leadership and teamwork
+    intro: Sports, music, drama, debate and robotics.
+    words: [Sports, Music, Drama, Debate, Robotics]
+related:
+  - { facility: science-lab }
+  - { facility: library }

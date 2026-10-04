@@ -1,0 +1,65 @@
+---
+// HomeDesktop / HomeMobile virtual tour modal. Without JS the "Take the virtual tour" controls are
+// plain links to YouTube (new tab). With JS they open this native <dialog>: focus goes to Close,
+// Esc and the backdrop close it, focus returns to the opener. The video itself plays on YouTube
+// (the board's "Play the tour" button), so nothing from YouTube loads on this page.
+import Icon from '../ui/Icon.astro';
+import { getServices } from '../../lib/site';
+interface Props { titleSm?: string; noteSm?: string; ph?: string }
+// Phone wording differs by page: Home says "Virtual tour"; Campus says "Virtual tour of the campus" and keeps a note.
+const { titleSm = 'Virtual tour', noteSm, ph = '[YouTube video NA7Ksy1WsnY · campus tour]' } = Astro.props;
+const services = await getServices();
+---
+<dialog class="tour on-dark" aria-labelledby="tourTitle" data-tour-dialog>
+  <div class="tour-head">
+    <h2 id="tourTitle" class="tour-title"><span class="only-lg">Virtual tour of the KenBridge campus</span><span class="only-sm">{titleSm}</span></h2>
+    <button type="button" class="tour-close" data-tour-close autofocus>Close<Icon name="close" size={14} /></button>
+  </div>
+  <div class="tour-frame">
+    <span class="tour-ph only-lg">{ph}</span>
+    <a class="tour-play" href={services.virtualTour.url} target="_blank" rel="noopener"><Icon name="play" size={22} />Play the tour<span class="vh"> (opens YouTube in a new tab)</span></a>
+  </div>
+  <p class="tour-note only-lg">Captions available on YouTube. Press Esc to close.</p>
+  {noteSm && <p class="tour-note tour-note--sm only-sm">{noteSm}</p>}
+</dialog>
+
+<style>
+  .tour {
+    width: calc(100% - 24px);
+    max-width: 1000px;
+    margin: 140px auto auto;
+    padding: 16px;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: var(--surface-dark);
+    color: var(--text-on-dark);
+    box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.6);
+    --focus-ring: var(--focus-on-dark);
+  }
+  .tour[open] { display: flex; flex-direction: column; gap: 14px; }
+  .tour::backdrop { background: rgba(31, 26, 23, 0.82); }
+  .tour-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .tour-title { font-family: var(--font-display); font-size: 24px; font-weight: 500; line-height: 1.1; }
+  .tour-close {
+    display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 12px;
+    border: 1px solid rgba(251, 247, 240, 0.45); border-radius: var(--radius-md); background: transparent; color: var(--text-on-dark); font-size: 15px; font-weight: 600;
+  }
+  .tour-frame { position: relative; aspect-ratio: 16 / 9; background: var(--ph-dark); display: flex; align-items: center; justify-content: center; }
+  .tour-ph { position: absolute; left: 16px; bottom: 14px; font-size: 13px; color: var(--text-on-dark-muted); }
+  .tour-play {
+    display: inline-flex; align-items: center; gap: 8px; height: 52px; padding: 0 20px;
+    border-radius: var(--radius-md); background: var(--accent); color: var(--text) !important; font-size: 16px; font-weight: 700; text-decoration: none;
+  }
+  .tour-note { font-size: 14px; color: var(--text-on-dark-muted); }
+  .tour-note--sm { font-size: 13px; }
+  @media (min-width: 1024px) {
+    .tour { width: 1000px; margin-top: 200px; padding: 24px 24px 28px; }
+    .tour[open] { gap: 20px; }
+    .tour-title { font-size: 32px; }
+    .tour-close { gap: 8px; padding: 0 14px; }
+    .tour-play { gap: 12px; height: 64px; padding: 0 28px 0 22px; font-size: 18px; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .tour[open] { animation: kb-sheet 320ms var(--ease-out) both; }
+  }
+</style>

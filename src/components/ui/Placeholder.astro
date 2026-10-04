@@ -1,0 +1,90 @@
+---
+// A missing photo, portrait or video, shown exactly as the board words it, e.g.
+// "[Photo · Drone-Front.jpg · school front, architectural]". Every label used on the site
+// is tracked in website/PLACEHOLDERS.md. Square corners, no shadow (Content board).
+//
+// When the label names a file (Drone-Front.jpg) and that file has been dropped into
+// src/assets/photos/, the real photograph renders instead, in the same frame: AVIF and WebP with a
+// JPEG fallback, a width ladder with srcset, explicit width and height, lazy unless `priority`.
+// Its alt text must come from the school in src/data/photos.yaml; the build stops rather than
+// invent one.
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { getEntry } from 'astro:content';
+
+interface Props {
+  label: string;
+  ratio?: string;
+  tone?: 1 | 2 | 3 | 4 | 'dark';
+  /** Accessible description; defaults to "Placeholder: <label>". */
+  alt?: string;
+  class?: string;
+  corners?: boolean;
+  /** Above the fold (a hero): load eagerly with high priority. */
+  priority?: boolean;
+  /** The image's displayed width, for srcset selection. */
+  sizes?: string;
+}
+const { label, ratio = '3 / 2', tone = 1, alt, class: cls, corners = false, priority = false, sizes = '100vw' } = Astro.props;
+
+const photos = import.meta.glob<{ default: ImageMetadata }>('/src/assets/photos/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG}');
+const file = label.match(/[\w.-]+\.(?:jpe?g|png|webp)/i)?.[0];
+const key = file && Object.keys(photos).find((k) => k.split('/').pop()!.toLowerCase() === file.toLowerCase());
+let src: ImageMetadata | undefined;
+let photoAlt = '';
+if (key) {
+  src = (await photos[key]()).default;
+  const entry = await getEntry('photos', 'main');
+  const found = entry?.data.alt[file!] ?? entry?.data.alt[key.split('/').pop()!];
+  if (found === undefined) throw new Error(`Photo ${file} is supplied but has no alt text in src/data/photos.yaml (use "" only for a purely decorative image).`);
+  photoAlt = found;
+}
+---
+{src ? (
+  <div class:list={['ph', 'ph--photo', cls]} style={`aspect-ratio:${ratio}`}>
+    <Picture
+      src={src}
+      alt={photoAlt}
+      formats={['avif', 'webp']}
+      fallbackFormat="jpg"
+      widths={[390, 640, 960, 1280, 1920, 2880].filter((w) => w <= src.width)}
+      sizes={sizes}
+      loading={priority ? 'eager' : 'lazy'}
+      fetchpriority={priority ? 'high' : undefined}
+      decoding="async"
+      class="ph-img"
+    />
+  </div>
+) : (
+  <div
+    class:list={['ph', tone === 'dark' && 'ph--dark', cls]}
+    style={`aspect-ratio:${ratio};${tone === 'dark' ? '' : `background:var(--ph-${tone})`}`}
+    role="img"
+    aria-label={alt ?? `Placeholder: ${label.replace(/^\[|\]$/g, '')}`}
+  >
+    {corners && <><span class="ph-c ph-c--tl"></span><span class="ph-c ph-c--tr"></span><span class="ph-c ph-c--bl"></span><span class="ph-c ph-c--br"></span></>}
+    <span class="ph-label">{label}</span>
+  </div>
+)}
+
+<style>
+  .ph {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    padding: 16px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--text-muted);
+  }
+  .ph--photo { padding: 0; overflow: hidden; background: var(--ph-1); }
+  .ph--photo :global(picture), .ph--photo :global(.ph-img) { display: block; width: 100%; height: 100%; }
+  .ph--photo :global(.ph-img) { object-fit: cover; }
+  .ph--dark { background: var(--ph-dark); color: var(--text-on-dark-muted); }
+  .ph-c { position: absolute; width: 24px; height: 24px; border-color: var(--text-on-dark-muted); border-style: solid; border-width: 0; }
+  .ph-c--tl { left: 32px; top: 32px; border-left-width: 1px; border-top-width: 1px; }
+  .ph-c--tr { right: 32px; top: 32px; border-right-width: 1px; border-top-width: 1px; }
+  .ph-c--bl { left: 32px; bottom: 32px; border-left-width: 1px; border-bottom-width: 1px; }
+  .ph-c--br { right: 32px; bottom: 32px; border-right-width: 1px; border-bottom-width: 1px; }
+</style>

@@ -1,0 +1,10 @@
+---
+// Motif 3 · Flame mark (Content board): saffron flame over a maroon nib; the nib turns
+// ivory on dark. A marker, never a logo substitute, and always aria-hidden.
+interface Props { size?: number; onDark?: boolean; class?: string }
+const { size = 14, onDark = false, class: cls } = Astro.props;
+---
+<svg class={cls} width={size} height={size} viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  <path d="M8 0.8C8 0.8 11.6 4.5 11.6 7.4C11.6 9.4 10 11 8 11C6 11 4.4 9.4 4.4 7.4C4.4 4.5 8 0.8 8 0.8Z" fill="#F89A1C" />
+  <path d="M5.4 12.2H10.6L8 15.8Z" fill={onDark ? '#FBF7F0' : '#7F0305'} />
+</svg>

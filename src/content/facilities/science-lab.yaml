@@ -1,0 +1,12 @@
+# Facility data from the FacilityDetail and CampusDesktop board scripts. Only school-approved copy goes in
+# what / how / features; anything not yet approved goes in pending (shown only when facilityDrafts is on).
+num: '05'
+name: Science Lab
+short: lab
+group: learn
+descriptor: Designed around the needs of young learners.
+atlasDesc: Designed around the needs of young learners.
+homePhoto: '[Science Lab photo]'
+atlasPhoto: science lab
+photoNeeded: true
+photos: []

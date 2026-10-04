@@ -1,0 +1,66 @@
+---
+// HomeDesktop §6 / HomeMobile "Proof in numbers". A description list; every figure names its
+// source. No count-up animation: numbers fade in once with the section (Content board).
+import { getHome } from '../../lib/site';
+const { stats } = await getHome();
+---
+<section class="proof" aria-labelledby="numbersTitle">
+  <div class="container">
+    <div class="proof-head">
+      <div class="proof-titles">
+        <span class="proof-eyebrow eyebrow-text">Proof in numbers</span>
+        <h2 id="numbersTitle" class="proof-title">KenBridge, by the record</h2>
+      </div>
+      <span class="proof-note only-lg">Every figure carries its source</span>
+    </div>
+    <dl class="proof-grid">
+      {stats.map((s) => (
+        <div class="proof-stat">
+          <dt class="proof-label">
+            <span class="only-lg">{s.label}</span><span class="only-sm">{s.labelSm ?? s.label}</span>
+          </dt>
+          <dd class="proof-value tnum">
+            {s.value}
+            {s.unit && <span class="proof-unit"><span class="only-lg">{s.unit}</span><span class="only-sm">{s.unitSm ?? s.unit}</span></span>}
+          </dd>
+          {s.detail && (
+            <dd class="proof-detail tnum"><span class="only-lg">{s.detail}</span><span class="only-sm">{s.detailSm ?? s.detail}</span></dd>
+          )}
+          <dd class="proof-source">Source: <span class="only-lg">{s.source}</span><span class="only-sm">{s.sourceSm ?? s.source}</span></dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<style>
+  .proof { padding: 64px 0; background: var(--surface-raised); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .proof-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; }
+  .proof-titles { display: flex; flex-direction: column; gap: 10px; }
+  .proof-eyebrow { font-size: 12px; color: var(--brand); }
+  .proof-title { font-family: var(--font-display); font-size: clamp(2.5rem, 1.943rem + 2.286vw, 4rem); font-weight: 500; line-height: 1.05; }
+  .proof-note { font-size: 14px; color: var(--text-muted); }
+  .proof-grid { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 16px; }
+  .proof-stat { display: flex; flex-direction: column; gap: 6px; padding-top: 12px; border-top: 1px solid var(--text); }
+  .proof-label { order: 2; font-size: 15px; font-weight: 700; line-height: 1.3; }
+  .proof-value {
+    order: 1; margin: 0; display: flex; align-items: baseline; gap: 4px;
+    font-family: var(--font-display); font-size: clamp(2.75rem, 1.914rem + 3.429vw, 5rem); font-weight: 500; line-height: 0.95; color: var(--brand);
+  }
+  .proof-unit { font-size: 20px; color: var(--text-muted); }
+  .proof-detail { order: 3; margin: 0; font-size: 14px; line-height: 1.4; }
+  .proof-source { order: 4; margin: 0; font-size: 12px; line-height: 1.4; color: var(--text-muted); }
+  @media (min-width: 1024px) {
+    .proof { padding: 128px 0; }
+    .proof-head { margin-bottom: 56px; }
+    .proof-titles { gap: 14px; }
+    .proof-eyebrow { font-size: 13px; }
+    .proof-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 56px 32px; }
+    .proof-stat { gap: 10px; padding-top: 20px; }
+    .proof-label { font-size: 17px; line-height: 1.35; }
+    .proof-value { gap: 8px; line-height: 0.9; }
+    .proof-unit { font-size: 28px; }
+    .proof-detail { font-size: 15px; line-height: 1.45; }
+    .proof-source { font-size: 13px; line-height: 1.45; }
+  }
+</style>

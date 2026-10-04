@@ -1,0 +1,290 @@
+---
+// /information/timings (TimingsDesktop, TimingsMobile, TimingsPrint). Terms, morning bells, timings by
+// class (a table; labelled rows on phones), and the period day (a drawn timeline plus the real table).
+// "Print timings" fits the page on one A4 sheet (print styles below; scripts/print-check.mjs proves it).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/shell/Breadcrumbs.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { getMain } from '../../lib/site';
+
+const { timings: T } = await getMain('info');
+const total = T.periods.reduce((s, p) => s + p.min, 0);
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'School Information', href: '/information' }, { label: T.title }];
+let at = 0;
+const marks = [T.periods[0].from, ...T.periods.map((p) => p.to)].map((label, i) => {
+  const left = (i === 0 ? 0 : (at += T.periods[i - 1].min)) / total * 100;
+  return { label, left };
+});
+---
+<BaseLayout
+  title="School Timings"
+  description="School timings at KenBridge School, Kalaburagi: terms, morning bells, school hours by class and the period timetable. Prints on one A4 sheet."
+  current="information"
+  breadcrumbs={crumbs}
+>
+  <div class="tm">
+    <section class="tm-sec tm-hero" aria-labelledby="tH1">
+      <div class="container tm-hero-in">
+        <div class="noprint"><Breadcrumbs items={crumbs} /></div>
+        <div class="tm-hero-row">
+          <div class="tm-hero-t">
+            <h1 id="tH1" class="tm-h1">{T.title}</h1>
+            <p class="tm-meta">{T.meta}</p>
+          </div>
+          <button type="button" class="tm-print js-only noprint" data-print><Icon name="print" size={18} />Print timings</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="tm-sec" aria-labelledby="termT">
+      <div class="container">
+        <h2 id="termT" class="tm-h2">Terms</h2>
+        <ol class="tm-terms" aria-label="Academic terms" role="list">
+          {T.terms.map((t, i) => <li class:list={['tm-term', i === 0 ? 'tm-term--a' : 'tm-term--b']} style={`flex:${t.span}`}><span class="tm-term-k">{t.label}</span><span class="tm-term-m">{t.months}</span></li>)}
+        </ol>
+        <div class="tm-months" aria-hidden="true">{T.months.map((m) => <span>{m}</span>)}</div>
+      </div>
+    </section>
+
+    <section class="tm-sec" aria-labelledby="mornT">
+      <div class="container">
+        <h2 id="mornT" class="tm-h2">Every morning</h2>
+        <dl class="tm-bells tnum">
+          {T.morning.map((b) => <div class="tm-bell"><dt>{b.label}</dt><dd><span class="tm-big">{b.time}</span><span class="tm-ampm">{b.ampm}</span></dd></div>)}
+        </dl>
+      </div>
+    </section>
+
+    <section class="tm-sec" aria-labelledby="gradeT">
+      <div class="container">
+        <h2 id="gradeT" class="tm-h2">Timings by class</h2>
+        <table class="tm-table tm-classes only-lg-print tnum">
+          <caption class="vh">School timings by class</caption>
+          <thead><tr><th scope="col">Classes</th><th scope="col">Days</th><th scope="col">School hours</th><th scope="col">Lunch</th></tr></thead>
+          <tbody>
+            {T.byClass.map((r) => <tr><th scope="row" class="tm-cls">{r.classes}</th><td class="tm-days">{r.days}</td><td class="tm-hours">{r.hours}</td><td class="tm-lunch">{r.lunch}</td></tr>)}
+          </tbody>
+        </table>
+        <ul class="tm-cards only-sm-screen tnum" aria-label="School timings by class" role="list">
+          {T.byClass.map((r) => (
+            <li class="tm-card">
+              <h3 class="tm-card-h">{r.classes}<span class="tm-card-days"> · {r.days}</span></h3>
+              <dl class="tm-card-dl"><dt>School hours</dt><dd class="tm-strong">{r.hours}</dd><dt>Lunch</dt><dd>{r.lunch}</dd></dl>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="tm-sec" aria-labelledby="perT">
+      <div class="container">
+        <h2 id="perT" class="tm-h2">Periods</h2>
+        <div class="tm-periods">
+          <figure class="tm-day noprint">
+            <figcaption class="tm-day-cap"><span class="only-lg">The day at a glance · {T.dayStart} to {T.dayEnd}</span><span class="only-sm">The day at a glance</span></figcaption>
+            <div class="tm-bar only-lg" aria-hidden="true">
+              <div class="tm-bar-row">{T.periods.map((p) => <div class:list={['tm-seg', p.break && 'tm-seg--break']} style={`width:${(p.min / total * 100).toFixed(3)}%`}>{p.short}</div>)}</div>
+              <div class="tm-bar-marks">{marks.map((m) => <span style={`left:${m.left.toFixed(3)}%`}>{m.label}</span>)}</div>
+            </div>
+            <div class="tm-vbar only-sm" aria-hidden="true">
+              {T.periods.map((p) => <div class="tm-vrow" style={`height:${(p.min * 1.6).toFixed(0)}px`}><span class="tm-vtime tnum">{p.from}</span><span class:list={['tm-vseg', p.break && 'tm-seg--break']}></span><span class:list={['tm-vlabel', p.break && 'tm-vlabel--break']}>{p.label}</span></div>)}
+              <div class="tm-vrow tm-vrow--end"><span class="tm-vtime tnum">{T.periods.at(-1)!.to}</span></div>
+            </div>
+            <p class="tm-legend"><span><span class="tm-key" aria-hidden="true"></span>Period</span><span><span class="tm-key tm-seg--break" aria-hidden="true"></span>Break (striped)</span></p>
+          </figure>
+          <div class="tm-ptable-wrap">
+            <table class="tm-table tm-ptable tnum">
+              <caption>Period timings</caption>
+              <thead><tr><th scope="col">Period</th><th scope="col">Time</th><th scope="col" class="tm-r">Length</th></tr></thead>
+              <tbody>{T.periods.map((p) => <tr class:list={[p.break && 'tm-break-row']}><th scope="row">{p.label}</th><td>{p.time}</td><td class="tm-r tm-muted">{p.min} min</td></tr>)}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <aside class="tm-sec tm-note" aria-labelledby="noteT">
+        <svg class="tm-note-icon" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7F0305" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9" /><path d="M12 7V12L15.5 14" /></svg>
+        <div><h2 id="noteT" class="tm-note-h">{T.office.title}</h2><p class="tm-note-p tnum">{T.office.text}</p></div>
+      </aside>
+      <p class="tm-printonly">{T.printFooter}</p>
+    </div>
+  </div>
+  <!-- Print sheet (TimingsPrint board): one A4 page, black on white; shown only when printing. -->
+  <div class="tm-sheet" aria-hidden="true" data-pagefind-ignore="all">
+    <div class="ts-head">
+      <div><p class="ts-k">KenBridge School, Kalaburagi</p><p class="ts-title">{T.title}</p></div>
+      <p class="ts-year">{T.meta.split(' · ').at(-1)}</p>
+    </div>
+    <div class="ts-two">
+      <div><p class="ts-h">Terms</p><p>{T.terms.map((x, i) => <>{i > 0 && <br />}{x.label}: {x.months}</>)}</p></div>
+      <div><p class="ts-h">Every morning</p><p>{T.morning.slice(0, 2).map((b, i) => <>{i > 0 && ' · '}{b.label} {b.time} {b.ampm}</>)}<br />{T.morning.slice(2).map((b) => <>{b.label} {b.time} {b.ampm}</>)}</p></div>
+    </div>
+    <p class="ts-h ts-h--gap">Timings by class</p>
+    <table class="ts-table">
+      <thead><tr><th>Classes</th><th>Days</th><th>School hours</th><th>Lunch</th></tr></thead>
+      <tbody>{T.byClass.map((r) => <tr><th>{r.classes}</th><td>{r.days}</td><td class="ts-b">{r.hours}</td><td>{r.lunch}</td></tr>)}</tbody>
+    </table>
+    <p class="ts-h ts-h--gap">Period timings</p>
+    <table class="ts-table">
+      <thead><tr><th>Period</th><th>Time</th><th class="ts-r">Length</th></tr></thead>
+      <tbody>{T.periods.map((x) => <tr class:list={[x.break && 'ts-break']}><th>{x.label}</th><td>{x.time}</td><td class="ts-r">{x.min} min</td></tr>)}</tbody>
+    </table>
+    <p class="ts-note">{T.office.title}: {T.office.text}</p>
+    <p class="ts-foot">{T.printFooter}</p>
+  </div>
+</BaseLayout>
+
+<script>
+  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+</script>
+
+<style>
+  .tm-muted { color: var(--text-muted); }
+  .tm-strong { font-weight: 700; }
+  .tm-sec { padding: 44px 0; border-bottom: 1px solid var(--border); }
+  .tm-hero { padding: 12px 0 36px; }
+  .tm-hero-in { display: flex; flex-direction: column; gap: 14px; }
+  .tm-hero-row { display: flex; flex-direction: column; gap: 14px; }
+  .tm-hero-t { display: flex; flex-direction: column; gap: 14px; }
+  .tm-h1 { font-family: var(--font-display); font-size: clamp(3.5rem, 2.243rem + 5.143vw, 6rem); font-weight: 500; line-height: 0.95; }
+  .tm-meta { font-size: 15px; color: var(--text-muted); }
+  .tm-print { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 52px; padding: 0 20px; border: 1.5px solid var(--brand); border-radius: var(--radius-md); background: transparent; color: var(--brand); font-size: 16px; font-weight: 600; }
+  .tm-print:hover { background: var(--brand-tint); }
+  .tm-h2 { margin-bottom: 20px; font-family: var(--font-display); font-size: clamp(2.125rem, 1.671rem + 1.862vw, 3rem); font-weight: 500; line-height: 1; }
+
+  .tm-terms { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; }
+  .tm-term { display: flex; flex-direction: column; justify-content: space-between; height: 76px; padding: 10px 12px; }
+  .tm-term--a { background: var(--brand); color: #FFFFFF; }
+  .tm-term--b { background: var(--surface); border: 2px solid var(--brand); }
+  .tm-term-k { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+  .tm-term--b .tm-term-k { color: var(--brand); }
+  .tm-term-m { font-family: var(--font-display); font-size: 20px; font-weight: 500; line-height: 1; }
+  .tm-months { display: flex; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border-strong); }
+  .tm-months span { flex: 1; text-align: center; font-size: 11px; color: var(--text-muted); }
+
+  .tm-bells { margin: 0; display: flex; flex-direction: column; }
+  .tm-bell { display: flex; flex-direction: column; gap: 6px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .tm-bell dt { order: 2; font-size: 16px; font-weight: 600; }
+  .tm-bell dd { order: 1; margin: 0; display: flex; align-items: baseline; gap: 6px; }
+  .tm-big { font-family: var(--font-display); font-size: 48px; font-weight: 500; line-height: 0.9; color: var(--brand); }
+  .tm-ampm { font-size: 15px; color: var(--text-muted); }
+
+  .tm-table { width: 100%; border-collapse: collapse; line-height: 1.3; }
+  .only-lg-print { display: none; }
+  .tm-cards { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--text); }
+  .tm-card { padding: 18px 0; border-bottom: 1px solid var(--border); }
+  .tm-card-h { margin-bottom: 10px; font-family: var(--font-display); font-size: 26px; font-weight: 500; }
+  .tm-card-days { font-family: var(--font-body); font-size: 15px; font-weight: 600; color: var(--text-muted); }
+  .tm-card-dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; row-gap: 6px; font-size: 16px; }
+  .tm-card-dl dt { color: var(--text-muted); }
+  .tm-card-dl dd { margin: 0; }
+
+  .tm-periods { display: flex; flex-direction: column; gap: 28px; }
+  .tm-day { margin: 0; }
+  .tm-day-cap { margin-bottom: 8px; font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .tm-seg--break, .tm-seg.tm-seg--break, .tm-key.tm-seg--break, .tm-vseg.tm-seg--break { background: repeating-linear-gradient(135deg, #FFFDF8 0 6px, #E7DED2 6px 8px); }
+  .tm-vbar { display: flex; flex-direction: column; padding-top: 8px; }
+  .tm-vrow { display: grid; grid-template-columns: 56px 28px 1fr; align-items: start; }
+  .tm-vrow--end { height: 16px; }
+  .tm-vtime { font-size: 12px; color: var(--text-muted); transform: translateY(-7px); }
+  .tm-vseg { display: block; height: 100%; background: var(--brand); border-bottom: 2px solid var(--bg); }
+  .tm-vseg.tm-seg--break { border: 1px solid var(--border-strong); }
+  .tm-vlabel { padding-left: 12px; font-size: 14px; font-weight: 700; line-height: 1.2; }
+  .tm-vlabel--break { font-weight: 600; font-style: italic; }
+  .tm-legend { margin-top: 14px; display: flex; gap: 24px; font-size: 13px; color: var(--text-muted); }
+  .tm-legend > span { display: inline-flex; align-items: center; gap: 8px; }
+  .tm-key { width: 18px; height: 12px; background: var(--brand); }
+  .tm-key.tm-seg--break { border: 1px solid var(--border-strong); }
+  .tm-ptable caption { padding-bottom: 12px; text-align: left; font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .tm-ptable { font-size: 15px; }
+  .tm-ptable tbody th { white-space: nowrap; }
+  .tm-ptable thead tr { border-bottom: 1px solid var(--text); }
+  .tm-ptable thead th { padding: 0 8px 10px 0; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted); }
+  .tm-ptable tbody tr { border-bottom: 1px solid var(--border); }
+  .tm-ptable tbody th { padding: 12px 8px 12px 0; text-align: left; font-weight: 700; }
+  .tm-ptable td { padding: 12px 8px; white-space: nowrap; }
+  .tm-ptable .tm-r { padding-right: 0; text-align: right; }
+  .tm-break-row { background: repeating-linear-gradient(135deg, #FFFDF8 0 6px, #E7DED2 6px 8px); }
+  .tm-break-row th { padding-left: 10px !important; font-style: italic; font-weight: 600 !important; }
+  .tm-break-row .tm-r { padding-right: 10px !important; }
+
+  .tm-note { margin: 32px 0 56px; padding: 20px; display: flex; gap: 16px; background: var(--surface); border: 1px solid var(--border); box-shadow: inset 4px 0 0 var(--accent); }
+  .tm-note-icon { flex-shrink: 0; margin-top: 2px; color: var(--brand); }
+  .tm-note-h { font-size: 17px; font-weight: 700; }
+  .tm-note-p { margin-top: 6px; font-size: 16px; line-height: 1.6; }
+  .tm-printonly { display: none; }
+
+  @media (max-width: 1023px) {
+    .only-sm-screen { display: block; }
+  }
+  @media (min-width: 1024px) {
+    .only-sm-screen { display: none; }
+    .only-lg-print { display: table; }
+    .tm-sec { padding: 80px 0; }
+    .tm-hero { padding: 28px 0 56px; }
+    .tm-hero-in { gap: 20px; }
+    .tm-hero-row { flex-direction: row; justify-content: space-between; align-items: flex-end; gap: 32px; padding-top: 12px; }
+    .tm-hero-t { gap: 12px; }
+    .tm-h1 { line-height: 0.92; }
+    .tm-meta { font-size: 16px; }
+    .tm-print { width: auto; }
+    .tm-h2 { margin-bottom: 28px; }
+    .tm-term { height: 88px; padding: 14px 18px; }
+    .tm-term-k { font-size: 13px; }
+    .tm-term-m { font-size: 28px; }
+    .tm-months span { font-size: 13px; }
+    .tm-bells { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; }
+    .tm-bell { padding: 0 32px 0 0; border: 0; }
+    .tm-bell + .tm-bell { padding-left: 32px; border-left: 1px solid var(--border); }
+    .tm-big { font-size: 72px; }
+    .tm-classes thead tr { border-bottom: 1px solid var(--text); }
+    .tm-classes thead th { padding: 0 16px 12px; text-align: left; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+    .tm-classes thead th:first-child { padding-left: 0; }
+    .tm-classes tbody tr { border-bottom: 1px solid var(--border); }
+    .tm-cls { padding: 20px 16px 20px 0; text-align: left; font-family: var(--font-display); font-size: 28px; font-weight: 500; }
+    .tm-days { padding: 20px 16px; font-size: 17px; font-weight: 600; }
+    .tm-hours { padding: 20px 16px; font-size: 20px; font-weight: 700; white-space: nowrap; }
+    .tm-lunch { padding: 20px 0 20px 16px; font-size: 17px; white-space: nowrap; }
+    .tm-periods { gap: 40px; }
+    .tm-day-cap { margin-bottom: 14px; }
+    .tm-bar { display: flex; flex-direction: column; gap: 10px; }
+    .tm-bar-row { display: flex; width: 100%; }
+    .tm-seg { height: 64px; background: var(--brand); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; border-right: 2px solid var(--bg); }
+    .tm-seg.tm-seg--break { background: repeating-linear-gradient(135deg, #FFFDF8 0 6px, #E7DED2 6px 8px); border: 1px solid var(--border-strong); color: var(--text); font-style: italic; font-weight: 600; font-size: 13px; }
+    .tm-bar-marks { position: relative; height: 18px; margin: 0 6px; }
+    .tm-bar-marks span { position: absolute; top: 0; transform: translateX(-50%); font-size: 12px; color: var(--text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .tm-ptable-wrap { max-width: 720px; }
+    .tm-ptable { font-size: 17px; }
+    .tm-ptable tbody th { padding: 14px 8px 14px 0; }
+    .tm-ptable td { padding: 14px 8px; }
+    .tm-note { margin: 64px 0 104px; padding: 28px 32px; }
+  }
+
+  /* One A4 sheet (TimingsPrint board): the screen page is replaced by the print sheet. */
+  .tm-sheet { display: none; }
+  @media print {
+    @page { size: A4; margin: 14mm; }
+    .tm { display: none !important; }
+    .tm-sheet { display: block; color: #000; font-family: var(--font-body); font-size: 10.5pt; line-height: 1.4; font-variant-numeric: tabular-nums; }
+    .ts-head { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 10px; border-bottom: 2px solid var(--brand); }
+    .ts-k { font-size: 8pt; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brand); }
+    .ts-title { margin-top: 2px; font-family: var(--font-display); font-size: 28pt; font-weight: 500; line-height: 1; }
+    .ts-year { font-size: 8.5pt; color: #555; }
+    .ts-two { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 16px; }
+    .ts-h { margin-bottom: 6px; font-size: 11pt; font-weight: 700; }
+    .ts-h--gap { margin-top: 18px; }
+    .ts-table { width: 100%; border-collapse: collapse; }
+    .ts-table thead th { padding: 0 8px 5px 0; text-align: left; font-size: 8pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #555; border-bottom: 1px solid #000; }
+    .ts-table tbody th, .ts-table td { padding: 5px 8px 5px 0; border-bottom: 0.75px solid #CCC; text-align: left; }
+    .ts-table tbody th { font-weight: 700; }
+    .ts-b { font-weight: 700; }
+    .ts-table .ts-r { text-align: right; }
+    .ts-break { background: #F2F2F2; }
+    .ts-break th { font-style: italic; }
+    .ts-note { margin-top: 16px; padding: 8px 10px; border: 1px solid #999; font-size: 9.5pt; }
+    .ts-foot { margin-top: 18px; font-size: 8pt; color: #555; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>

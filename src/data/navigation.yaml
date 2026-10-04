@@ -1,0 +1,140 @@
+# Main navigation, mega panels (MegaPanel board), mobile sheet (MobileMenu board) and footer.
+# Link kinds: internal (default) | ext | pdf | video. `service:` pulls the URL from services.yaml.
+# Campus links come from the facilities collection; Gallery years are computed.
+# Panel titles link to their hub page (flagged deviation: the board leaves hubs unlinked, see PLAN.md gap 1).
+main:
+  sections:
+    - key: about
+      label: About
+      hub: /about
+      eyebrow: About
+      title: About KenBridge
+      intro: Founded in 2011 by the Homi Educational Trust in Kalaburagi.
+      cols: 1
+      groups:
+        - links:
+            - { label: Our Story, href: /about }
+            - { label: Founder, meta: Late Shri Neville Irani, href: /about/founder }
+            - { label: Principal’s Message, meta: Mrs. Neeta Purohit, href: /about/principal }
+      photo: Founder’s portrait, school archive
+      caption: '[Caption for the founder’s portrait.]'
+    - key: learning
+      label: Learning
+      hub: /learning
+      eyebrow: Learning
+      title: Learning at KenBridge
+      intro: Four stages of the CBSE curriculum, from Pre-KG to Class X.
+      cols: 1
+      groups:
+        - links:
+            - { label: Pre-Primary, meta: Pre-KG – UKG, href: /learning/pre-primary }
+            - { label: Primary, meta: Classes I – V, href: /learning/primary }
+            # TODO(content): OPEN-QUESTIONS #1. "VI to VII" vs "VI to VIII"; the design uses VI–VIII.
+            - { label: Middle School, meta: Classes VI – VIII, href: /learning/middle-school }
+            - { label: Secondary School, meta: Classes IX – X, href: /learning/secondary-school }
+      photo: A Primary classroom at work
+      caption: '[Caption: class, subject, term.]'
+    - key: campus
+      label: Campus
+      hub: /campus
+      eyebrow: Campus
+      title: Our campus
+      intro: Spaces to learn, to play and to perform.
+      lead: { label: Campus overview, href: /campus }
+      cols: 2
+      facilityGroups:
+        - { label: Spaces to learn, group: learn }
+        - { label: Spaces to grow, group: grow }
+      photo: The school campus from the playground
+      caption: '[Caption for the campus photograph.]'
+    - key: admissions
+      label: Admissions
+      hub: /admissions
+      eyebrow: Admissions
+      title: Admissions
+      intro: How to apply, who can apply, and the forms you will need.
+      cols: 2
+      groups:
+        - label: Before you apply
+          links:
+            - { label: Admission Procedure, href: /admissions#procedure }
+            - { label: Age Criteria, href: /admissions#age }
+        - label: Apply
+          links:
+            - { label: Apply Online, meta: Opens the admissions portal, service: admissionEnquiry, kind: ext }
+            - { label: Download Brochure, meta: '[File size]', service: brochure, kind: pdf }
+      photo: Parents and a child at the school reception
+      caption: '[Caption for the admissions photograph.]'
+    - key: gallery
+      label: Gallery
+      hub: /gallery
+      eyebrow: Gallery
+      title: Gallery
+      intro: School life, year by year, since 2011.
+      years: true
+      cols: 1
+      photo: Cover photo from the latest album
+      caption: '[Album name, 2026–27.]'
+    - key: information
+      label: Information
+      hub: /information
+      eyebrow: Information
+      title: Information
+      intro: Daily routines, school traditions and statutory disclosures.
+      cols: 3
+      groups:
+        - label: Daily life
+          links:
+            - { label: School Timings, href: /information/timings }
+            - { label: School Rules, href: /information/rules }
+            - { label: Decorum, href: /information/decorum }
+        - label: Traditions
+          links:
+            - { label: School Song, href: /information/song }
+            - { label: School Prayer, href: /information/prayer }
+        - label: Records
+          links:
+            - { label: Mandatory Public Disclosure, href: /information/disclosure }
+            - { label: Results, href: /achievements }
+            - { label: Download CBSE TC, service: tc, kind: ext }
+      photo: Morning assembly in the courtyard
+      caption: '[Caption for the assembly photograph.]'
+    - key: contact
+      label: Contact
+      hub: /contact
+      eyebrow: Contact
+      title: Contact
+      intro: Shahabad Road, Opp. Nrupathunga Colony, Kalaburagi (Gulbarga) – 585105.
+      cols: 1
+      groups:
+        - links:
+            - { label: Contact & Map, href: /contact }
+            - { label: Careers, meta: Openings at KenBridge, service: careers, kind: ext }
+            - { label: Virtual Tour, meta: A walk through the campus, href: /campus#tour, kind: video }
+      photo: The school entrance on Shahabad Road
+      caption: '[Caption for the entrance photograph.]'
+
+  # Header search panel (ShellHeader, state D).
+  searchQuickLinks:
+    - { label: Admission Procedure, href: /admissions#procedure }
+    - { label: Age Criteria, href: /admissions#age }
+    - { label: School Timings, href: /information/timings }
+    - { label: Results, href: /achievements }
+    - { label: Mandatory Public Disclosure, href: /information/disclosure }
+
+  footer:
+    ourSchool:
+      - { label: Pre-Primary, href: /learning/pre-primary }
+      - { label: Primary, href: /learning/primary }
+      - { label: Middle School, href: /learning/middle-school }
+      - { label: Secondary School, href: /learning/secondary-school }
+      - { label: Admission Apply, service: admissionEnquiry, kind: ext }
+    quickLinks:
+      - { label: Parent Login, service: parentLogin, kind: ext }
+      - { label: Staff Login, service: staffLogin, kind: ext }
+      - { label: Brochure, service: brochure, kind: pdf }
+      - { label: Careers, service: careers, kind: ext }
+      - { label: Android App, service: androidApp, kind: ext }
+      - { label: iOS App, service: iosApp, kind: ext }
+      - { label: Mandatory Public Disclosure, href: /information/disclosure }
+      - { label: CBSE TC, service: tc, kind: ext }

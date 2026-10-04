@@ -1,0 +1,146 @@
+---
+// /information/decorum (DecorumDesktop, DecorumMobile). Section A (absence, with the 75% attendance
+// figure drawn as a scale) and Section B (withdrawal / suspension); every point has its own anchor (#a2).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/shell/Breadcrumbs.astro';
+import RelatedLinks from '../../components/info/RelatedLinks.astro';
+import { getMain } from '../../lib/site';
+
+const { decorum: D } = await getMain('info');
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'School Information', href: '/information' }, { label: D.title }];
+const v = D.attendance.value;
+---
+<BaseLayout
+  title="Decorum"
+  description="Decorum at KenBridge School, Kalaburagi: 75% minimum attendance, absence and leave, withdrawal and suspension."
+  current="information"
+  breadcrumbs={crumbs}
+>
+  <section class="dc-hero" aria-labelledby="dH1">
+    <div class="container dc-hero-in">
+      <Breadcrumbs items={crumbs} />
+      <div class="dc-hero-row">
+        <div class="dc-hero-t">
+          <h1 id="dH1" class="dc-h1">{D.title}</h1>
+          <p class="dc-lead">{D.lead}</p>
+        </div>
+        <nav aria-label="On this page">
+          <ul class="dc-jumps" role="list">
+            {D.sections.map((s) => <li><a class="dc-jump" href={`#${s.id}`}><span class="dc-jump-l">{s.letter}</span>{s.title}</a></li>)}
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  {D.sections.map((s, si) => (
+    <section class:list={['dc-sec', si === 1 && 'dc-sec--raised']} aria-labelledby={s.id}>
+      <div class="container dc-grid">
+        <div class="dc-side">
+          <div class="dc-head">
+            <span class="dc-letter" aria-hidden="true">{s.letter}</span>
+            <h2 id={s.id} class="dc-h2"><span class="vh">Section {s.letter}: </span>{s.title}</h2>
+            <p class="dc-count">{s.points.length} points</p>
+          </div>
+          {si === 0 && (
+            <figure class="dc-att">
+              <figcaption class="dc-att-k">{D.attendance.label}</figcaption>
+              <p class="dc-att-num">{v}%</p>
+              <div class="dc-scale" role="img" aria-label={`A bar from 0 to 100 percent with the minimum marked at ${v} percent`}>
+                <div class="dc-scale-bar"><div class="dc-scale-fill" style={`width:${v}%`}></div></div>
+                <div class="dc-scale-mark" aria-hidden="true" style={`left:${v}%`}></div>
+                <div class="dc-scale-labels tnum" aria-hidden="true"><span class="dc-l0">0%</span><span class="dc-lv" style={`left:${v}%`}>{v}%</span><span class="dc-l100">100%</span></div>
+              </div>
+              <p class="dc-att-p">{D.attendance.note}</p>
+            </figure>
+          )}
+        </div>
+        <ol class="dc-points" role="list">
+          {s.points.map((p) => (
+            <li id={p.id} class="dc-point">
+              <span class="dc-pn tnum">{p.id.toUpperCase()}</span>
+              <div>
+                <h3 class="dc-ph">{p.title}</h3>
+                <p class="dc-pp">{p.text}</p>
+                {p.list.length > 0 && <ul class="dc-plist" role="list">{p.list.map((x) => <li><span class="dc-diamond" aria-hidden="true"></span><span>{x}</span></li>)}</ul>}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  ))}
+
+  <RelatedLinks items={[
+    { title: 'School Rules', desc: '15 rules on arrival, uniform, food and leave', href: '/information/rules' },
+    { title: 'Contact', desc: 'Address, phones, email and office hours', href: '/contact' }
+  ]} />
+</BaseLayout>
+
+<style>
+  .dc-hero { padding: 12px 0 32px; border-bottom: 1px solid var(--border); }
+  .dc-hero-in, .dc-hero-t { display: flex; flex-direction: column; gap: 12px; }
+  .dc-hero-row { display: flex; flex-direction: column; gap: 12px; }
+  .dc-h1 { font-family: var(--font-display); font-size: clamp(4rem, 2.743rem + 3.2vw, 6rem); font-weight: 500; line-height: 0.95; }
+  .dc-lead { font-size: 17px; line-height: 1.5; color: var(--text-muted); }
+  .dc-jumps { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .dc-jump { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 1px solid var(--border-strong); border-radius: 999px; color: var(--text); font-size: 14px; font-weight: 600; text-decoration: none; }
+  .dc-jump:hover { border-color: var(--text); color: var(--text); }
+  .dc-jump-l { font-family: var(--font-display); font-size: 18px; color: var(--brand); }
+
+  .dc-sec { padding: 44px 0 48px; }
+  .dc-sec--raised { background: var(--surface-raised); border-top: 1px solid var(--border); }
+  .dc-grid { display: flex; flex-direction: column; gap: 24px; }
+  .dc-side { display: flex; flex-direction: column; gap: 24px; }
+  .dc-head { display: flex; flex-direction: column; gap: 10px; }
+  .dc-letter { font-family: var(--font-display); font-size: 56px; font-weight: 500; line-height: 0.8; color: var(--brand); }
+  .dc-h2 { font-family: var(--font-display); font-size: clamp(2.25rem, 1.821rem + 1.714vw, 3rem); font-weight: 500; line-height: 1; scroll-margin-top: 96px; }
+  .dc-count { font-size: 14px; color: var(--text-muted); }
+  .dc-att { margin: 0; display: flex; flex-direction: column; gap: 14px; padding: 22px 20px; background: var(--surface); border: 1px solid var(--border); }
+  .dc-att-k { font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .dc-att-num { font-family: var(--font-display); font-size: 96px; font-weight: 500; line-height: 0.85; color: var(--brand); font-variant-numeric: lining-nums; }
+  .dc-scale { position: relative; margin-top: 18px; }
+  .dc-scale-bar { height: 14px; background: var(--surface-disabled); border: 1px solid var(--border-strong); display: flex; }
+  .dc-scale-fill { background: var(--brand); }
+  .dc-scale-mark { position: absolute; top: -10px; height: 34px; border-left: 2px solid var(--text); }
+  .dc-scale-labels { position: relative; height: 20px; margin-top: 8px; font-size: 12px; color: var(--text-muted); }
+  .dc-scale-labels span { position: absolute; }
+  .dc-l0 { left: 0; }
+  .dc-lv { transform: translateX(-50%); font-weight: 700; color: var(--text); }
+  .dc-l100 { right: 0; }
+  .dc-att-p { margin-top: 4px; font-size: 16px; line-height: 1.55; }
+  .dc-points { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--text); }
+  .dc-point { display: grid; grid-template-columns: 40px 1fr; gap: 10px; padding: 18px 0; border-bottom: 1px solid var(--border); }
+  .dc-point:target { background: var(--accent-tint); }
+  .dc-pn { font-family: var(--font-display); font-size: 22px; font-weight: 500; color: var(--brand); }
+  .dc-ph { margin-bottom: 6px; font-size: 16px; font-weight: 700; line-height: 1.35; }
+  .dc-pp { font-size: 17px; line-height: 1.6; }
+  .dc-plist { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .dc-plist li { display: grid; grid-template-columns: 16px 1fr; gap: 10px; font-size: 16px; line-height: 1.55; }
+  .dc-diamond { margin-top: 9px; width: 7px; height: 7px; background: var(--brand); transform: rotate(45deg); }
+
+  @media (min-width: 1024px) {
+    .dc-hero { padding: 28px 0 56px; }
+    .dc-hero-in { gap: 20px; }
+    .dc-hero-row { flex-direction: row; justify-content: space-between; align-items: flex-end; gap: 32px; padding-top: 12px; }
+    .dc-hero-t { gap: 14px; }
+    .dc-h1 { line-height: 0.92; }
+    .dc-lead { font-size: 18px; }
+    .dc-jumps { margin: 0; gap: 10px; flex-wrap: nowrap; }
+    .dc-jump { min-height: 48px; gap: 10px; padding: 0 18px; font-size: 15px; }
+    .dc-jump-l { font-size: 20px; }
+    .dc-sec { padding: 96px 0; }
+    .dc-sec--raised { padding-bottom: 112px; }
+    .dc-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; align-items: start; }
+    .dc-side { grid-column: 1 / span 4; gap: 36px; }
+    .dc-letter { font-size: 88px; }
+    .dc-att { padding: 28px; }
+    .dc-att-num { font-size: 128px; }
+    .dc-points { grid-column: 6 / span 7; }
+    .dc-point { grid-template-columns: 56px 1fr; gap: 16px; padding: 24px 0; }
+    .dc-pn { font-size: 26px; }
+    .dc-ph { font-size: 17px; }
+    .dc-pp { font-size: 19px; line-height: 1.65; }
+    .dc-plist li { font-size: 18px; }
+  }
+</style>

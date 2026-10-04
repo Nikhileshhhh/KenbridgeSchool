@@ -1,0 +1,179 @@
+---
+// /search (SearchPage, SearchMobile, SearchStates, SearchStatesMobile). A plain GET form that always
+// works; with JS, scripts/search.js runs the query against the Pagefind index (built after `astro
+// build`) and renders the six states: empty (suggestions), loading (aria-busy skeletons), results
+// (tag, trail, title, excerpt with bold + underlined matches), no results ("Did you mean"), error
+// (Try again). Without JS a note says search needs JavaScript and offers the browse links.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/ui/Icon.astro';
+import { getSchool } from '../lib/site';
+
+const school = await getSchool();
+const phone = school.phones[0];
+const suggest = ['timings', 'admissions', 'annual day', 'transfer certificate', 'calendar'];
+const tags = [
+  { type: 'Page', desc: 'A page on this website' },
+  { type: 'PDF', desc: 'A document; opens in a new tab' },
+  { type: 'Album', desc: 'A photo album in the Gallery' },
+  { type: 'External', desc: 'Another website; opens in a new tab' }
+];
+const browse = [
+  { label: 'School Information', href: '/information' },
+  { label: 'Admissions', href: '/admissions' },
+  { label: 'Gallery', href: '/gallery' },
+  { label: 'Online Services', href: '/services' },
+  { label: 'Contact', href: '/contact' }
+];
+---
+<BaseLayout
+  title="Search"
+  description="Search the KenBridge School website: pages, PDFs, gallery albums and the school’s external services."
+  search={false}
+  noindex
+>
+  <div class="container sr-wrap">
+    <div class="sr-main">
+      <h1 class="sr-h1">Search</h1>
+      <form class="sr-form" role="search" action="/search" method="get" data-search-form>
+        <label for="srQ" class="sr-label">Search the site</label>
+        <div class="sr-row">
+          <input id="srQ" class="sr-q" name="q" type="search" autocomplete="off" aria-describedby="srHint" data-search-input />
+          <button type="submit" class="sr-btn"><Icon name="search" size={20} /><span class="sr-btn-t">Search</span></button>
+        </div>
+        <p id="srHint" class="sr-hint">Searches pages, PDFs, gallery albums and the school’s external services.</p>
+      </form>
+
+      <noscript>
+        <div class="sr-nojs">
+          <p><strong>Search needs JavaScript, which is turned off in this browser.</strong> You can browse instead:</p>
+          <ul>{browse.map((b) => <li><a href={b.href}>{b.label}</a></li>)}</ul>
+          <p>Or call the school office on <a class="tnum" href={`tel:${phone.tel}`}>{phone.display}</a>.</p>
+        </div>
+      </noscript>
+
+      <p class="vh" aria-live="polite" data-search-live></p>
+
+      <div class="sr-out js-only" data-search-out>
+        <section class="sr-empty" aria-labelledby="srTry" data-state="empty">
+          <h2 id="srTry" class="sr-k">Try searching for</h2>
+          <ul class="sr-chips" role="list">
+            {suggest.map((s) => <li><a class="sr-chip" href={`/search?q=${encodeURIComponent(s)}`} data-suggest={s}>{s}</a></li>)}
+          </ul>
+        </section>
+      </div>
+    </div>
+
+    <aside class="sr-side only-lg" aria-label="About search">
+      <section class="sr-key" aria-labelledby="srKey">
+        <h2 id="srKey" class="sr-k">What the tags mean</h2>
+        <dl class="sr-key-dl">
+          {tags.map((t) => <><dt><span class={`sr-tag sr-tag--${t.type.toLowerCase()}`}>{t.type}</span></dt><dd>{t.desc}</dd></>)}
+        </dl>
+      </section>
+      <nav class="sr-browse" aria-labelledby="srBrowse">
+        <h2 id="srBrowse" class="sr-k">Or browse</h2>
+        {browse.map((b) => <a class="sr-browse-a" href={b.href}>{b.label}</a>)}
+      </nav>
+      <p class="sr-call">Can’t find it? Call the school office on <a class="sr-link tnum" href={`tel:${phone.tel}`}>{phone.display}</a>.</p>
+    </aside>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../scripts/search.js';
+</script>
+
+<style>
+  .sr-wrap { display: flex; align-items: flex-start; gap: 96px; padding-top: 28px; padding-bottom: 64px; }
+  .sr-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+  .sr-h1 { font-family: var(--font-display); font-size: clamp(3.5rem, 2.571rem + 3.81vw, 6rem); font-weight: 500; line-height: 0.95; }
+  .sr-form { display: flex; flex-direction: column; gap: 8px; }
+  .sr-label { font-size: 15px; font-weight: 600; }
+  .sr-row { display: flex; gap: 8px; }
+  .sr-q { flex: 1; min-width: 0; height: 60px; padding: 0 18px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); font-size: 19px; }
+  .sr-q:hover { border-color: var(--text); }
+  .sr-q:focus { border-color: var(--text); outline: 2px solid var(--focus); outline-offset: 2px; }
+  .sr-btn { display: inline-flex; align-items: center; gap: 8px; height: 60px; padding: 0 16px; border: 0; border-radius: var(--radius-md); background: var(--brand); color: #FFFFFF; font-size: 17px; font-weight: 600; }
+  .sr-btn:hover { background: var(--brand-hover); }
+  .sr-btn-t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .sr-hint { font-size: 14px; color: var(--text-muted); }
+  .sr-nojs { display: flex; flex-direction: column; gap: 10px; padding: 22px 18px; background: var(--surface); border: 1px solid var(--border); font-size: 16px; line-height: 1.6; }
+  .sr-nojs ul { margin: 0; padding-left: 20px; }
+  .sr-nojs a { color: var(--brand); font-weight: 600; }
+
+  .sr-k { font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .sr-out :global(.sr-empty) { display: flex; flex-direction: column; gap: 14px; padding-top: 8px; }
+  .sr-out :global(.sr-chips) { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .sr-out :global(.sr-chip) { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border: 1px solid var(--border-strong); border-radius: 999px; color: var(--text); text-decoration: none; font-size: 15px; font-weight: 600; }
+  .sr-out :global(.sr-chip:hover) { border-color: var(--brand); color: var(--brand); }
+
+  .sr-out :global(.sr-loading) { display: flex; flex-direction: column; gap: 4px; }
+  .sr-out :global(.sr-loading-p) { margin-bottom: 8px; font-size: 16px; color: var(--text-muted); }
+  .sr-out :global(.sr-skel) { display: flex; flex-direction: column; gap: 10px; padding: 22px 0; border-top: 1px solid var(--border); }
+  .sr-out :global(.sr-skel span) { height: 14px; background: #EFE6DA; border-radius: 3px; }
+  .sr-out :global(.sr-skel span:first-child) { width: 120px; background: var(--border); }
+  .sr-out :global(.sr-skel span:nth-child(2)) { height: 26px; background: var(--border); }
+  @media (prefers-reduced-motion: no-preference) {
+    .sr-out :global(.sr-skel) { animation: sr-pulse 1.4s ease-in-out infinite; }
+  }
+  @keyframes -global-sr-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+
+  .sr-out :global(.sr-count) { padding-bottom: 14px; border-bottom: 1px solid var(--text); font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .sr-out :global(.sr-list) { list-style: none; margin: 0; padding: 0; }
+  .sr-out :global(.sr-res) { display: flex; flex-direction: column; gap: 8px; padding: 22px 0; border-bottom: 1px solid var(--border); }
+  .sr-out :global(.sr-meta) { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 13px; color: var(--text-muted); }
+  .sr-out :global(.sr-title) { align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; color: var(--brand); text-decoration: none; }
+  .sr-out :global(.sr-title-t) { font-family: var(--font-display); font-size: 24px; font-weight: 500; line-height: 1.1; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 6px; }
+  .sr-out :global(.sr-title:hover .sr-title-t) { text-decoration-thickness: 2px; }
+  .sr-out :global(.sr-title-t svg) { margin-left: 8px; vertical-align: 0; }
+  .sr-out :global(.sr-ex) { max-width: 720px; font-size: 16px; line-height: 1.6; color: #3A332E; }
+  .sr-out :global(.sr-more) { align-self: flex-start; margin-top: 24px; }
+  /* Matches are bold and underlined, never colour alone (CLAUDE.md). */
+  .sr-out :global(mark) { background: var(--accent-tint); color: var(--text); font-weight: 700; padding: 0 1px; margin: 0 -1px; border-radius: 2px; box-shadow: inset 0 -2px 0 var(--accent); }
+  @media (forced-colors: active) { .sr-out :global(mark) { text-decoration: underline; } }
+
+  .sr-out :global(.sr-panel) { display: flex; flex-direction: column; gap: 16px; padding: 22px 18px; background: var(--surface); border: 1px solid var(--border); }
+  .sr-out :global(.sr-panel-h) { font-family: var(--font-display); font-size: 34px; font-weight: 500; line-height: 1.1; }
+  .sr-out :global(.sr-panel p), .sr-out :global(.sr-panel li) { font-size: 16px; line-height: 1.55; }
+  .sr-out :global(.sr-dym) { font-size: 17px !important; line-height: 1.5; }
+  .sr-out :global(.sr-dym a) { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; }
+  .sr-out :global(.sr-dym--above) { margin-bottom: 12px; }
+  .sr-out :global(.sr-panel ul) { margin: 0; padding: 0 0 0 20px; display: flex; flex-direction: column; gap: 6px; }
+  .sr-out :global(.sr-error) { gap: 14px; border: 2px solid var(--error); border-radius: var(--radius-sm); }
+  .sr-out :global(.sr-error-h) { display: flex; align-items: flex-start; gap: 12px; font-size: 19px; font-weight: 700; line-height: 1.35; }
+  .sr-out :global(.sr-error-h svg) { color: var(--error); flex-shrink: 0; margin-top: 2px; }
+  .sr-out :global(.sr-sec) { align-self: flex-start; display: inline-flex; align-items: center; min-height: 48px; padding: 0 18px; border: 1.5px solid var(--brand); border-radius: var(--radius-md); background: #FFFFFF; color: var(--brand); font-size: 16px; font-weight: 600; }
+  .sr-out :global(.sr-sec:hover) { background: var(--brand-tint); }
+
+  .sr-wrap :global(.sr-link), .sr-out :global(a.sr-link) { color: var(--brand); font-weight: 600; text-decoration: underline; text-decoration-color: rgba(127, 3, 5, 0.4); text-underline-offset: 5px; }
+  :global(.sr-tag) { display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border-radius: 3px; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid; }
+  :global(.sr-tag--page) { background: #FFFFFF; border-color: var(--border-strong); color: var(--text); }
+  :global(.sr-tag--pdf) { background: var(--brand-tint); border-color: var(--brand); color: var(--brand); }
+  :global(.sr-tag--album) { background: var(--accent-tint); border-color: var(--warning-text); color: var(--warning-text); }
+  :global(.sr-tag--external) { background: var(--text); border-color: var(--text); color: #FFFFFF; }
+
+  .sr-side { flex: 0 0 344px; margin-top: 123px; display: flex; flex-direction: column; gap: 36px; }
+  .sr-key { display: flex; flex-direction: column; gap: 14px; padding: 24px; background: var(--surface-raised); border: 1px solid var(--border); border-top: 3px solid var(--accent); }
+  .sr-key-dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 12px 14px; align-items: baseline; font-size: 15px; line-height: 1.5; }
+  .sr-key-dl dt { justify-self: start; }
+  .sr-key-dl dd { margin: 0; }
+  .sr-browse { display: flex; flex-direction: column; gap: 6px; }
+  .sr-browse .sr-k { margin-bottom: 6px; }
+  .sr-browse-a { display: flex; align-items: center; min-height: 44px; border-bottom: 1px solid var(--border); color: var(--brand); font-size: 17px; font-weight: 600; text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 5px; }
+  .sr-browse-a:hover { text-decoration-color: currentColor; }
+  .sr-call { font-size: 15px; line-height: 1.6; color: var(--text-muted); }
+  .sr-call .sr-link { font-weight: 700; white-space: nowrap; }
+
+  @media (min-width: 1024px) {
+    .sr-wrap { padding-top: 56px; padding-bottom: 112px; }
+    .sr-main { max-width: 856px; gap: 32px; }
+    .sr-btn { padding: 0 26px; }
+    .sr-btn-t { position: static; width: auto; height: auto; overflow: visible; clip: auto; }
+    .sr-out :global(.sr-title-t) { font-size: 30px; }
+    .sr-out :global(.sr-panel) { padding: 32px; }
+  }
+  @media (max-width: 1023px) {
+    .sr-wrap { display: block; }
+    .sr-h1 { line-height: 0.95; }
+  }
+</style>

@@ -1,0 +1,60 @@
+# /campus · Our Campus (CampusDesktop, CampusMobile; P11 of KENBRIDGE_SCREEN_PROMPTS_FROM_LIVE_SITE.md).
+# The ten facilities themselves live in src/content/facilities.
+main:
+  hero:
+    title: Our Campus
+    lead: A building of unique modern architecture, set in a lush green five-acre plot in a pollution-free environment.
+    photo: '[Photo · DJI_0401 / Drone-Front · aerial view of the campus, full bleed]'
+    photoSm: '[Photo · DJI_0401 / Drone-Front · aerial, cropped for portrait]'
+    alt: 'Placeholder: full-bleed aerial drone photograph of the KenBridge campus (DJI_0401 / Drone-Front)'
+    explore: Explore the facilities
+    tour: Take the virtual tour
+  figures:
+    title: The campus in figures
+    source: 'Source: CBSE Mandatory Public Disclosure'
+    items:
+      - { value: '20,234', unit: sq m, label: Campus area }
+      - { value: '72', label: Classrooms, note: 50 sq m each }
+      - { value: '6', label: Laboratories, note: 75 sq m each }
+      - { value: '150', unit: sq m, label: Library }
+      - { icon: globe, value: 'Yes', label: Internet-enabled campus }
+  scenes:
+    eyebrow: A day on campus
+    title: Spaces to learn, play, create and gather
+    list:
+      - verb: Learn
+        places: Classrooms, labs and library
+        photo: Class-Room.jpg
+        text: 72 classrooms, six laboratories and a 150 sq m library.
+        facilities: [classrooms, science-lab, language-lab, maths-lab, library]
+      - verb: Play
+        places: Playground and indoor sports
+        photo: Indoor-Sports-Room-1.jpg (playground photo needed)
+        text: A playground developed to support sports events, synthetic courts for outdoor games, and an indoor arena.
+        facilities: [playground, indoor-sports-room]
+      - verb: Create
+        places: Dance, music and art
+        photo: Dance-Room-2.jpg / Music-Room-2.jpg
+        text: Rooms for dance and music, with an Art Room alongside.
+        facilities: [dance-music-room]
+      - verb: Gather
+        places: Multipurpose Hall
+        photo: MPH.jpg
+        text: 'Planned with perfect acoustics: the venue for events, seminars, workshops and guest lectures.'
+        facilities: [multipurpose-hall]
+  atlas:
+    eyebrow: Facility atlas · 10 spaces
+    title: Every space on campus
+    hint: Point at, tap or tab to a facility to see it in the preview. Every entry also has its own page.
+    also:
+      name: Computer Lab
+      text: One of the six laboratories on campus.
+      photo: '[Photo · comp2.jpg, 2015: newer photo needed]'
+  closing:
+    tourEyebrow: Video · YouTube
+    tourTitle: Virtual tour of the campus
+    tourThumb: '[Thumbnail · YouTube NA7Ksy1WsnY]'
+    eyebrow: See it in person
+    title: Plan a visit
+    text: Call the school to plan your visit.
+    directions: { label: Directions and contact details, href: /contact }

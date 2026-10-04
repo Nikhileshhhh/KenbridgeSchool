@@ -1,0 +1,58 @@
+# Stage 2 · Primary. Hub copy from LearningDesktop/LearningMobile; page copy from the ProgramDetail
+# board (the only programme drawn) and P08 of KENBRIDGE_SCREEN_PROMPTS_FROM_LIVE_SITE.md.
+stage: 2
+num: '02'
+name: Primary
+range: Classes I – V
+hub:
+  lead: A strong foundation in core subjects such as English, Maths and Science, with holistic development through co-curricular activities.
+  classes: [I, II, III, IV, V]
+  focus: []
+  next: Middle School, from Class VI
+  cta: Explore Primary
+  photo: Primary classroom (Class-Room.jpg)
+  photoSm: Primary classroom (Class-Room.jpg)
+eyebrow: Learning · Stage 2
+chip: Classes I – V
+lead: In primary school, children are introduced to a more formal way of learning, and the school environment plays a critical role in their development.
+heroPhoto: Primary classroom (Class-Room.jpg)
+facts: []
+admissionCta: See admission steps for Primary
+chapters:
+  - type: subjects
+    title: Curriculum
+    intro: Subjects taught in Classes I to V.
+    items:
+      - { name: English }
+      - { name: Second Language, note: Hindi / Kannada }
+      - { name: Mathematics }
+      - { name: EVS }
+      - { name: G.K. }
+      - { name: Value Education }
+      - { name: Computers }
+    calloutKicker: From Class IV
+    callout: From Class IV, a third language (Kannada or Hindi) is introduced.
+  - type: activities
+    title: Co-curricular
+    intro: Co-curricular activities are built into the timetable, as per CBSE guidelines.
+    words: [Sports, Music, Dance, Art, Drama]
+    facts:
+      - { label: Timetable, value: 'Built in, as per CBSE guidelines' }
+      - { label: Conducted by, value: Trained professionals }
+      - { label: Approach, value: 'Activity-based learning, with special activity classes' }
+  - type: words
+    title: Values
+    words: [Respect, Honesty, Integrity, Responsibility]
+    after: Reinforced through activities and programmes.
+  - type: statement
+    title: Social and emotional growth
+    statement: Children grow socially and emotionally in an environment that fosters these skills.
+  - type: age
+    title: Admission age
+    ages: [{ label: Grade 1, years: '6' }]
+    ageNote: Age as on 1 June of the academic year. Age criteria are strictly adhered to.
+related:
+  - { facility: classrooms, photo: Class-Room.jpg }
+  - { facility: library, photo: Library-2.jpg }
+  - { facility: maths-lab, photo: Math-Lab.jpg }
+  - { facility: dance-music-room, photo: Dance-Room-2.jpg / Music-Room-2.jpg, photoSm: Dance-Room-2.jpg }

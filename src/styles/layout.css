@@ -1,0 +1,25 @@
+/* Page frame and grid: ≥1024 12 cols / 64 margin / 32 gap · 640–1023 8 / 32 / 24 · <640 4 / 20 / 16. */
+.container {
+  width: 100%;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--margin);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: var(--gutter);
+}
+@media (min-width: 640px) { .grid { grid-template-columns: repeat(8, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .grid { grid-template-columns: repeat(12, minmax(0, 1fr)); } }
+
+.section { padding-block: var(--section-pad); }
+.section--dark { background: var(--surface-dark); }
+.full-bleed { width: 100%; }
+
+.stack { display: flex; flex-direction: column; }
+.stack-1 { gap: var(--space-1); }
+.stack-2 { gap: var(--space-2); }
+.stack-3 { gap: var(--space-3); }
+.stack-4 { gap: var(--space-4); }
+.stack-6 { gap: var(--space-6); }

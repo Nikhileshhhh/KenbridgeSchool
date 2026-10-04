@@ -1,0 +1,47 @@
+---
+// HomeDesktop §2 / HomeMobile values. The one-line descriptors are placeholders for the school
+// to approve (OPEN-QUESTIONS "Value statements"); each board words them differently.
+import { getHome } from '../../lib/site';
+const { values } = await getHome();
+const rays = [[18, 18], [17.45, 13.86], [15.86, 10], [13.31, 6.69], [10, 4.14], [6.14, 2.55], [2, 2]];
+---
+<section class="values" aria-labelledby="valuesTitle">
+  <div class="container">
+    <h2 id="valuesTitle" class="values-h eyebrow-text">Our values</h2>
+    <ul role="list" class="values-list">
+      {values.map((v) => (
+        <li class="value">
+          <span class="value-word">{v.word}</span>
+          <svg class="value-rays" aria-hidden="true" viewBox="0 0 260 20" preserveAspectRatio="xMinYMid meet">
+            <g stroke-width="1" stroke-linecap="round">
+              {rays.map(([x, y], i) => <line x1="2" y1="18" x2={x} y2={y} stroke={i % 2 ? '#F5C400' : '#F89A1C'} />)}
+              <line x1="24" y1="18" x2="258" y2="18" stroke="#F89A1C" />
+            </g>
+          </svg>
+          <span class="value-line only-lg">{v.line}</span>
+          <span class="value-line only-sm">{v.sm}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .values { padding: 56px 0; background: var(--bg); border-bottom: 1px solid var(--border); }
+  .values-h { margin: 0 0 32px; font-size: 12px; color: var(--brand); }
+  .values-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 32px; }
+  .value { display: flex; flex-direction: column; gap: 10px; }
+  .value-word { font-family: var(--font-display); font-size: clamp(2.75rem, 2.564rem + 0.762vw, 3.25rem); font-weight: 600; letter-spacing: 0.04em; line-height: 1; }
+  .value-rays { width: 200px; height: 20px; }
+  .value-line { font-size: 16px; line-height: 1.55; color: var(--text-muted); }
+  @media (min-width: 1024px) {
+    .values { padding: 96px 0; }
+    .values-h { margin-bottom: 40px; font-size: 13px; }
+    .values-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+    .value { gap: 14px; padding-right: 32px; }
+    .value + .value { padding-left: 32px; border-left: 1px solid var(--border); }
+    .value:nth-child(2) { padding-right: 16px; }
+    .value-rays { width: 260px; }
+    .value-line { font-size: 17px; }
+  }
+</style>

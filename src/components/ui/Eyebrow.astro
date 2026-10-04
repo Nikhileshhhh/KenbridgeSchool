@@ -1,0 +1,26 @@
+---
+// Eyebrow with the flame mark (Type board): 12→13px, 700, uppercase, +0.14em.
+// Maroon on light; saffron on dark with an ivory nib.
+import FlameMark from './FlameMark.astro';
+interface Props { onDark?: boolean; mark?: boolean; as?: 'p' | 'div' | 'span'; class?: string; id?: string }
+const { onDark = false, mark = true, as: Tag = 'p', class: cls, id } = Astro.props;
+---
+<Tag class:list={['eyebrow', onDark && 'eyebrow--dark', cls]} id={id}>
+  {mark && <FlameMark size={14} onDark={onDark} />}<span><slot /></span>
+</Tag>
+
+<style>
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-size: var(--fs-eyebrow);
+    font-weight: 700;
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--brand);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .eyebrow--dark { color: var(--accent); }
+</style>

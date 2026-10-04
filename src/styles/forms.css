@@ -1,0 +1,46 @@
+/* Form shell shared by EnquiryForm and ContactForm (EnquiryForm, ContactForm boards). Classes are prefixed enq-. */
+.enq { color: var(--text); }
+  .enq-form, .enq-success { display: flex; flex-direction: column; gap: 22px; padding: 24px 20px; background: var(--surface); border: 1px solid var(--border); }
+  .enq-success { gap: 18px; box-shadow: inset 0 4px 0 var(--success); }
+  .enq-success-k { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--success); }
+  .enq-success-h { font-family: var(--font-display); font-size: 28px; font-weight: 500; line-height: 1.1; }
+  .enq-success-dl { margin: 0; display: grid; grid-template-columns: 140px 1fr; row-gap: 8px; font-size: 16px; line-height: 1.5; }
+  .enq-success-dl dt { color: var(--text-muted); }
+  .enq-success-dl dd { margin: 0; font-weight: 600; }
+  .enq-anywhere { overflow-wrap: anywhere; }
+  .enq-muted { font-size: 16px; line-height: 1.6; color: var(--text-muted); }
+  .enq-muted a, .enq-failed a, .enq-demo a, .enq-nojs a { color: var(--brand); font-weight: 600; }
+  .enq-again { align-self: flex-start; display: inline-flex; align-items: center; min-height: 48px; padding: 0 20px; border: 1.5px solid var(--brand); border-radius: var(--radius-md); background: transparent; color: var(--brand); font-size: 16px; font-weight: 600; }
+  .enq-again:hover { background: var(--brand-tint); }
+
+  .enq-summary { display: flex; flex-direction: column; gap: 10px; padding: 18px 22px; border: 2px solid var(--error); border-radius: var(--radius-sm); }
+  .enq-summary[hidden], .enq-demo[hidden] { display: none; }
+  .enq-summary-t { display: flex; align-items: center; gap: 10px; font-size: 17px; }
+  .enq-summary-t svg, .enq-failed svg { color: var(--error); flex-shrink: 0; }
+  .enq-summary-list { margin: 0; padding: 0 0 0 30px; display: flex; flex-direction: column; gap: 4px; }
+  .enq-summary-list a { display: inline-flex; min-height: 32px; align-items: center; font-size: 15px; font-weight: 600; color: var(--error); }
+  .enq-failed, .enq-demo { display: flex; gap: 12px; padding: 18px 22px; border: 2px solid var(--error); border-radius: var(--radius-sm); font-size: 16px; line-height: 1.55; }
+  .enq-failed svg, .enq-demo svg { flex-shrink: 0; margin-top: 2px; }
+  .enq-demo { border-color: var(--warning-text); background: var(--accent-tint); }
+  .enq-demo svg { color: var(--warning-text); }
+
+  .enq-fields { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .enq-actions { display: flex; flex-direction: column; align-items: stretch; gap: 16px; padding-top: 6px; }
+  .enq-submit { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 56px; padding: 0 28px; border: 0; border-radius: var(--radius-md); background: var(--brand); color: #FFFFFF; font-size: 17px; font-weight: 600; }
+  .enq-submit:hover:not(:disabled) { background: var(--brand-hover); }
+  .enq-submit--sending, .enq-submit:disabled { background: var(--brand-hover); cursor: progress; }
+  .enq-privacy { font-size: 14px; line-height: 1.5; }
+  .enq-nojs { padding: 16px 18px; border: 1px solid var(--border); background: var(--surface-raised); font-size: 16px; line-height: 1.55; }
+  @media (prefers-reduced-motion: no-preference) {
+    .enq-spin { animation: enq-spin 900ms linear infinite; transform-origin: 50% 50%; }
+  }
+  @keyframes enq-spin { to { transform: rotate(360deg); } }
+
+  @media (min-width: 640px) {
+    .enq:not(.enq--compact) .enq-form, .enq:not(.enq--compact) .enq-success { padding: 40px; }
+    .enq:not(.enq--compact) .enq-success-h { font-size: 36px; }
+    .enq:not(.enq--compact) .enq-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .enq:not(.enq--compact) .enq-fields .field--wide { grid-column: 1 / -1; }
+    .enq:not(.enq--compact) .enq-actions { flex-direction: row; align-items: center; }
+  }
+  .enq-privacy--sm { font-size: 13px; }

@@ -1,0 +1,6 @@
+# Alt text for supplied photographs (src/assets/photos/<file>). A photo named in a placeholder label
+# renders only once its file is in src/assets/photos/ AND it has an entry here, written or approved by
+# the school. Use "" only for a purely decorative image. Example:
+#   Drone-Front.jpg: The school's front building seen from above, with the playground in front.
+main:
+  alt: {}

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "astro",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/about-us", "destination": "/about", "statusCode": 301 },
+    { "source": "/about-us/", "destination": "/about", "statusCode": 301 },
+    { "source": "/about-us/founder", "destination": "/about/founder", "statusCode": 301 },
+    { "source": "/about-us/founder/", "destination": "/about/founder", "statusCode": 301 },
+    { "source": "/about-us/principal-message", "destination": "/about/principal", "statusCode": 301 },
+    { "source": "/about-us/principal-message/", "destination": "/about/principal", "statusCode": 301 },
+    { "source": "/ourschool", "destination": "/learning", "statusCode": 301 },
+    { "source": "/ourschool/", "destination": "/learning", "statusCode": 301 },
+    { "source": "/ourschool/preprimary", "destination": "/learning/pre-primary", "statusCode": 301 },
+    { "source": "/ourschool/preprimary/", "destination": "/learning/pre-primary", "statusCode": 301 },
+    { "source": "/ourschool/primary", "destination": "/learning/primary", "statusCode": 301 },
+    { "source": "/ourschool/primary/", "destination": "/learning/primary", "statusCode": 301 },
+    { "source": "/ourschool/middleschool", "destination": "/learning/middle-school", "statusCode": 301 },
+    { "source": "/ourschool/middleschool/", "destination": "/learning/middle-school", "statusCode": 301 },
+    { "source": "/ourschool/secondaryschool", "destination": "/learning/secondary-school", "statusCode": 301 },
+    { "source": "/ourschool/secondaryschool/", "destination": "/learning/secondary-school", "statusCode": 301 },
+    { "source": "/facilities", "destination": "/campus", "statusCode": 301 },
+    { "source": "/facilities/", "destination": "/campus", "statusCode": 301 },
+    { "source": "/admission", "destination": "/admissions", "statusCode": 301 },
+    { "source": "/admission/", "destination": "/admissions", "statusCode": 301 },
+    { "source": "/school-information", "destination": "/information", "statusCode": 301 },
+    { "source": "/school-information/", "destination": "/information", "statusCode": 301 },
+    { "source": "/school-information/school-song", "destination": "/information/song", "statusCode": 301 },
+    { "source": "/school-information/school-song/", "destination": "/information/song", "statusCode": 301 },
+    { "source": "/school-information/school-prayer", "destination": "/information/prayer", "statusCode": 301 },
+    { "source": "/school-information/school-prayer/", "destination": "/information/prayer", "statusCode": 301 },
+    { "source": "/school-information/school-timings", "destination": "/information/timings", "statusCode": 301 },
+    { "source": "/school-information/school-timings/", "destination": "/information/timings", "statusCode": 301 },
+    { "source": "/school-information/decorum", "destination": "/information/decorum", "statusCode": 301 },
+    { "source": "/school-information/decorum/", "destination": "/information/decorum", "statusCode": 301 },
+    { "source": "/school-information/school-rules", "destination": "/information/rules", "statusCode": 301 },
+    { "source": "/school-information/school-rules/", "destination": "/information/rules", "statusCode": 301 },
+    { "source": "/mandatory-public-disclosure", "destination": "/information/disclosure", "statusCode": 301 },
+    { "source": "/mandatory-public-disclosure/", "destination": "/information/disclosure", "statusCode": 301 },
+    {
+      "source": "/gallery",
+      "has": [{ "type": "query", "key": "year", "value": "(?<year>\\d{4}-\\d{2})" }],
+      "destination": "/gallery/:year",
+      "statusCode": 301
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+      ]
+    },
+    {
+      "source": "/fonts/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/pagefind/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600" }]
+    },
+    {
+      "source": "/_astro/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    }
+  ]
+}

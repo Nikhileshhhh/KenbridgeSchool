@@ -1,0 +1,201 @@
+# School Information hub and its six pages (Information*, Timings*, Rules*, Decorum*, Song*, Prayer*,
+# Disclosure* boards; P17–P23 of KENBRIDGE_SCREEN_PROMPTS_FROM_LIVE_SITE.md). Wording is the boards'.
+main:
+  hub:
+    title: School Information
+    lead: Everything families need day to day.
+    groups:
+      - label: Day to day
+        items:
+          - { icon: clock, title: School Timings, desc: 'Two terms, bell, class and period timings.', href: /information/timings }
+          - { icon: list, title: School Rules, desc: '15 rules on punctuality, uniform, grooming, food and leave.', href: /information/rules }
+          - { icon: calendar, title: Decorum, desc: 'Attendance (75%), absence, withdrawal and suspension.', href: /information/decorum }
+      - label: Our school
+        items:
+          - { icon: music, title: School Song, quote: 'For us no mountain too high…', href: /information/song }
+          - { icon: flame, title: School Prayer, quote: 'Where the mind is without fear…', by: by Rabindranath Tagore, href: /information/prayer }
+      - label: Official
+        items:
+          - { icon: shield, title: Mandatory Public Disclosure, desc: CBSE-required information and documents., href: /information/disclosure }
+    # Downloads. A file with no href is shown without a link until the school supplies it (PLAN §0).
+    downloads:
+      - { title: Brochure, desc: School prospectus, kind: pdf, service: brochure }
+      - { title: Fee Structure, desc: '[Academic year]', kind: pdf }
+      - { title: Annual Academic Calendar, desc: '[Academic year]', kind: pdf }
+      - { title: CBSE Transfer Certificate, desc: Download a CBSE TC, kind: external, service: tc }
+
+  timings:
+    title: School Timings
+    meta: KenBridge School, Kalaburagi · [Academic year]
+    terms:
+      - { label: Term 1, months: June – September, span: 4 }
+      - { label: Term 2, months: October – March, span: 6 }
+    months: [Jun, Jul, Aug, Sep, Oct, Nov, Dec, Jan, Feb, Mar]
+    morning:
+      - { label: First Bell, time: '08:30', ampm: AM }
+      - { label: Second Bell, time: '08:35', ampm: AM }
+      - { label: School Assembly, time: '08:35', ampm: AM }
+    # TODO(content): OPEN-QUESTIONS "School start time". Classes III–X start at 08:30 but the period
+    # timetable begins at 09:00; confirm what happens in between (assembly?) and how to show it.
+    byClass:
+      - { classes: Pre-KG to UKG, days: Mon – Fri, hours: '09:30 AM – 02:00 PM', lunch: '12:00 – 12:30 PM' }
+      - { classes: Class I & II, days: Mon – Sat, hours: '09:30 AM – 02:00 PM', lunch: '12:00 – 12:30 PM' }
+      - { classes: Class III to X, days: Mon – Fri, hours: '08:30 AM – 03:30 PM', lunch: '—' }
+      - { classes: Class III to X, days: Saturday, hours: '08:30 AM – 12:30 PM', lunch: '—' }
+    periods:
+      - { label: 1st period, short: 1st, from: '09:00', to: '09:50', time: '09:00 – 09:50 AM', min: 50 }
+      - { label: 2nd period, short: 2nd, from: '09:50', to: '10:35', time: '09:50 – 10:35 AM', min: 45 }
+      - { label: First Break, short: Break, from: '10:35', to: '10:55', time: '10:35 – 10:55 AM', min: 20, break: true }
+      - { label: 3rd period, short: 3rd, from: '10:55', to: '11:40', time: '10:55 – 11:40 AM', min: 45 }
+      - { label: 4th period, short: 4th, from: '11:40', to: '12:25', time: '11:40 AM – 12:25 PM', min: 45 }
+      - { label: 5th period, short: 5th, from: '12:25', to: '01:10', time: '12:25 – 01:10 PM', min: 45 }
+      - { label: Lunch, short: Lunch, from: '01:10', to: '01:30', time: '01:10 – 01:30 PM', min: 20, break: true }
+      - { label: 6th period, short: 6th, from: '01:30', to: '02:10', time: '01:30 – 02:10 PM', min: 40 }
+      - { label: 7th period, short: 7th, from: '02:10', to: '02:50', time: '02:10 – 02:50 PM', min: 40 }
+      - { label: 8th period, short: 8th, from: '02:50', to: '03:30', time: '02:50 – 03:30 PM', min: 40 }
+    dayStart: '09:00 AM'
+    dayEnd: '03:30 PM'
+    office: { title: Office working hours differ, text: 'Mon–Fri 8:30 AM–4:30 PM, Sat 8:30 AM–2:00 PM.' }
+    printFooter: 'Printed from kenbridgegulbarga.com/information/timings · Office: 98869 99660'
+
+  rules:
+    title: School Rules
+    meta: 15 rules in four groups
+    groups:
+      - id: arrival
+        title: Arrival
+        range: i – ii
+        rules:
+          - { n: i, text: Students are to be within school campus before 1st bell. Late comers will not be allowed to attend the classes. }
+          - { n: ii, text: No permission will be granted to any child to leave the school premises during school hours. }
+      - id: uniform
+        title: Uniform & Grooming
+        range: iii – x, xiii
+        rules:
+          - { n: iii, text: Students should be properly attired in the school uniform. }
+          - { n: iv, text: 'School uniform should be neat, washed and ironed.' }
+          - { n: v, text: Students must polish shoes and cut nails regularly. }
+          - { n: vi, text: Girls with long hair should have them braided and apply oil. }
+          - { n: vii, text: 'Girls must avoid fancy haircuts and make-up and growing long nails; applying mehendi or nail polish is against the school rules.' }
+          - { n: viii, text: Girls can wear simple ear studs and avoid fancy earrings/hangings. }
+          - { n: ix, text: Girls must wear black cycling tights regularly and bring black leggings every day. }
+          - { n: x, text: 'Children should not wear valuable (silver, gold, platinum, etc.) ornaments to school.' }
+          - { n: xiii, text: 'Boys must avoid fancy haircuts; they must have a short trim haircut and apply oil regularly.' }
+      - id: food
+        title: Food
+        range: xi – xii
+        rules:
+          - { n: xi, text: Students must bring healthy and nutritious food for lunch and snack breaks. }
+          - { n: xii, text: 'Students must avoid junk food, non-vegetarian food, aerated drinks, bubble gum and chewing gum.' }
+      - id: leave
+        title: Leave & Meetings
+        range: xiv – xv
+        parents: true
+        rules:
+          - { n: xiv, text: 'No leave will be sanctioned without prior permission. Parents can take permission from the class teacher for 2 days’ leave and must take permission from the Principal/Vice Principal for 3 or more days.' }
+          - { n: xv, text: 'Parents can meet the Principal/Vice Principal (Mon–Fri) between 3 and 4 PM with a prior appointment.' }
+
+  decorum:
+    title: Decorum
+    lead: 'Attendance, absence, withdrawal and suspension.'
+    attendance:
+      label: Minimum attendance
+      value: 75
+      note: 'At least 3 of every 4 working days. Required for promotion, unless relaxed on medical grounds or in an unavoidable emergency.'
+    # TODO(content): OPEN-QUESTIONS "Headmistress vs Vice Principal" and "Caution Money vs Security Deposit".
+    sections:
+      - id: secA
+        letter: A
+        title: Absence
+        points:
+          - { id: a1, title: Attendance, text: '75% attendance is compulsory for all students, failing which he/she may not be eligible for promotion. The percentage may be relaxed on medical grounds or in unavoidable emergencies.' }
+          - { id: a2, title: Repeated or unexplained absence, text: 'Repeated absence without leave, or unexplained absence for more than 15 consecutive days, may lead to the student’s name being struck off the rolls. Readmission only on payment of a fresh re-admission fee, at the Principal’s/Headmistress’s discretion.' }
+          - { id: a3, title: Leave of absence, text: No leave of absence except on an application from parents/guardians for plausible reasons. }
+          - { id: a4, title: After an illness, text: 'After an infectious or contagious disease, a doctor’s certificate permitting attendance is required.' }
+      - id: secB
+        letter: B
+        title: Withdrawal / Suspension
+        points:
+          - { id: b1, title: Refund on withdrawal, text: 'On withdrawal, only caution money is refunded, subject to clearance of all dues; dues are never adjusted against caution money.' }
+          - { id: b2, title: Notice of withdrawal, text: 'A written notice of withdrawal is required one clear month in advance, or one month’s tuition fee in lieu.' }
+          - id: b3
+            title: Asked to leave
+            text: 'A student may be asked to leave at the Principal’s/Headmistress’s discretion on these grounds:'
+            list: [Disciplinary reasons, Unsatisfactory progress in work, Detention or repeated detention in a class, Any other ground deemed necessary in the interest of the school and its students]
+
+  song:
+    title: Our School Song
+    kicker: KenBridge School · Kalaburagi
+    recording: { meta: '[duration] · recorded by [choir / year]' }
+    stanzas:
+      - { label: Verse 1, lines: ['For us no mountain too high,', 'For us no river too wide,', 'For us no road too rough,', 'For us no challenge too tough.'] }
+      - { label: Verse 2, lines: ['We will cherish what we learnt,', 'We will achieve what we yearn,', 'We will always do our best,', 'We will be better than the rest.'] }
+      - { label: Chorus, chorus: true, refrain: [0], lines: ['We can, yes we can.'] }
+      - { label: Verse 3, lines: ['We promise to make the world a better place,', 'Uphold the truth; be kind and helpful always,', 'Make our school and parents proud,', 'Stand out from the crowd,', 'Choose right over wrong,', 'Make our nation strong.'] }
+      # "KenBridgeians" is kept as sung (OPEN-QUESTIONS #7: only inside the school song).
+      - { label: Closing, closing: true, refrain: [0, 1, 4], lines: ['We can, yes we can,', 'We can, O yes we can.', 'Each one a champion,', 'We are the KenBridgeians.', 'We can, O yes we can.', 'Each one a champion,', 'We are the KenBridgeians.'] }
+
+  prayer:
+    title: Our School Prayer
+    kicker: KenBridge School · Kalaburagi
+    subtitle: Let My Country Awake
+    author: Rabindranath Tagore
+    lines:
+      - Where the mind is without fear and the head held high,
+      - Where knowledge is free,
+      - Where the world has not been broken up into fragments
+      - By narrow domestic walls,
+      - Where words come out from the depth of truth,
+      - Where tireless striving stretches its arms towards perfection,
+      - Where the clear stream of reason has not lost its way
+      - Into the dreary desert sand of dead habit,
+      - Where the mind is led forward by thee
+      - Into ever-widening thought and action,
+      - Into that heaven of freedom, my Father, let my country awake.
+
+  disclosure:
+    title: Mandatory Public Disclosure
+    lead: 'This disclosure ensures transparency and accountability, enabling parents and students to make informed decisions.'
+    updated: '[date]'
+    general:
+      - { label: School name, value: KenBridge School }
+      - { label: Affiliation No., value: '830594' }
+      - { label: School Code, value: '45527' }
+      - { label: Address, value: 'Sy. No 21/2, Rajapur, Opp. Nrupathunga Colony, Shahabad Road, Kusnoor, Kalaburagi – 585105' }
+      - { label: Principal, value: 'Mrs. Neeta Purohit, M.Sc, B.Ed' }
+      - { label: Email, value: kbsglb@kenbridgegulbarga.com, href: 'mailto:kbsglb@kenbridgegulbarga.com' }
+      # TODO(content): OPEN-QUESTIONS #4. The disclosure lists 98866 99966 as a third number.
+      - label: Contact
+        phones: [{ display: 88844 44942, tel: '+918884444942' }, { display: 88844 44952, tel: '+918884444952' }]
+        note: third number [to be confirmed]
+    documents:
+      - { title: Affiliation / Upgradation letter, kind: pdf }
+      - { title: Trust Deed, kind: pdf }
+      - { title: NOC, kind: pdf }
+      - { title: RTE Recognition, kind: na, note: This certificate does not apply to the school. }
+      - { title: Building Safety Certificate, kind: pdf }
+      - { title: Fire Safety Certificate, kind: pdf }
+      - { title: DEO Certificate, kind: unavailable, note: Not published in the disclosure yet. }
+      - { title: 'Water, Health & Sanitation Certificate', kind: pdf }
+    academics:
+      - { title: Fee Structure, kind: pdf }
+      - { title: Annual Academic Calendar, kind: pdf }
+      - { title: School Management Committee (SMC), kind: pdf }
+      - { title: PTA members, kind: unavailable, note: Not published in the disclosure yet. }
+    # TODO(content): OPEN-QUESTIONS "Teacher counts on the Disclosure page" (TGT and PRT are marked Data Bank).
+    staff:
+      - { role: Principal, value: Mrs. Neeta Purohit }
+      - { role: Vice Principal, value: Mrs. Sulochana Reddy }
+      - { role: PGT, value: '0' }
+      - { role: TGT, value: '53', details: Data Bank }
+      - { role: PRT, value: '60', details: Data Bank }
+      - { role: Special Educator, value: Mr. John Emrison }
+      - { role: Counsellor & Wellness Teacher, value: Mrs. Sulochana Reddy }
+    infrastructure:
+      - { label: Campus area, value: '20,234 sq m' }
+      - { label: Classrooms, value: '72, each 50 sq m' }
+      - { label: Laboratories, value: '6, each 75 sq m (including computer labs)' }
+      - { label: Library, value: 150 sq m }
+      - { label: Internet facility, value: 'Yes' }
+      - { label: Toilets, value: Girls 60 · Boys 60 · CWSN 2 }
+      - { label: Inspection video, value: '[Inspection video link]' }

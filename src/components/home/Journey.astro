@@ -1,0 +1,205 @@
+---
+// HomeDesktop §5 learning journey, in three forms (only one is ever displayed):
+//  · pinned scroll scene (Journey + HomeJourneyScroll boards): ≥1024px, JS on, motion allowed.
+//    The section is tall and its inner frame is position: sticky; native scroll drives it.
+//  · still grid (HomeDesktopReduced): ≥1024px with reduced motion or without JS.
+//  · vertical chapters (HomeMobile): below 1024px.
+import FlameMark from '../ui/FlameMark.astro';
+import Icon from '../ui/Icon.astro';
+import TextLink from '../ui/TextLink.astro';
+import Placeholder from '../ui/Placeholder.astro';
+import { getHome } from '../../lib/site';
+const { journey } = await getHome();
+const nodePos = [[3.33, 96], [33.9, 36.4], [66.1, 36.4], [96.67, 96]];
+---
+<section class="journey-pin" aria-labelledby="journeyTitle" data-journey>
+  <div class="jp-sticky">
+    <div class="container jp-inner">
+      <div class="jp-head">
+        <div class="jp-titles">
+          <p class="jp-eyebrow eyebrow-text"><FlameMark size={14} /><span class="tnum">Pre-KG to Class X</span></p>
+          <h2 id="journeyTitle" class="jp-title">The learning journey</h2>
+        </div>
+        <div class="jp-controls">
+          <span class="jp-count tnum" aria-live="polite"><span class="jp-count-now" data-jp-count>01</span> <span class="jp-count-of">/ 04</span></span>
+          <button type="button" class="jp-step" aria-label="Previous stage" data-jp-prev><Icon name="arrow-left" size={18} /></button>
+          <button type="button" class="jp-step" aria-label="Next stage" data-jp-next><Icon name="arrow" size={18} /></button>
+        </div>
+      </div>
+
+      <div class="jp-arc">
+        <svg class="jp-arc-svg" aria-hidden="true" focusable="false" viewBox="0 0 1200 200" preserveAspectRatio="none">
+          <defs><clipPath id="jpClip"><rect x="0" y="-40" width="40" height="300" data-jp-clip /></clipPath></defs>
+          <path d="M40 200A1190 1190 0 0 1 1160 200" fill="none" stroke="#857A71" stroke-width="1.5" vector-effect="non-scaling-stroke" />
+          <path d="M40 200A1190 1190 0 0 1 1160 200" fill="none" stroke="#7F0305" stroke-width="2.5" vector-effect="non-scaling-stroke" clip-path="url(#jpClip)" />
+        </svg>
+        <ol role="list" aria-label="Stages" class="jp-nodes">
+          {journey.map((c, i) => (
+            <li class="jp-node" style={`left:${nodePos[i][0]}%;top:${nodePos[i][1]}px`}>
+              <button type="button" class="jp-node-btn" data-jp-node={i}>
+                <span class="jp-dot" aria-hidden="true"></span>
+                <span class="jp-node-label">
+                  <span class="jp-node-num tnum">{c.num}</span>
+                  <span class="jp-node-name">{c.label}</span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <div class="jp-viewport">
+        <div class="jp-track" data-jp-track>
+          {journey.map((c, i) => (
+            <article class="jp-chapter" aria-hidden={i === 0 ? 'false' : 'true'} data-jp-chapter>
+              <Placeholder label={`[Photo · ${c.photoPinned ?? c.photo}]`} ratio="auto" class="jp-photo" alt={`Placeholder for a photograph: ${c.photoPinned ?? c.photo}`} />
+              <div class="jp-text">
+                <span class="jp-range eyebrow-text tnum">{c.range}</span>
+                <h3 class="jp-h3">{c.title}</h3>
+                <p class="jp-p">{c.text}</p>
+                <a class="jp-cta" href={c.href} tabindex={i === 0 ? undefined : '-1'}>{c.cta}<Icon name="arrow" /></a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+      <div class="jp-bar" aria-hidden="true"><div class="jp-bar-fill" data-jp-bar></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="journey-still only-lg" aria-labelledby="journeyStillTitle">
+  <div class="container">
+    <span class="js-eyebrow eyebrow-text tnum">Pre-KG to Class X</span>
+    <h2 id="journeyStillTitle" class="js-title">The learning journey</h2>
+    <ol role="list" class="js-list">
+      {journey.map((c) => (
+        <li class="js-item">
+          <Placeholder label={`[Photo · ${c.photo}]`} ratio="4 / 5" class="js-photo" alt={`Placeholder for a photograph: ${c.photo}`} />
+          <div class="js-text">
+            <span class="js-num tnum">{c.num} · {c.range}</span>
+            <h3 class="js-h3">{c.title}</h3>
+            <p class="js-p">{c.text}</p>
+            <TextLink href={c.href} kind="plain" class="js-link">{c.cta} →</TextLink>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<section class="journey-v only-sm" aria-labelledby="mJourney">
+  <div class="container">
+    <div class="jv-head">
+      <span class="jv-eyebrow eyebrow-text tnum">Pre-KG to Class X</span>
+      <h2 id="mJourney" class="jv-title">The learning journey</h2>
+    </div>
+    <ol role="list" class="jv-list">
+      {journey.map((c, i) => (
+        <li class="jv-item">
+          <span class="jv-rail" aria-hidden="true"><span class:list={['jv-line', i === journey.length - 1 && 'is-last']}></span><span class="jv-dot"></span></span>
+          <div class="jv-body">
+            <span class="jv-num tnum">{c.num} · {c.range}</span>
+            <Placeholder label={`[Photo · ${c.photo}]`} ratio="4 / 3" class="jv-photo" alt={`Placeholder for a photograph: ${c.photo}`} />
+            <h3 class="jv-h3">{c.title}</h3>
+            <p class="jv-p">{c.text}</p>
+            <TextLink href={c.href} kind="plain" class="jv-link">{c.cta} →</TextLink>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  /* ---------- which form shows ---------- */
+  .journey-pin { display: none; }
+  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+    :global(html.js) .journey-pin { display: block; }
+    :global(html.js) .journey-still { display: none !important; }
+  }
+
+  /* ---------- pinned scene ---------- */
+  .journey-pin { position: relative; height: calc(100vh + 2100px); background: var(--bg); }
+  .jp-sticky { position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); min-height: 760px; overflow: hidden; }
+  .jp-inner { height: 100%; display: flex; flex-direction: column; padding-top: 48px; }
+  .jp-head { display: flex; justify-content: space-between; align-items: flex-end; }
+  .jp-titles { display: flex; flex-direction: column; gap: 14px; }
+  .jp-eyebrow { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 13px; color: var(--brand); }
+  .jp-title { font-family: var(--font-display); font-size: 64px; font-weight: 500; line-height: 1.05; }
+  .jp-controls { display: flex; align-items: center; gap: 16px; }
+  .jp-count { font-family: var(--font-display); font-size: 28px; }
+  .jp-count-now { color: var(--brand); }
+  .jp-count-of { color: var(--text-muted); }
+  .jp-step {
+    width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border-strong); border-radius: var(--radius-md); background: transparent; color: var(--text);
+  }
+  .jp-step:hover { background: var(--brand-tint); }
+  .jp-arc { position: relative; margin-top: 40px; height: 150px; }
+  .jp-arc-svg { position: absolute; left: 0; top: 0; width: 100%; height: 96px; overflow: visible; }
+  .jp-nodes { list-style: none; margin: 0; padding: 0; }
+  .jp-node { position: absolute; transform: translate(-50%, -50%); }
+  .jp-node-btn { position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; padding: 0; border: 0; background: transparent; }
+  .jp-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 1.5px solid var(--border-strong); }
+  .jp-node.is-done .jp-dot { background: var(--brand); border-color: var(--brand); }
+  .jp-node.is-current .jp-dot { width: 22px; height: 22px; background: var(--accent); border: 0; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--brand); }
+  .jp-node-label { position: absolute; top: 46px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 2px; white-space: nowrap; }
+  .jp-node-num { font-size: 12px; font-weight: 800; color: var(--text-muted); }
+  .jp-node-name { font-family: var(--font-display); font-size: 22px; font-weight: 500; color: var(--text-muted); }
+  .jp-node.is-current .jp-node-num { color: var(--brand); }
+  .jp-node.is-current .jp-node-name { color: var(--text); font-weight: 700; }
+  .jp-viewport { position: relative; margin: 56px calc(-1 * var(--margin)) 0; height: 400px; }
+  .jp-track { display: flex; gap: 64px; will-change: transform; }
+  .jp-chapter { position: relative; flex-shrink: 0; width: var(--jp-card, 920px); height: 400px; display: grid; grid-template-columns: 480px 1fr; gap: 48px; }
+  /* Neighbouring chapters are dimmed by an ivory veil (same look as 35% opacity on ivory), so the
+     text underneath keeps its full contrast for anyone who can read it. */
+  .jp-chapter::after { content: ''; position: absolute; inset: -1px; background: var(--bg); opacity: var(--jp-dim, 0); pointer-events: none; }
+  .jp-chapter :global(.jp-photo) { height: 360px; aspect-ratio: auto; }
+  .jp-text { display: flex; flex-direction: column; gap: 16px; padding-top: 8px; }
+  .jp-range { font-size: 13px; color: var(--brand); }
+  .jp-h3 { font-family: var(--font-display); font-size: 48px; font-weight: 500; line-height: 1.05; }
+  .jp-p { font-size: 18px; line-height: 1.6; }
+  .jp-cta {
+    align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+    color: var(--brand); font-size: 17px; font-weight: 600;
+    text-decoration: underline; text-decoration-color: var(--link-underline); text-underline-offset: 6px;
+  }
+  .jp-bar { position: absolute; left: var(--margin); right: var(--margin); bottom: 32px; height: 2px; background: var(--border); }
+  .jp-bar-fill { height: 2px; width: 100%; background: var(--brand); transform-origin: 0 50%; transform: scaleX(0); }
+  @media (max-width: 1279px) {
+    .jp-sticky { top: var(--mobile-header-h); height: calc(100vh - var(--mobile-header-h)); }
+    .jp-chapter { grid-template-columns: 1fr 1fr; gap: 32px; }
+  }
+
+  /* ---------- still grid ---------- */
+  .journey-still { padding: 96px 0 128px; background: var(--bg); }
+  .js-eyebrow { font-size: 13px; color: var(--brand); }
+  .js-title { margin: 14px 0 48px; font-family: var(--font-display); font-size: 64px; font-weight: 500; line-height: 1.05; }
+  .js-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px 32px; }
+  .js-item { display: grid; grid-template-columns: minmax(0, 260px) 1fr; gap: 28px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .js-item :global(.js-photo) { padding: 12px; font-size: 12px; }
+  .js-text { display: flex; flex-direction: column; gap: 12px; }
+  .js-num { font-size: 12px; font-weight: 800; color: var(--brand); }
+  .js-h3 { font-family: var(--font-display); font-size: 36px; font-weight: 500; line-height: 1.05; }
+  .js-p { font-size: 17px; line-height: 1.6; }
+  .js-text :global(.js-link) { align-self: flex-start; font-size: 16px; }
+
+  /* ---------- vertical chapters (phones) ---------- */
+  .journey-v { padding: 64px 0; }
+  .jv-head { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+  .jv-eyebrow { font-size: 12px; color: var(--brand); }
+  .jv-title { font-family: var(--font-display); font-size: 40px; font-weight: 500; line-height: 1.05; }
+  .jv-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .jv-item { position: relative; display: grid; grid-template-columns: 28px 1fr; gap: 16px; padding-bottom: 40px; }
+  .jv-rail { position: relative; display: flex; justify-content: center; }
+  .jv-line { position: absolute; top: 18px; bottom: -6px; width: 1.5px; background: var(--brand); }
+  .jv-line.is-last { background: transparent; }
+  .jv-dot { position: relative; margin-top: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 4px var(--bg); }
+  .jv-body { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .jv-num { font-size: 12px; font-weight: 800; color: var(--brand); }
+  .jv-body :global(.jv-photo) { padding: 10px; font-size: 12px; }
+  .jv-h3 { margin-top: 4px; font-family: var(--font-display); font-size: 32px; font-weight: 500; line-height: 1.05; }
+  .jv-p { font-size: 16px; line-height: 1.6; }
+  .jv-body :global(.jv-link) { align-self: flex-start; font-size: 16px; }
+</style>

@@ -1,0 +1,40 @@
+# Class X results (A8 of KENBRIDGE_SCREEN_PROMPTS_FROM_LIVE_SITE.md). Shared by Home and Achievements.
+main:
+  # Official figures from the CBSE Mandatory Public Disclosure.
+  classX:
+    - { year: 2025, registered: 174, passed: 170, passPct: '97.75', remarks: 4 compartment }
+    - { year: 2024, registered: 179, passed: 179, passPct: '100', remarks: '' }
+    - { year: 2023, registered: 143, passed: 143, passPct: '100', remarks: '' }
+  firstBatch: { year: 2016-17, passPct: '100' }
+
+  # Class X 2026 result analysis (home banner): students per percentage band.
+  # TODO(content): OPEN-QUESTIONS "2026 results". The five bands add up to 184; confirm this matches the number who appeared.
+  distribution:
+    year: 2026
+    bands:
+      - { band: 90–100%, students: 11 }
+      - { band: 80–90%, students: 51 }
+      - { band: 70–80%, students: 50 }
+      - { band: 60–70%, students: 43 }
+      - { band: 50–60%, students: 29 }
+
+  achievers:
+    year: 2026
+    list:
+      - { name: Abdullah S. Khan, score: '96.8' }
+      - { name: Ganesh A Patil, score: '94.8' }
+      - { name: Basavaprabhu Hiremath, score: '94.4' }
+
+  # The school's result banners (Toppers archive). A banner is published only with a typed transcription;
+  # rows: [] shows "Transcription needed before release" (OPEN-QUESTIONS "Result banners").
+  banners:
+    - { year: '2021', file: toppers_2021-1.jpg, rows: [] }
+    - { year: '2022', file: toppers_2022.jpg, rows: [] }
+    - { year: '2023', file: 2023-Results.jpg, rows: [] }
+    - { year: '2024', file: 2024-results.jpg, rows: [] }
+    - year: '2026'
+      file: 2026BannerREV.jpg
+      rows:
+        - { name: Abdullah S. Khan, score: 96.8% }
+        - { name: Ganesh A Patil, score: 94.8% }
+        - { name: Basavaprabhu Hiremath, score: 94.4% }

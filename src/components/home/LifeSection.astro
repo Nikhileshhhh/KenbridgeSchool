@@ -1,0 +1,121 @@
+---
+// HomeDesktop §10 / HomeMobile "Life at KenBridge": Annual Day 2025-26 and the recent albums.
+// Recent album tiles link to their gallery year until each album's photos are imported (PLAN gap 3).
+import Icon from '../ui/Icon.astro';
+import { getHome } from '../../lib/site';
+const { life } = await getHome();
+const albumHref = `/gallery/${life.album.year}/${life.album.slug}`;
+const recentHref = `/gallery/${life.recentYear.replace('–', '-')}`;
+---
+<section class="life" aria-labelledby="lifeTitle">
+  <div class="container life-inner">
+    <div class="life-head">
+      <div class="life-titles">
+        <span class="life-eyebrow eyebrow-text">Life at KenBridge</span>
+        <h2 id="lifeTitle" class="life-title">{life.album.title} <span class="tnum">{life.album.yearLabel}</span></h2>
+      </div>
+      <a class="life-album-link tnum only-lg" href={albumHref}>View the album · {life.album.count} photographs →</a>
+    </div>
+
+    <div class="life-mosaic">
+      <div class="life-ph life-ph--main" role="img" aria-label="Placeholder: Annual Day 2025-26 photograph">
+        <span class="only-lg">{life.photos[0]}</span><span class="only-sm">{life.photoSm}</span>
+      </div>
+      <div class="life-side">
+        <div class="life-ph life-ph--b only-lg" role="img" aria-label="Placeholder: Annual Day 2025-26 photograph">{life.photos[1]}</div>
+        <div class="life-pair">
+          <div class="life-ph life-ph--s" role="img" aria-label="Placeholder: Annual Day 2025-26 photograph"><span class="only-lg">{life.photos[2]}</span></div>
+          <div class="life-ph life-ph--s" role="img" aria-label="Placeholder: Annual Day 2025-26 photograph"><span class="only-lg">{life.photos[3]}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="life-recent">
+      <h3 class="life-recent-h">Recent albums <span class="life-recent-year tnum">{life.recentYear}</span></h3>
+      <ul role="list" class="life-albums">
+        {life.recent.map((name) => (
+          <li class="life-album-li">
+            <a class="life-album" href={recentHref}>
+              <span class="life-cover" aria-hidden="true"><span class="only-lg">[Album cover]</span></span>
+              <span class="life-album-name">{name}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="life-foot">
+      <div class="life-acts">
+        <h3 class="life-acts-h eyebrow-text">Sports &amp; activities</h3>
+        <p class="life-acts-p">
+          {life.activities.map((a, i) => (
+            <>{i === 0 ? a.charAt(0).toUpperCase() + a.slice(1) : a}{i < life.activities.length - 1 && <> <span aria-hidden="true" class="life-dot">·</span> </>}</>
+          ))}
+        </p>
+      </div>
+      <a class="life-cta arrow-nudge" href="/gallery">Open the gallery<span class="arrow" aria-hidden="true"><Icon name="arrow" /></span></a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .life { padding: 64px 0; background: var(--surface-raised); border-top: 1px solid var(--border); }
+  .life-inner { display: flex; flex-direction: column; gap: 20px; }
+  .life-head { display: flex; justify-content: space-between; align-items: flex-end; }
+  .life-titles { display: flex; flex-direction: column; gap: 10px; }
+  .life-eyebrow { font-size: 12px; color: var(--brand); }
+  .life-title { font-family: var(--font-display); font-size: clamp(2.5rem, 1.943rem + 2.286vw, 4rem); font-weight: 500; line-height: 1.05; }
+  .life-album-link { display: inline-flex; align-items: center; min-height: 44px; font-size: 16px; font-weight: 600; text-decoration: underline; text-decoration-color: var(--link-underline); text-underline-offset: 6px; }
+  .life-mosaic { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .life-ph { background: var(--ph-1); display: flex; align-items: flex-end; font-size: 12px; color: var(--text-muted); padding: 10px; }
+  .life-ph--main { grid-column: 1 / -1; aspect-ratio: 3 / 2; }
+  .life-side, .life-pair { display: contents; }
+  .life-ph--s { aspect-ratio: 1 / 1; }
+  .life-recent { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
+  .life-recent-h { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--font-display); font-size: 24px; font-weight: 600; }
+  .life-recent-year { font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--text-muted); }
+  .life-albums { list-style: none; margin: 0 calc(-1 * var(--margin)); padding: 0 var(--margin); display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; }
+  .life-albums::-webkit-scrollbar { display: none; }
+  .life-album-li { flex-shrink: 0; width: 140px; }
+  .life-album { display: flex; flex-direction: column; gap: 8px; color: var(--text); text-decoration: none; }
+  .life-album:hover { color: var(--text); }
+  .life-album:hover .life-album-name { color: var(--brand); text-decoration: underline; text-underline-offset: 4px; }
+  .life-cover { aspect-ratio: 1 / 1; background: var(--ph-1); display: flex; align-items: flex-end; padding: 10px; font-size: 11px; color: var(--text-muted); }
+  .life-album-name { font-size: 15px; font-weight: 700; }
+  .life-foot { display: flex; flex-direction: column; gap: 18px; margin-top: 16px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .life-acts { display: flex; flex-direction: column; gap: 10px; }
+  .life-acts-h { margin: 0; font-size: 12px; color: var(--brand); }
+  .life-acts-p { font-family: var(--font-display); font-size: clamp(1.375rem, 1.189rem + 0.762vw, 1.875rem); font-weight: 500; line-height: 1.4; }
+  .life-dot { color: var(--accent); }
+  .life-cta {
+    display: flex; align-items: center; justify-content: center; gap: 10px; height: 52px;
+    border-radius: var(--radius-md); background: var(--brand); color: #FFFFFF; font-size: 16px; font-weight: 600; text-decoration: none;
+  }
+  .life-cta:hover { background: var(--brand-hover); color: #FFFFFF; }
+  .life-cta .arrow { display: inline-flex; }
+
+  @media (min-width: 1024px) {
+    .life { padding: 128px 0; }
+    .life-inner { gap: 48px; }
+    .life-titles { gap: 14px; }
+    .life-eyebrow { font-size: 13px; }
+    .life-mosaic { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; gap: 0 24px; }
+    .life-ph { padding: 16px; font-size: 13px; }
+    .life-ph--main { grid-column: span 7; aspect-ratio: auto; height: 560px; }
+    .life-side { display: grid; grid-column: span 5; grid-template-rows: 1fr 1fr; gap: 24px; }
+    .life-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+    .life-ph--s { aspect-ratio: auto; padding: 12px; font-size: 12px; }
+    .life-recent { margin: 0; }
+    .life-recent-h { padding-bottom: 12px; border-bottom: 1px solid var(--text); font-size: 28px; }
+    .life-recent-year { font-size: 14px; }
+    .life-albums { margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 24px; overflow: visible; }
+    .life-album-li { width: auto; }
+    .life-album { gap: 12px; }
+    .life-album-name { font-size: 17px; }
+    .life-foot { margin: 0; padding-top: 24px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; align-items: end; }
+    .life-acts { grid-column: span 9; gap: 12px; }
+    .life-acts-h { font-size: 13px; }
+    .life-acts-p { line-height: 1.35; }
+    .life-cta { grid-column: 10 / span 3; justify-self: end; display: inline-flex; padding: 0 22px 0 24px; }
+  }
+</style>

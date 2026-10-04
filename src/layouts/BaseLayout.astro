@@ -1,0 +1,126 @@
+---
+// Every page: head and SEO, skip link, header (solid or over a hero), <main id="main">,
+// footer, mobile menu and the shared shell script. An inline script adds .js to <html>
+// before first paint so enhancements never flash; without it every page still works.
+import '../styles/fonts.css';
+import '../styles/tokens.css';
+import '../styles/base.css';
+import '../styles/layout.css';
+import '../styles/utilities.css';
+import '../styles/motion.css';
+import '../styles/print.css';
+import SiteHeader from '../components/shell/SiteHeader.astro';
+import MobileMenu from '../components/shell/MobileMenu.astro';
+import Footer from '../components/shell/Footer.astro';
+import { getSchool, indexingEnabled } from '../lib/site';
+
+interface Crumb { label: string; href?: string }
+interface Props {
+  title: string;
+  description: string;
+  header?: 'solid' | 'hero';
+  current?: string;
+  breadcrumbs?: Crumb[];
+  ogImage?: string;
+  /** For pages that must never be indexed (404, dev pages). */
+  noindex?: boolean;
+  /** Site search (Pagefind): the result tag for this page, or false to leave it out of the index. */
+  search?: false | 'Page' | 'Album';
+}
+const { title, description, header = 'solid', current = 'none', breadcrumbs, ogImage = '/favicon.png', noindex = false, search } = Astro.props;
+// Search records: the tag and the trail shown above each result ("School Information › School Timings").
+const searchType = noindex ? false : (search ?? 'Page');
+const trail = breadcrumbs ? breadcrumbs.filter((c) => c.href !== '/').map((c) => c.label).join(' › ') : title;
+const school = await getSchool();
+const site = Astro.site ?? new URL(school.url);
+// With build.format 'file' the build-time pathname ends in .html; the live URLs are clean (vercel cleanUrls).
+const cleanPath = Astro.url.pathname.replace(/(^|\/)index\.html$/, '$1').replace(/\.html$/, '').replace(/(.)\/$/, '$1') || '/';
+const canonical = new URL(cleanPath, site).href;
+const fullTitle = cleanPath === '/' ? `${school.fullName} · ${school.tagline}` : `${title} · ${school.fullName}`;
+const robots = indexingEnabled && !noindex ? 'index, follow' : 'noindex, nofollow';
+
+const org = {
+  '@context': 'https://schema.org',
+  '@type': 'School',
+  name: school.fullName,
+  alternateName: school.name,
+  url: school.url,
+  logo: new URL('/favicon.png', site).href,
+  email: school.email,
+  telephone: school.phones.map((p) => p.tel),
+  foundingDate: String(school.founded),
+  slogan: school.tagline,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: school.address.street,
+    addressLocality: 'Kalaburagi',
+    addressRegion: school.address.region,
+    postalCode: school.address.postalCode,
+    addressCountry: 'IN'
+  },
+  identifier: { '@type': 'PropertyValue', propertyID: 'CBSE Affiliation No.', value: school.affiliationNo },
+  sameAs: [school.social.facebook, school.social.youtube]
+};
+const crumbLd = breadcrumbs && breadcrumbs.length > 1
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: breadcrumbs.map((c, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: c.label,
+        item: new URL(c.href ?? cleanPath, site).href
+      }))
+    }
+  : null;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+    <meta name="theme-color" content="#7F0305" />
+    <link rel="preload" href="/fonts/cormorant-garamond-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/manrope-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={school.fullName} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(ogImage, site).href} />
+    <meta property="og:locale" content="en_IN" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify(org)} />
+    {crumbLd && <script type="application/ld+json" set:html={JSON.stringify(crumbLd)} />}
+  </head>
+  <body id="top">
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <SiteHeader variant={header} current={current} />
+    <main id="main" tabindex="-1" class:list={['site-main', header === 'hero' && 'under-hero']} data-pagefind-body={searchType ? '' : undefined} data-pagefind-meta={searchType ? `type:${searchType}` : undefined}>
+      <slot />
+      {/* Last, never first: hero pages pull main's first child up under the header. */}
+      {searchType && <span hidden data-pagefind-meta="trail[data-trail], title[data-title]" data-trail={trail} data-title={title}></span>}
+    </main>
+    <Footer />
+    <MobileMenu current={current} />
+    <script>
+      import '../scripts/shell.js';
+    </script>
+  </body>
+</html>
+
+<style>
+  .site-main:focus { outline: none; }
+  /* Hero pages pull the first section up beneath the transparent header (ShellHeader › No layout jump). */
+  .under-hero > :global(:first-child) { margin-top: calc(-1 * var(--mobile-header-h)); }
+  @media (min-width: 1280px) {
+    .under-hero > :global(:first-child) { margin-top: calc(-1 * (var(--header-h) + 1px)); }
+  }
+</style>

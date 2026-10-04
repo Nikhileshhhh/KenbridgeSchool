@@ -1,0 +1,128 @@
+---
+// /about/principal (PrincipalDesktop / PrincipalMobile). An editorial letter: a typographic
+// author column (no portrait was supplied, none is invented) and a reading column. No signature image.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/shell/Breadcrumbs.astro';
+import FlameMark from '../../components/ui/FlameMark.astro';
+import NextLinks from '../../components/ui/NextLinks.astro';
+import { getMain } from '../../lib/site';
+
+const p = await getMain('principal');
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'About', href: '/about' }, { label: 'Principal’s Message' }];
+---
+<BaseLayout
+  title="Principal’s Message"
+  description={`A message from ${p.name}, ${p.role} (${p.qualifications}).`}
+  current="about"
+  breadcrumbs={crumbs}
+>
+  <div class="container pr-crumbs"><Breadcrumbs items={crumbs} /></div>
+
+  <div class="container pr-grid">
+    <h1 class="pr-h1">Principal’s <span class="em">Message</span></h1>
+    <aside class="pr-aside" aria-label="About the author">
+      <div class="pr-id">
+        <FlameMark size={28} class="only-lg" />
+        <p class="pr-name">{p.name}</p>
+        <div class="pr-rule" aria-hidden="true"></div>
+        <p class="pr-role">{p.role}</p>
+        <p class="pr-quals">{p.qualifications}</p>
+      </div>
+      <dl class="pr-facts tnum">
+        {p.facts.map((f) => (
+          <div class="pr-fact">
+            <dt class="pr-fact-label">{f.label}{f.note && <span class="only-sm"> · {f.note}</span>}</dt>
+            <dd class="pr-fact-value"><span class="pr-fact-num">{f.value}</span>{f.note && <span class="pr-fact-note only-lg">{f.note}</span>}</dd>
+          </div>
+        ))}
+      </dl>
+    </aside>
+
+    <article class="pr-letter" aria-label="Message from the Principal">
+      <p class="pr-opening">{p.opening} <span class="em">{p.openingEm}</span>.</p>
+      <div class="pr-paras">{p.paragraphs.map((t) => <p>{t}</p>)}</div>
+      <figure class="pr-quote">
+        <div class="pr-quote-rule" aria-hidden="true"></div>
+        <blockquote class="pr-quote-q">“{p.quote}”</blockquote>
+        <figcaption>{p.quoteCaption}</figcaption>
+      </figure>
+      <div class="pr-sign">
+        <p class="pr-signoff">{p.signOff}</p>
+        <p class="pr-signname"><strong>{p.name}</strong>, Principal</p>
+      </div>
+    </article>
+  </div>
+
+  <NextLinks
+    compact
+    items={[
+      { eyebrow: 'Learning', label: 'Explore learning', href: '/learning', tone: 'maroon' },
+      { eyebrow: 'Contact', label: 'Contact the school', href: '/contact', tone: 'brand' }
+    ]}
+  />
+</BaseLayout>
+
+<style>
+  .pr-crumbs { padding-top: 12px; }
+  .pr-grid { display: flex; flex-direction: column; }
+  .pr-h1 { padding-top: 32px; font-size: 13px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--brand); }
+  .pr-h1 .em { font-style: normal; color: inherit; }
+  .pr-aside { padding: 16px 0 40px; display: flex; flex-direction: column; }
+  .pr-id { display: flex; flex-direction: column; gap: 16px; }
+  .pr-name { font-family: var(--font-display); font-size: clamp(3rem, 2.814rem + 0.762vw, 3.5rem); font-weight: 500; line-height: 1; }
+  .pr-rule { width: 64px; height: 1px; background: var(--brand); }
+  .pr-role { font-size: 16px; line-height: 1.55; }
+  .pr-quals { font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .pr-facts { margin: 16px 0 0; padding-top: 16px; border-top: 1px solid var(--text); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .pr-fact { display: flex; flex-direction: column; gap: 4px; }
+  .pr-fact-label { order: 2; font-size: 12px; line-height: 1.35; color: var(--text-muted); }
+  .pr-fact-value { order: 1; margin: 0; display: flex; align-items: baseline; gap: 10px; }
+  .pr-fact-num { font-family: var(--font-display); font-size: 30px; line-height: 1; color: var(--brand); }
+  .pr-fact-note { font-size: 15px; font-weight: 700; }
+  .pr-letter {
+    margin: 0 calc(-1 * var(--margin));
+    padding: 40px var(--margin) 64px;
+    background: var(--surface-raised);
+    border-top: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 24px;
+  }
+  .pr-opening { font-family: var(--font-display); font-size: clamp(2rem, 1.629rem + 1.524vw, 2.75rem); font-weight: 500; line-height: 1.2; }
+  .pr-opening .em { font-style: italic; }
+  .pr-paras { display: flex; flex-direction: column; gap: 22px; font-size: 18px; line-height: 1.8; }
+  .pr-quote { margin: 16px 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; }
+  .pr-quote-rule { width: 72px; height: 2px; background: var(--accent); }
+  .pr-quote-q { margin: 0; font-family: var(--font-display); font-size: clamp(1.875rem, 1.564rem + 1.276vw, 2.75rem); font-style: italic; font-weight: 400; line-height: 1.2; }
+  .pr-quote figcaption { font-size: 15px; color: var(--text-muted); }
+  .pr-sign { display: flex; flex-direction: column; gap: 10px; padding-top: 24px; border-top: 1px solid var(--text); }
+  .pr-signoff { font-family: var(--font-display); font-size: clamp(1.625rem, 1.414rem + 0.857vw, 2rem); font-style: italic; line-height: 1.3; color: var(--brand-strong); }
+  .pr-signname { font-size: 14px; color: var(--text-muted); }
+  .pr-signname strong { color: var(--text); }
+
+  @media (min-width: 1024px) {
+    .pr-crumbs { padding-top: 32px; }
+    .pr-h1 { grid-column: 1 / -1; margin-bottom: 64px; padding: 0 0 40px; border-bottom: 1px solid var(--text); font-family: var(--font-display); font-size: clamp(4rem, 2.514rem + 6.095vw, 6rem); font-weight: 500; letter-spacing: -0.015em; text-transform: none; line-height: 0.95; color: var(--text); }
+    .pr-h1 .em { font-style: italic; color: var(--brand); }
+    .pr-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; align-items: start; padding-top: 72px; padding-bottom: 128px; }
+    .pr-aside { grid-column: span 4; position: sticky; top: 112px; padding: 0; gap: 40px; }
+    .pr-id { gap: 18px; }
+    .pr-name { font-size: 44px; }
+    .pr-rule { width: 80px; }
+    .pr-quals { font-size: 14px; }
+    .pr-facts { margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 0; }
+    .pr-fact { padding: 18px 0; border-top: 1px solid var(--border); }
+    .pr-fact:first-child { border-top-color: var(--text); }
+    .pr-fact:last-child { border-bottom: 1px solid var(--border); }
+    .pr-fact-label { order: 1; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
+    .pr-fact-value { order: 2; }
+    .pr-fact-num { font-size: 40px; }
+    .pr-letter { grid-column: 6 / span 6; margin: 0; padding: 0; background: none; border: 0; gap: 32px; }
+    .pr-opening { text-wrap: pretty; }
+    .pr-paras { gap: 28px; padding-top: 32px; border-top: 1px solid var(--border); font-size: 20px; }
+    .pr-quote { margin: 32px 0; gap: 20px; }
+    .pr-quote-rule { width: 96px; }
+    .pr-quote-q { text-wrap: balance; }
+    .pr-quote figcaption { font-size: 17px; }
+    .pr-sign { gap: 14px; padding-top: 32px; }
+    .pr-signname { font-size: 15px; line-height: 1.5; }
+  }
+</style>

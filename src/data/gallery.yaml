@@ -1,0 +1,67 @@
+# Gallery (GalleryDesktop, GalleryMobile, GalleryAlbum; P15–P16). Album names are the current site's.
+# Years run from 2011-12 to the current academic year (computed); a year with no albums here shows the
+# empty state. Only albums listed under `albums` with photos get their own page; the rest are unlinked
+# tiles until their photos are imported (PLAN gap 3).
+main:
+  # TODO(content): the categories are a proposal for the school to confirm (GalleryDesktop board script).
+  categories: [Celebrations, Sports, Academics, Arts, Ceremonies]
+  categoryOf:
+    Endowment Lecture: Academics
+    Yoga Day: Sports
+    Investiture Ceremony: Ceremonies
+    Environment Day: Celebrations
+    Independence Day: Ceremonies
+    Grand Parents Day: Celebrations
+    Excursion: Academics
+    Inauguration of Sports Week: Sports
+    Annual Day: Celebrations
+    Republic Day: Ceremonies
+    Graduation Day: Ceremonies
+    Robotic Lab: Academics
+    Red Colour Day: Celebrations
+    Little Minds Big Impact: Academics
+    Math Art Competition: Arts
+    Wonderla: Celebrations
+    Sports Day: Sports
+    Interschool Dance: Arts
+    Farewell Party: Celebrations
+    Christmas: Celebrations
+  years:
+    - year: 2026-27
+      lead: Independence Day
+      albums: [Endowment Lecture, Yoga Day, Investiture Ceremony, Environment Day, Independence Day]
+    - year: 2025-26
+      lead: Annual Day
+      albums: [Annual Day, Environment Day, Yoga Day, Investiture Ceremony, Endowment Lecture, Grand Parents Day, Excursion, Inauguration of Sports Week, Republic Day, Graduation Day]
+    - year: 2024-25
+      lead: Sports Day
+      # The current site has more 2024-25 albums than these; shown as a Draft note in the demo.
+      more: true
+      albums: [Sports Day, Investiture Ceremony, Environment Day, Yoga Day, Robotic Lab, Red Colour Day, Little Minds Big Impact, Math Art Competition, Endowment Lecture, Republic Day, Wonderla, Interschool Dance, Independence Day, Farewell Party, Christmas]
+  # Albums whose photos are imported. Ratios follow the GalleryAlbum board until full-size originals
+  # arrive (the live copies are 768 × 510, all 3:2); alt text and captions stay placeholders until supplied.
+  albums:
+    - year: 2025-26
+      slug: annual-day
+      name: Annual Day
+      date: '[Date of the event]'
+      more: [Graduation Day, Republic Day, Inauguration of Sports Week]
+      photos:
+        - { file: ANNUAL-2025-26SC_01.jpg, ratio: 1.5 }
+        - { file: ANNUAL-2025-26SC_02.jpg, ratio: 0.667 }
+        - { file: ANNUAL-2025-26SC_03.jpg, ratio: 1.5 }
+        - { file: ANNUAL-2025-26SC_04.jpg, ratio: 1.5 }
+        - { file: ANNUAL-2025-26SC_05.jpg, ratio: 1 }
+        - { file: ANNUAL-2025-26SC_06.jpg, ratio: 1.5 }
+        - { file: ANNUAL-2025-26SC_07.jpg, ratio: 0.75 }
+        - { file: ANNUAL-2025-26SC_08.jpg, ratio: 1.5 }
+        - { file: ANNUAL-2025-26SC_09.jpg, ratio: 1.5 }
+        - { file: ANNUAL-2025-26SC_10.jpg, ratio: 0.667 }
+        - { file: ANNUAL-2025-26SC_11.jpg, ratio: 1.5 }
+        - { file: ANNUAL-2025-26SC_12.jpg, ratio: 1 }
+        - { file: ANNUAL-2025-26SC_13.jpg, ratio: 1.5 }
+        - { file: ANNUAL-2025-26SC_14.jpg, ratio: 1.5 }
+        - { file: ANNUAL-2025-26SC_15.jpg, ratio: 0.75 }
+        - { file: ANNUAL-2025-26SC_16.jpg, ratio: 1.5 }
+        - { file: ANNUAL-2025-26SC_17.jpg, ratio: 1.5 }
+        - { file: ANNUAL-2025-26SC_18.jpg, ratio: 1.5 }

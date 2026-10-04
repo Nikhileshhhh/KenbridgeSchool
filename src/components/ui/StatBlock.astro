@@ -1,0 +1,46 @@
+---
+// Content board · Stat block: serif numeral (lining, tabular) · label · source line.
+// Markup is a description list so the label is read with the number. No count-up animation.
+// Bracketed values (e.g. "[000]") await verified figures and render muted.
+interface Stat { value: string; unit?: string; label: string; detail?: string; source?: string }
+interface Props { stats: Stat[]; onDark?: boolean; columns?: 2 | 3 | 4; class?: string }
+const { stats, onDark = false, columns = 4, class: cls } = Astro.props;
+const pending = (v: string) => v.includes('[');
+---
+<dl class:list={['stats', onDark && 'stats--dark', cls]} style={`--stat-cols:${columns}`}>
+  {stats.map((s) => (
+    <div class="stat">
+      <dd class:list={['stat-value', pending(s.value) && 'is-pending']}>{s.value}{s.unit && <span class="stat-unit">{s.unit}</span>}</dd>
+      <dt class="stat-label">{s.label}</dt>
+      {s.detail && <span class="stat-detail">{s.detail}</span>}
+      {s.source && <span class="stat-source">Source: {s.source}</span>}
+    </div>
+  ))}
+</dl>
+
+<style>
+  .stats { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; }
+  @media (min-width: 1024px) { .stats { grid-template-columns: repeat(var(--stat-cols), minmax(0, 1fr)); gap: 32px; } }
+  .stat { display: flex; flex-direction: column; gap: 6px; padding-top: 12px; border-top: 1px solid var(--text); }
+  @media (min-width: 1024px) { .stat { gap: 12px; padding-top: 20px; } }
+  .stat-value {
+    order: 1;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 2.571rem + 3.81vw, 6rem);
+    font-weight: 500;
+    line-height: 0.9;
+    color: var(--brand);
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .stat-value.is-pending { color: var(--text-muted); }
+  .stat-unit { font-size: 0.42em; margin-left: 0.12em; }
+  .stat-label { order: 2; font-size: 15px; font-weight: 700; }
+  @media (min-width: 1024px) { .stat-label { font-size: 17px; } }
+  .stat-detail, .stat-source { order: 3; font-size: 14px; line-height: 1.5; color: var(--text-muted); }
+  .stat-source { order: 4; }
+  .stats--dark .stat { border-top-color: var(--rule-on-dark-strong); }
+  .stats--dark .stat-value { color: var(--accent); }
+  .stats--dark .stat-label { color: var(--text-on-dark); }
+  .stats--dark .stat-detail, .stats--dark .stat-source { color: var(--text-on-dark-muted); }
+</style>

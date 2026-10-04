@@ -1,0 +1,24 @@
+---
+// /gallery/[year] (GalleryDesktop, GalleryMobile, GalleryDesktopEmpty): one static page per academic
+// year from 2011-12 to the current year. /gallery?year=… 301s here (vercel.json).
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import YearView from '../../../components/gallery/YearView.astro';
+import { academicYearsSince } from '../../../lib/academic-year';
+
+export function getStaticPaths() {
+  return academicYearsSince(2011).map((y) => ({ params: { year: y.slug } }));
+}
+const { year } = Astro.params;
+---
+<BaseLayout
+  title={`Gallery ${year}`}
+  description={`Photo albums from the ${year} academic year at KenBridge School, Kalaburagi.`}
+  current="gallery"
+  breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Gallery', href: '/gallery' }, { label: year! }]}
+>
+  <YearView year={year!} />
+</BaseLayout>
+
+<script>
+  import '../../../scripts/gallery.js';
+</script>

@@ -1,0 +1,54 @@
+# Stage 3 · Middle School. Hub copy from LearningDesktop/LearningMobile; page copy from P09 of
+# KENBRIDGE_SCREEN_PROMPTS_FROM_LIVE_SITE.md, set in the ProgramDetail template's chapter types.
+# TODO(content): OPEN-QUESTIONS #1. The live site says both "Classes VI to VII" and "VI to VIII"; the design uses VI–VIII.
+# TODO(content): OPEN-QUESTIONS #2. The live site's "1:5" ratio is not shown until the school confirms it.
+stage: 3
+num: '03'
+name: Middle School
+range: Classes VI – VIII
+hub:
+  lead: Prepares students for the upcoming challenges of academic and personal growth.
+  classes: [VI, VII, VIII]
+  focus: []
+  next: Secondary School, from Class IX
+  cta: Explore Middle School
+  photo: Middle-school students in the Maths Lab (Math-Lab.jpg)
+  photoSm: Maths Lab (Math-Lab.jpg)
+eyebrow: Learning · Stage 3
+chip: Classes VI – VIII
+lead: As students transition from primary school to middle school, they face new challenges and opportunities.
+heroPhoto: Middle-school students in the Maths Lab (Math-Lab.jpg)
+facts: []
+chapters:
+  - type: subjects
+    title: Curriculum
+    intro: A curriculum designed to challenge and stimulate intellectual curiosity. Students are encouraged to think critically and independently.
+    items:
+      - { name: Science }
+      - { name: Mathematics }
+      - { name: Social Studies }
+      - { name: Languages }
+  # TODO(content): OPEN-QUESTIONS #9. Confirm which of these activities run for Middle School (robotics has a 2024-25 gallery album).
+  - type: activities
+    title: Beyond academics
+    intro: Sports, music, drama, debate, robotics and other creative pursuits.
+    words: [Sports, Music, Drama, Debate, Robotics]
+  - type: statement
+    title: Health and wellbeing
+    intro: Physical education is an essential component.
+    statement: Counselling services and support systems help students with the emotional and social challenges of this phase.
+    # Names and roles from the CBSE Mandatory Public Disclosure (A9).
+    facts:
+      - { label: Counsellor & Wellness Teacher, value: Mrs. Sulochana Reddy }
+      - { label: Special Educator, value: Mr. John Emrison }
+  - type: subjects
+    title: Values
+    listLabel: Values
+    items:
+      - { name: Responsibility, note: To encourage children to be responsible for themselves. }
+      - { name: Representation, note: To encourage every child to express their individuality appropriately. }
+related:
+  - { facility: science-lab }
+  - { facility: maths-lab }
+  - { facility: language-lab }
+  - { facility: indoor-sports-room }

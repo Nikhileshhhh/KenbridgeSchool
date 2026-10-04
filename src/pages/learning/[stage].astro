@@ -1,0 +1,466 @@
+---
+// /learning/[stage] · Program Detail template (ProgramDetail, ProgramDetailMobile). One template for the
+// four stages; each stage's content is set in the board's five chapter types (subjects · activities ·
+// words · statement · age). Only Primary is drawn; the other three use verified copy (see their data files).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/shell/Breadcrumbs.astro';
+import Button from '../../components/ui/Button.astro';
+import Icon from '../../components/ui/Icon.astro';
+import ArcGlyph from '../../components/ui/ArcGlyph.astro';
+import Placeholder from '../../components/ui/Placeholder.astro';
+import { getProgrammes, getFacilities, getResults, metaDescription } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const all = await getProgrammes();
+  return all.map((p, i) => ({
+    params: { stage: p.id },
+    props: { idx: i, journey: all.map((j) => ({ slug: j.id, num: j.data.num, name: j.data.name, range: j.data.range, stage: j.data.stage })) }
+  }));
+}
+
+const { idx, journey } = Astro.props;
+const all = await getProgrammes();
+const p = all[idx].data;
+const facilities = Object.fromEntries((await getFacilities()).map((f) => [f.id, f.data]));
+const pad2 = (n: number) => String(n).padStart(2, '0');
+const slug = (t: string) => t.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const chapters = p.chapters.map((c, i) => ({ ...c, id: slug(c.title), num: pad2(i + 1) }));
+
+let facts = p.facts;
+if (p.resultsFacts) {
+  // Class X results rail (P10), read from the shared results data.
+  const r = await getResults();
+  const top = r.achievers.list.reduce((m, a) => (parseFloat(a.score) > parseFloat(m) ? a.score : m), '0');
+  facts = [
+    ...[...r.classX].sort((a, b) => b.year - a.year).map((y) => ({ label: `Class X ${y.year}`, value: `${y.passPct}% (${y.passed}/${y.registered})` })),
+    { label: `${r.achievers.year} top score`, value: `${top}%` }
+  ];
+}
+const related = p.related.map((r) => {
+  const f = facilities[r.facility];
+  if (!f) throw new Error(`Unknown facility "${r.facility}" in programme ${all[idx].id}`);
+  const photo = r.photo ?? f.homePhoto;
+  return { href: `/campus/${r.facility}`, name: f.name, photo, photoSm: r.photoSm ?? photo };
+});
+const prev = idx > 0 ? journey[idx - 1] : null;
+const next = idx < journey.length - 1 ? journey[idx + 1] : null;
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'Our School', href: '/learning' }, { label: p.name }];
+const vars = `--mark:var(--stage${p.stage}-mark);--tx:var(--stage${p.stage}-text);--tint:var(--stage${p.stage}-tint)`;
+---
+<BaseLayout
+  title={p.name}
+  description={metaDescription(`${p.name} (${p.range}) at KenBridge School, Kalaburagi: ${p.lead}`)}
+  current="learning"
+  breadcrumbs={crumbs}
+>
+  <div class="pd" style={vars}>
+    <div class="container pd-crumbs"><Breadcrumbs items={crumbs} /></div>
+
+    <section class="container pd-hero" aria-labelledby="pdH1">
+      <div class="pd-hero-copy">
+        <p class="pd-eyebrow"><ArcGlyph stage={p.stage} width={40} class="pd-glyph" />{p.eyebrow}</p>
+        <h1 id="pdH1" class="pd-h1">{p.name}</h1>
+        <p class="pd-chip tnum">{p.chip}</p>
+        <p class="pd-lead">{p.lead}</p>
+      </div>
+      <div class="pd-frame">
+        <Placeholder label={`[Photo · ${p.heroPhoto}]`} ratio="4 / 5" alt={`Placeholder for a photograph: ${p.heroPhoto}`} class="pd-hero-ph" />
+      </div>
+    </section>
+
+    {facts.length > 0 && (
+      <div class="container">
+        <dl class="pd-facts" aria-label={p.resultsFacts ? 'Class X results' : 'Quick facts'}>
+          {facts.map((f) => <div class="pd-fact"><dt>{f.label}</dt><dd class="tnum">{f.value}</dd></div>)}
+        </dl>
+        {p.resultsFacts && <a class="pd-link pd-facts-link" href="/achievements">View all results<Icon name="arrow" size={16} /></a>}
+      </div>
+    )}
+
+    <nav class="container pd-strip only-lg" aria-label="The four programmes">
+      <ol class="pd-strip-list" role="list">
+        {journey.map((j) => {
+          const cur = j.slug === all[idx].id;
+          return (
+            <li>
+              <a class:list={['pd-strip-link', cur && 'is-current']} href={`/learning/${j.slug}`} aria-current={cur ? 'page' : undefined} style={`--smark:var(--stage${j.stage}-mark);--stx:var(--stage${j.stage}-text)`}>
+                <span class="pd-strip-num tnum">{j.num}{cur && ' · You are here'}</span>
+                <span class="pd-strip-name">{j.name}</span>
+                <span class="pd-strip-range tnum">{j.range}</span>
+              </a>
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+
+    <nav class="pd-mstrip only-sm" aria-label="The four programmes">
+      <p class="pd-mstrip-label tnum">Stage <span class="pd-tx">{p.num}</span> of 04</p>
+      <ol class="pd-mstrip-list" role="list">
+        {journey.map((j) => {
+          const cur = j.slug === all[idx].id;
+          return (
+            <li><a class:list={['pd-mstrip-link', 'tnum', cur && 'is-current']} href={`/learning/${j.slug}`} aria-current={cur ? 'page' : undefined}><span class="vh">{j.name}, </span>{j.num}</a></li>
+          );
+        })}
+      </ol>
+    </nav>
+
+    <nav class="pd-mtoc only-sm" aria-label="On this page">
+      <details class="pd-mtoc-d">
+        <summary class="pd-mtoc-btn">On this page<Icon name="chevron-down" size={16} class="pd-chev" /></summary>
+        <ol class="pd-mtoc-list" role="list">
+          {chapters.map((c) => <li><a href={`#${c.id}`}><span class="pd-toc-num tnum">{c.num}</span>{c.title}</a></li>)}
+        </ol>
+      </details>
+    </nav>
+
+    <div class="container pd-body">
+      <nav class="pd-toc only-lg" aria-label="On this page">
+        <p class="pd-toc-title">On this page</p>
+        <ol class="pd-toc-list" role="list">
+          {chapters.map((c) => <li><a href={`#${c.id}`} class="pd-toc-link"><span class="pd-toc-num tnum">{c.num}</span><span class="pd-toc-label">{c.title}</span></a></li>)}
+        </ol>
+      </nav>
+
+      <div class="pd-chapters">
+        {chapters.map((c) => (
+          <section id={c.id} class="pd-ch" aria-labelledby={`${c.id}-h`}>
+            <div class="pd-ch-head">
+              <span class="pd-ch-num tnum">{c.num}</span>
+              <h2 id={`${c.id}-h`} class="pd-h2">{c.title}</h2>
+            </div>
+            {c.intro && <p class="pd-intro">{c.intro}</p>}
+
+            {c.type === 'subjects' && (
+              <>
+                <ul class="pd-subjects" aria-label={c.listLabel ?? 'Subjects'} role="list">
+                  {c.items.map((it, k) => (
+                    <li class="pd-subject">
+                      <span class="pd-subject-n tnum" aria-hidden="true">{pad2(k + 1)}</span>
+                      <span class="pd-subject-text"><span class="pd-subject-name">{it.name}</span>{it.note && <span class="pd-subject-note">{it.note}</span>}</span>
+                    </li>
+                  ))}
+                </ul>
+                {c.callout && (
+                  <aside class="pd-callout" aria-label={c.calloutKicker}>
+                    <span class="pd-callout-k">{c.calloutKicker}</span>
+                    <p class="pd-callout-p">{c.callout}</p>
+                  </aside>
+                )}
+              </>
+            )}
+
+            {c.type === 'activities' && (
+              <ul class="pd-acts" aria-label={c.listLabel ?? 'Activities'} role="list">
+                {c.words.map((w, k) => <li>{w}{k < c.words.length - 1 && <span class="pd-dot" aria-hidden="true">·</span>}</li>)}
+              </ul>
+            )}
+
+            {c.type === 'words' && (
+              <>
+                <ul class="pd-words" aria-label={c.title} role="list">
+                  {c.words.map((w, k) => (
+                    <li class:list={['pd-word', k % 2 === 0 && 'is-red-lg', (k === 0 || k === 3) && 'is-red-sm', k % 2 === 1 && 'is-right-sm', k >= 2 && 'is-last-row-sm', w.length > 10 && 'is-long']}>{w}</li>
+                  ))}
+                </ul>
+                {c.after && <p class="pd-after">{c.after}</p>}
+              </>
+            )}
+
+            {c.type === 'statement' && <p class="pd-statement">{c.statement}</p>}
+
+            {c.type === 'age' && (
+              <div class:list={['pd-age', c.ages.length > 1 && 'pd-age--many']}>
+                <dl class:list={['pd-age-dl', 'tnum', c.ages.length > 1 && 'pd-age-dl--many']}>
+                  {c.ages.map((g) => <div class="pd-age-item"><dt>{g.label}</dt><dd><span class="pd-age-num">{g.years}</span><span class="pd-age-unit">years</span></dd></div>)}
+                </dl>
+                <div class="pd-age-side">
+                  <p class="pd-age-note">{c.ageNote}</p>
+                  {p.admissionCta && <Button href="/admissions#procedure" arrow class="pd-age-cta">{p.admissionCta}</Button>}
+                </div>
+              </div>
+            )}
+
+            {c.facts.length > 0 && (
+              <dl class="pd-ch-facts">
+                {c.facts.map((f) => <div><dt>{f.label}</dt><dd>{f.value}</dd></div>)}
+              </dl>
+            )}
+          </section>
+        ))}
+      </div>
+    </div>
+
+    {related.length > 0 && (
+      <section class="pd-related" aria-labelledby="pdRelated">
+        <div class="container">
+          <div class="pd-related-head">
+            <h2 id="pdRelated" class="pd-related-h2">Related facilities</h2>
+            <a class="pd-link only-lg" href="/campus">All facilities<Icon name="arrow" size={16} /></a>
+          </div>
+          <ul class="pd-fac-list" role="list">
+            {related.map((r) => (
+              <li>
+                <a class="pd-fac" href={r.href}>
+                  <span class="only-lg"><Placeholder label={`[Photo · ${r.photo}]`} ratio="3 / 2" alt={`Placeholder for a photograph: ${r.photo}`} class="pd-fac-ph" /></span>
+                  <span class="only-sm"><Placeholder label={`[Photo · ${r.photoSm}]`} ratio="1 / 1" alt={`Placeholder for a photograph: ${r.photoSm}`} class="pd-fac-ph pd-fac-ph--sm" /></span>
+                  <span class="pd-fac-row"><span class="pd-fac-name">{r.name}</span><Icon name="arrow" size={20} class="pd-fac-arrow" /></span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <a class="pd-link pd-related-all only-sm" href="/campus">All facilities<Icon name="arrow" size={16} /></a>
+        </div>
+      </section>
+    )}
+
+    <nav class="pd-pager" aria-label="Previous and next programme">
+      {prev && (
+        <a class="pd-pager-link pd-pager-prev" href={`/learning/${prev.slug}`} rel="prev">
+          <Icon name="arrow-left" size={28} class="pd-pager-arrow" />
+          <span class="pd-pager-k">Previous stage<span class="only-lg"> · <span class="tnum">{prev.range}</span></span></span>
+          <span class="pd-pager-name">{prev.name}</span>
+        </a>
+      )}
+      {next && (
+        <a class="pd-pager-link pd-pager-next" href={`/learning/${next.slug}`} rel="next">
+          <span class="pd-pager-k">Next stage<span class="only-lg"> · <span class="tnum">{next.range}</span></span></span>
+          <span class="pd-pager-name">{next.name}</span>
+          <Icon name="arrow" size={28} class="pd-pager-arrow" />
+        </a>
+      )}
+    </nav>
+  </div>
+</BaseLayout>
+
+<style>
+  .pd-crumbs { padding-top: 12px; }
+  .pd-tx { color: var(--tx); }
+  .pd-link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 16px; font-weight: 600; color: var(--brand); text-decoration: underline; text-decoration-color: var(--link-underline); text-underline-offset: 5px; }
+  .pd-link:hover { text-decoration-thickness: 2px; text-decoration-color: currentColor; }
+
+  /* ---------- hero ---------- */
+  .pd-hero { padding-top: 28px; display: flex; flex-direction: column; gap: 20px; }
+  .pd-hero-copy { display: flex; flex-direction: column; gap: 20px; }
+  .pd-eyebrow { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tx); }
+  .pd-eyebrow :global(.pd-glyph) { width: 36px; height: 14px; }
+  .pd-h1 { font-family: var(--font-display); font-size: clamp(4.75rem, 3.371rem + 5.657vw, 8.5rem); font-weight: 500; line-height: 0.92; letter-spacing: -0.015em; overflow-wrap: anywhere; }
+  .pd-chip { align-self: flex-start; display: inline-flex; align-items: center; height: 40px; padding: 0 14px; border: 1px solid var(--tx); border-radius: var(--radius-sm); background: var(--tint); font-size: 15px; font-weight: 700; color: var(--tx); }
+  .pd-lead { margin-top: 4px; font-family: var(--font-display); font-size: clamp(1.5625rem, 1.383rem + 0.733vw, 2rem); font-weight: 500; line-height: 1.3; }
+  .pd-frame { margin-top: 8px; padding: 10px; background: var(--tint); }
+  .pd-frame :global(.pd-hero-ph) { aspect-ratio: 4 / 3 !important; padding: 12px; font-size: 12px; }
+
+  .pd-facts { margin: 32px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--text); }
+  .pd-fact { display: flex; flex-direction: column; gap: 4px; padding: 16px 12px 16px 0; border-bottom: 1px solid var(--border); }
+  .pd-fact dt { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .pd-fact dd { margin: 0; font-family: var(--font-display); font-size: 22px; font-weight: 500; line-height: 1.2; }
+  .pd-facts-link { margin-top: 8px; }
+
+  /* ---------- stage strip (phones) ---------- */
+  .pd-mstrip { margin: 40px var(--margin) 0; padding: 16px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .pd-mstrip-label { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .pd-mstrip-list { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; }
+  .pd-mstrip-link { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-weight: 700; color: var(--text-muted); text-decoration: none; }
+  .pd-mstrip-link:hover { border-color: var(--border-strong); color: var(--text); }
+  .pd-mstrip-link.is-current { background: var(--tint); border: 1.5px solid var(--tx); color: var(--tx); }
+
+  /* ---------- on this page (phones) ---------- */
+  .pd-mtoc { margin: 0 var(--margin); border-bottom: 1px solid var(--border); }
+  .pd-mtoc-btn { min-height: 56px; display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: 700; cursor: pointer; list-style: none; }
+  .pd-mtoc-btn::-webkit-details-marker { display: none; }
+  .pd-mtoc-d[open] :global(.pd-chev) { transform: rotate(180deg); }
+  .pd-mtoc-list { list-style: none; margin: 0 0 12px; padding: 0; }
+  .pd-mtoc-list a { display: flex; align-items: center; gap: 14px; min-height: 44px; color: var(--text); text-decoration: none; font-size: 16px; font-weight: 600; }
+  .pd-mtoc-list a:hover { color: var(--brand); }
+  .pd-toc-num { font-size: 12px; color: var(--tx); }
+
+  /* ---------- chapters ---------- */
+  .pd-body { padding-inline: 0; }
+  .pd-ch { padding: 56px var(--margin); border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 22px; }
+  .pd-ch-head { display: flex; flex-direction: column; gap: 8px; }
+  .pd-ch-num { font-family: var(--font-display); font-size: 24px; font-weight: 500; line-height: 1.2; color: var(--tx); }
+  .pd-h2 { font-family: var(--font-display); font-size: clamp(2.5rem, 2.071rem + 1.714vw, 3.5rem); font-weight: 500; line-height: 1.05; }
+  .pd-intro { font-size: 17px; line-height: 1.7; }
+
+  .pd-subjects { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--text); }
+  .pd-subject { display: grid; grid-template-columns: 32px 1fr; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .pd-subject-n { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+  .pd-subject-text { display: flex; flex-direction: column; gap: 2px; }
+  .pd-subject-name { font-family: var(--font-display); font-size: 26px; font-weight: 500; line-height: 1.1; }
+  .pd-subject-note { font-size: 14px; line-height: 1.5; color: var(--text-muted); }
+  .pd-callout { display: flex; flex-direction: column; gap: 8px; padding: 20px 20px 22px; background: var(--tint); box-shadow: inset 4px 0 0 var(--mark); }
+  .pd-callout-k { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tx); }
+  .pd-callout-p { font-family: var(--font-display); font-size: 24px; font-weight: 500; line-height: 1.3; }
+
+  .pd-acts { list-style: none; margin: 0; padding: 18px 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 0; border-top: 1px solid var(--text); border-bottom: 1px solid var(--border); }
+  .pd-acts li { display: inline-flex; align-items: baseline; font-family: var(--font-display); font-size: 34px; font-weight: 500; line-height: 1.2; }
+  .pd-dot { margin: 0 12px; color: var(--accent); }
+
+  .pd-words { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--text); }
+  .pd-word { padding: 22px 0; border-bottom: 1px solid var(--border); font-family: var(--font-display); font-size: 36px; font-style: italic; font-weight: 500; line-height: 1; color: var(--text); }
+  .pd-word.is-long { font-size: 30px; }
+  .pd-word.is-red-sm { color: var(--brand); }
+  .pd-word.is-right-sm { padding-left: 16px; border-left: 1px solid var(--border); }
+  .pd-word.is-last-row-sm { border-bottom-color: var(--text); }
+  .pd-after { font-size: 17px; line-height: 1.7; }
+
+  .pd-statement { padding-left: 20px; border-left: 2px solid var(--accent); font-family: var(--font-display); font-size: 28px; font-weight: 500; line-height: 1.3; }
+
+  .pd-age { display: flex; flex-direction: column; gap: 22px; }
+  .pd-age-dl { margin: 0; display: flex; gap: 32px; padding: 24px 0; border-top: 1px solid var(--text); border-bottom: 1px solid var(--border); }
+  .pd-age-item { display: flex; flex-direction: column; gap: 6px; }
+  .pd-age-item dt { order: 2; font-size: 15px; font-weight: 700; }
+  .pd-age-item dd { order: 1; margin: 0; display: flex; align-items: baseline; gap: 8px; }
+  .pd-age-num { font-family: var(--font-display); font-size: 112px; font-weight: 500; line-height: 0.8; color: var(--brand); }
+  .pd-age-unit { font-size: 16px; color: var(--text-muted); }
+  /* The board draws one age (Grade 1); Pre-Primary has three, so phones set them smaller to fit one row. */
+  .pd-age-dl--many { flex-wrap: wrap; gap: 16px 24px; }
+  .pd-age-dl--many .pd-age-num { font-size: 80px; }
+  .pd-age-side { display: flex; flex-direction: column; gap: 22px; }
+  .pd-age-note { font-size: 16px; line-height: 1.6; color: var(--text-muted); }
+  .pd-age-side :global(.pd-age-cta) { justify-content: space-between; height: auto; min-height: 56px; padding: 0 18px 0 20px; white-space: normal; text-align: left; }
+
+  .pd-ch-facts { margin: 0; display: flex; flex-direction: column; gap: 16px; }
+  .pd-ch-facts div { display: flex; flex-direction: column; gap: 4px; }
+  .pd-ch-facts dt { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .pd-ch-facts dd { margin: 0; font-size: 17px; line-height: 1.5; }
+
+  /* ---------- related facilities ---------- */
+  .pd-related { padding: 56px 0 64px; background: var(--surface-raised); border-bottom: 1px solid var(--border); }
+  .pd-related-head { padding-bottom: 20px; border-bottom: 1px solid var(--text); }
+  .pd-related-h2 { font-family: var(--font-display); font-size: clamp(2.5rem, 2.071rem + 1.714vw, 3.5rem); font-weight: 500; line-height: 1.05; }
+  .pd-fac-list { list-style: none; margin: 24px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 14px; }
+  .pd-fac { display: flex; flex-direction: column; gap: 10px; color: var(--text); text-decoration: none; }
+  .pd-fac:hover { color: var(--text); }
+  .pd-fac:hover .pd-fac-name { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 1px; }
+  .pd-fac > span:not(.pd-fac-row) { display: block; }
+  .pd-fac :global(.pd-fac-ph--sm) { padding: 8px; font-size: 11px; line-height: 1.3; }
+  .pd-fac-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; min-height: 44px; }
+  .pd-fac-name { font-family: var(--font-display); font-size: 23px; font-weight: 500; line-height: 1.1; }
+  .pd-fac :global(.pd-fac-arrow) { flex-shrink: 0; margin-top: 4px; color: var(--brand); width: 18px; height: 18px; }
+  .pd-related-all { margin-top: 20px; }
+
+  /* ---------- pager ---------- */
+  .pd-pager { display: flex; flex-direction: column; }
+  .pd-body + .pd-pager { border-top: 1px solid var(--border); }
+  /* One markup, two arrangements: phones put the arrow beside the text; desktop sets the kicker above. */
+  .pd-pager-link { display: grid; align-content: center; column-gap: 16px; row-gap: 4px; min-height: 104px; padding: 0 var(--margin); border-bottom: 1px solid var(--border); color: var(--text); text-decoration: none; }
+  .pd-pager-prev { grid-template-columns: auto 1fr; grid-template-areas: 'arrow k' 'arrow name'; }
+  .pd-pager-next { grid-template-columns: 1fr auto; grid-template-areas: 'k arrow' 'name arrow'; }
+  .pd-pager-link:hover { color: var(--text); }
+  .pd-pager-link:hover .pd-pager-name { text-decoration: underline; text-underline-offset: 8px; text-decoration-thickness: 1px; }
+  .pd-pager-k { grid-area: k; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .pd-pager-name { grid-area: name; font-family: var(--font-display); font-size: 32px; font-weight: 500; line-height: 1; }
+  .pd-pager :global(.pd-pager-arrow) { grid-area: arrow; align-self: center; width: 22px; height: 22px; color: var(--brand); }
+
+  @media (min-width: 1024px) and (max-width: 1279px) {
+    .pd-age.pd-age--many { grid-template-columns: 1fr; gap: 32px; }
+  }
+
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .pd-subjects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
+  }
+
+  @media (min-width: 1024px) {
+    .pd-crumbs { padding-top: 32px; }
+    .pd-hero { padding-top: 48px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; }
+    .pd-hero-copy { grid-column: 1 / span 6; gap: 28px; padding-top: 24px; }
+    .pd-eyebrow { gap: 12px; font-size: 13px; }
+    .pd-eyebrow :global(.pd-glyph) { width: 40px; height: 16px; }
+    .pd-h1 { letter-spacing: -0.02em; }
+    .pd-chip { height: 44px; padding: 0 16px; font-size: 16px; }
+    .pd-lead { margin-top: 8px; max-width: 600px; }
+    .pd-frame { grid-column: 8 / span 5; margin: 0; padding: 16px; align-self: start; }
+    .pd-frame :global(.pd-hero-ph) { aspect-ratio: 4 / 5 !important; padding: 16px; font-size: 13px; }
+
+    .pd-facts { margin-top: 64px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .pd-fact { gap: 6px; padding: 24px 24px 24px 0; border-bottom: 0; }
+    .pd-fact dt { font-size: 13px; }
+    .pd-fact dd { font-size: 28px; }
+
+    .pd-strip { margin-top: 80px; }
+    .pd-strip-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--border); }
+    .pd-strip-link { display: flex; flex-direction: column; gap: 6px; min-height: 120px; padding: 22px 24px 22px 0; color: var(--text); text-decoration: none; }
+    .pd-strip-link:hover { color: var(--text); }
+    .pd-strip-link:hover .pd-strip-name { text-decoration: underline; text-underline-offset: 6px; }
+    .pd-strip-link.is-current { box-shadow: inset 0 4px 0 var(--smark); }
+    .pd-strip-num { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; color: var(--stx); }
+    .pd-strip-name { font-family: var(--font-display); font-size: 26px; font-weight: 500; line-height: 1.1; color: var(--text-muted); }
+    .is-current .pd-strip-name { font-weight: 600; color: var(--text); }
+    .pd-strip-range { font-size: 13px; color: var(--text-muted); }
+
+    .pd-body { padding: 120px var(--margin) 136px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; }
+    .pd-toc { grid-column: 1 / span 3; align-self: start; position: sticky; top: 112px; display: flex; flex-direction: column; gap: 4px; }
+    .pd-toc-title { margin-bottom: 12px; font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+    .pd-toc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-left: 1px solid var(--border); }
+    .pd-toc-link { display: flex; align-items: center; gap: 14px; min-height: 44px; padding: 6px 0 6px 18px; color: var(--text); text-decoration: none; font-size: 16px; font-weight: 600; }
+    .pd-toc-link:hover { color: var(--brand); }
+    .pd-toc-link:hover .pd-toc-label { text-decoration: underline; text-underline-offset: 5px; }
+    .pd-chapters { grid-column: 5 / span 8; display: flex; flex-direction: column; }
+    .pd-ch { gap: 32px; padding: 88px 0; border-top: 1px solid var(--border); border-bottom: 0; }
+    .pd-ch:first-child { padding-top: 0; border-top: 0; }
+    .pd-ch:last-child { padding-bottom: 0; }
+    .pd-ch-head { gap: 14px; }
+    .pd-ch-num { font-size: 28px; }
+    .pd-h2 { line-height: 1.02; }
+    .pd-intro { max-width: 720px; font-size: 19px; line-height: 1.75; }
+
+    .pd-subjects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
+    .pd-subject { grid-template-columns: 40px 1fr; padding: 20px 0; }
+    .pd-subject-n { font-size: 12px; }
+    .pd-subject-text { gap: 4px; }
+    .pd-subject-name { font-size: 32px; }
+    .pd-subject-note { font-size: 15px; }
+    .pd-callout { display: grid; grid-template-columns: 180px 1fr; gap: 24px; align-items: center; padding: 28px 32px; }
+    .pd-callout-k { font-size: 13px; }
+    .pd-callout-p { font-size: 28px; }
+
+    .pd-acts { padding: 28px 0; gap: 8px 0; }
+    .pd-acts li { font-size: 44px; line-height: 1.15; }
+    .pd-dot { margin: 0 22px; }
+
+    .pd-words { display: flex; flex-wrap: wrap; justify-content: space-between; column-gap: 32px; border-bottom: 1px solid var(--text); }
+    .pd-word, .pd-word.is-long { padding: 36px 0; border: 0; font-size: 48px; color: var(--text); }
+    .pd-word.is-right-sm { padding-left: 0; border: 0; }
+    .pd-word.is-red-sm { color: var(--text); }
+    .pd-word.is-red-lg { color: var(--brand); }
+    .pd-after { font-size: 19px; line-height: 1.75; }
+
+    .pd-statement { max-width: 760px; padding-left: 32px; font-size: 40px; line-height: 1.25; }
+
+    .pd-age { display: grid; grid-template-columns: auto 1fr; gap: 56px; align-items: center; padding: 40px 0; border-top: 1px solid var(--text); border-bottom: 1px solid var(--border); }
+    .pd-age-dl { gap: 48px; padding: 0; border: 0; }
+    .pd-age-item { gap: 8px; }
+    .pd-age-item dt { font-size: 16px; }
+    .pd-age-item dd { gap: 10px; }
+    .pd-age-num, .pd-age-dl--many .pd-age-num { font-size: 144px; }
+    .pd-age-dl--many { flex-wrap: nowrap; gap: 48px; }
+    .pd-age-unit { font-size: 17px; }
+    .pd-age-side { gap: 20px; align-items: flex-start; }
+    .pd-age-note { font-size: 18px; line-height: 1.65; color: var(--text); }
+    .pd-age-side :global(.pd-age-cta) { min-height: 0; height: 52px; padding: 0 22px 0 24px; white-space: nowrap; }
+
+    .pd-ch-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 32px; }
+    .pd-ch-facts div { gap: 8px; }
+    .pd-ch-facts dt { font-size: 13px; }
+    .pd-ch-facts dd { font-size: 18px; line-height: 1.55; }
+
+    .pd-related { padding: 112px 0 120px; border-top: 1px solid var(--border); }
+    .pd-related-head { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 32px; }
+    .pd-related-h2 { line-height: 1; }
+    .pd-fac-list { margin-top: 40px; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 32px; }
+    .pd-fac { gap: 18px; }
+    .pd-fac-row { align-items: center; gap: 16px; min-height: 0; }
+    .pd-fac-name { font-size: 30px; }
+    .pd-fac :global(.pd-fac-arrow) { margin-top: 0; width: 20px; height: 20px; }
+
+    .pd-pager { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-bottom: 1px solid var(--border); }
+    .pd-pager-link { column-gap: 24px; row-gap: 14px; min-height: 0; padding: 72px var(--margin); border-bottom: 0; }
+    .pd-pager-prev { grid-template-columns: auto 1fr; grid-template-areas: 'k k' 'arrow name'; border-right: 1px solid var(--border); }
+    .pd-pager-next { grid-column: 2; grid-template-columns: 1fr auto; grid-template-areas: 'k k' 'name arrow'; text-align: right; }
+    .pd-pager-k { font-size: 13px; }
+    .pd-pager-name { font-size: 48px; }
+    .pd-pager :global(.pd-pager-arrow) { width: 28px; height: 28px; }
+  }
+</style>

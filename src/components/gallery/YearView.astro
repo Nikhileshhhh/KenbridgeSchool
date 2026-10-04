@@ -1,0 +1,236 @@
+---
+// Gallery year view (GalleryDesktop, GalleryMobile, GalleryDesktopEmpty). Desktop: a sticky year rail;
+// phones: scrollable year chips with arrow buttons. Albums use the board's editorial grid (lead album
+// first and big). Filter chips (JS) narrow by type with a live count; without JS every album shows.
+// Each year is a real page, /gallery/2025-26; /gallery?year=2025-26 301s there (vercel.json).
+import Breadcrumbs from '../shell/Breadcrumbs.astro';
+import Icon from '../ui/Icon.astro';
+import { getMain, getSettings } from '../../lib/site';
+import { academicYearsSince } from '../../lib/academic-year';
+import { tileVars, tileSizes } from '../../lib/gallery-layout.js';
+
+interface Props { year: string; latest?: boolean }
+const { year } = Astro.props;
+const G = await getMain('gallery');
+const { facilityDrafts: drafts } = await getSettings();
+const years = academicYearsSince(2011);
+const latest = years[0].slug;
+const data = G.years.find((y) => y.year === year);
+const pages = new Map(G.albums.map((a) => [`${a.year}/${a.name}`, a]));
+const albums = (data?.albums ?? [])
+  .map((name) => {
+    const page = pages.get(`${year}/${name}`);
+    return { name, cat: G.categoryOf[name] ?? 'Celebrations', lead: name === data?.lead, href: page ? `/gallery/${year}/${page.slug}` : undefined, count: page ? `${page.photos.length} photos` : '[n] photos' };
+  })
+  .sort((a, b) => Number(b.lead) - Number(a.lead));
+const countOf = (y: string) => { const d = G.years.find((x) => x.year === y); return d ? `${d.albums.length}${d.more ? '+' : ''}` : ''; };
+const more = !!data?.more;
+const countLabel = albums.length ? `${albums.length} album${albums.length === 1 ? '' : 's'}${more ? ' shown' : ''}` : 'No albums yet';
+const words = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen', 'Twenty'];
+const span = years[0].start - 2011;
+const lead = `${words[span] ?? span} years of KenBridge moments, from 2011-12 to today.`;
+const tones = ['--ph-1', '--ph-2', '--ph-3', '--ph-4'];
+const crumbs = [{ label: 'Home', href: '/' }, { label: 'Gallery' }];
+---
+<section class="gl-hero" aria-labelledby="galH1">
+  <div class="container gl-hero-grid">
+    <div class="gl-crumbs"><Breadcrumbs items={crumbs} collapse /></div>
+    <h1 id="galH1" class="gl-h1">Gallery</h1>
+    <div class="gl-hero-text">
+      <p class="gl-lead">{lead}</p>
+      <p class="gl-meta tnum only-lg">{years.length} academic years · albums grouped by the year they happened</p>
+    </div>
+  </div>
+</section>
+
+<nav class="gl-chiprail only-sm" aria-label="Academic year">
+  <p class="gl-rail-k gl-chiprail-k">Academic year</p>
+  <div class="gl-chiprail-row">
+    <button type="button" class="gl-arrow js-only" aria-label="Show more recent years" data-years-scroll="-1"><Icon name="chevron-right" size={16} class="gl-flip" /></button>
+    <ol class="gl-chips-years" role="list" data-years-rail>
+      {years.map((y) => (
+        <li><a class:list={['gl-ychip', y.slug === year && 'is-current']} href={`/gallery/${y.slug}`} aria-current={y.slug === year ? 'page' : undefined}><span class="gl-ychip-y tnum">{y.slug}</span>{countOf(y.slug) && <span class="gl-count tnum">{countOf(y.slug)}</span>}</a></li>
+      ))}
+    </ol>
+    <button type="button" class="gl-arrow js-only" aria-label="Show earlier years" data-years-scroll="1"><Icon name="chevron-right" size={16} /></button>
+  </div>
+</nav>
+
+<div class="container gl-body">
+  <nav class="gl-rail only-lg" aria-label="Academic year">
+    <p class="gl-rail-k">Academic year</p>
+    <ol class="gl-rail-list" role="list">
+      {years.map((y) => (
+        <li><a class:list={['gl-rail-link', y.slug === year && 'is-current']} href={`/gallery/${y.slug}`} aria-current={y.slug === year ? 'page' : undefined}><span class="gl-rail-y tnum">{y.slug}</span>{countOf(y.slug) && <span class="gl-count tnum">{countOf(y.slug)}</span>}</a></li>
+      ))}
+    </ol>
+  </nav>
+
+  <section class="gl-year" aria-labelledby="yearTitle" data-gallery>
+    <div class="gl-year-head">
+      <div class="gl-year-t">
+        <h2 id="yearTitle" class="gl-year-h tnum">{year}</h2>
+        <p class="gl-year-count tnum" aria-live="polite" data-count data-total={albums.length} data-more={more ? 'true' : undefined}>{countLabel}</p>
+      </div>
+      <p class="gl-path only-lg">/gallery/{year}</p>
+    </div>
+
+    {albums.length > 0 && (
+      <div class="gl-filters js-only" role="group" aria-label="Filter albums by type">
+        {['All', ...G.categories].map((c) => (
+          <button type="button" class="gl-filter" aria-pressed={c === 'All' ? 'true' : 'false'} data-filter={c}><Icon name="check" size={14} class="gl-tick" />{c}</button>
+        ))}
+      </div>
+    )}
+
+    {albums.length > 0 && (
+      <ul class="gl-albums" aria-label={`Albums, ${year}`} role="list" data-albums>
+        {albums.map((a, i) => {
+          const s = tileSizes(i, albums.length);
+          const inner = (
+            <>
+              <span class="gl-cover" style={`background:var(${tones[i % 4]})`}>
+                <span class="gl-cover-img" role="img" aria-label={`Cover photo placeholder: ${a.name}`}>[Cover · {a.name}]</span>
+                {a.lead && i === 0 && <span class="gl-featured">Featured</span>}
+              </span>
+              <span class="gl-tile-text"><span class="gl-tile-name">{a.name}</span><span class="gl-tile-meta tnum">{year} · {a.count}</span></span>
+            </>
+          );
+          return (
+            <li class="gl-item" style={`${tileVars(i, albums.length)};--ds:${s.ds}px;--ms:${s.ms}px`} data-cat={a.cat} data-lead={a.lead ? 'true' : undefined}>
+              {a.href ? <a class="gl-tile gl-tile--link" href={a.href}>{inner}</a> : <div class="gl-tile">{inner}</div>}
+            </li>
+          );
+        })}
+      </ul>
+    )}
+
+    <div class="gl-empty" role="status" data-filter-empty hidden>
+      <svg class="gl-empty-icon" aria-hidden="true" viewBox="0 0 56 44" fill="none" stroke="#857A71" stroke-width="1.5" stroke-linejoin="round"><rect x="1" y="7" width="46" height="36" /><path d="M9 1H55V35" /><path d="M1 35L15 22L25 31L33 24L47 36" /><circle cx="34" cy="16" r="3.5" /></svg>
+      <p class="gl-empty-t" data-filter-empty-title>No albums of this type in {year}</p>
+      <p class="gl-empty-p">Try another type, or show every album from this year.</p>
+      <button type="button" class="gl-btn" data-filter-clear>Show all {year} albums</button>
+    </div>
+
+    {more && drafts && <p class="gl-draft"><strong>Draft:</strong> {year} has more albums on the current site. Import the rest before launch.</p>}
+
+    {albums.length === 0 && (
+      <>
+        <div class="gl-empty" role="status">
+          <svg class="gl-empty-icon" aria-hidden="true" viewBox="0 0 56 44" fill="none" stroke="#857A71" stroke-width="1.5" stroke-linejoin="round"><rect x="1" y="7" width="46" height="36" /><path d="M9 1H55V35" /><path d="M1 35L15 22L25 31L33 24L47 36" /><circle cx="34" cy="16" r="3.5" /></svg>
+          <p class="gl-empty-t">No albums for this year yet</p>
+          <p class="gl-empty-p">Photos from {year} will appear here once they are added.</p>
+          <a class="gl-link tnum" href={`/gallery/${latest}`}>See the latest albums, {latest}</a>
+        </div>
+        {drafts && <p class="gl-draft"><strong>Draft:</strong> the current site has albums for {year}. Import them before launch<span class="only-lg">; this empty state is only for a year that truly has none</span>.</p>}
+      </>
+    )}
+  </section>
+</div>
+
+<style>
+  .gl-hero { padding: 12px 0 40px; border-bottom: 1px solid var(--border); }
+  .gl-hero-grid { display: flex; flex-direction: column; gap: 14px; }
+  .gl-h1 { font-family: var(--font-display); font-size: clamp(5rem, 3.257rem + 6.857vw, 9.5rem); font-weight: 500; line-height: 0.9; letter-spacing: -0.015em; }
+  .gl-lead { font-family: var(--font-display); font-size: clamp(1.625rem, 1.386rem + 0.952vw, 2.25rem); font-weight: 500; line-height: 1.25; }
+  .gl-meta { font-size: 15px; color: var(--text-muted); }
+
+  /* phone year chips */
+  .gl-chiprail { padding-top: 20px; border-bottom: 1px solid var(--border); }
+  .gl-rail-k { margin-bottom: 12px; font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .gl-chiprail-k { margin: 0 var(--margin) 10px; font-size: 12px; }
+  .gl-chiprail-row { display: grid; grid-template-columns: 48px 1fr 48px; align-items: center; }
+  :global(html:not(.js)) .gl-chiprail-row { grid-template-columns: 1fr; }
+  .gl-arrow { width: 44px; height: 44px; margin-left: 4px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-strong); border-radius: 50%; background: var(--bg); color: var(--text); }
+  .gl-arrow:last-child { margin-left: 0; }
+  .gl-chiprail :global(.gl-flip) { transform: rotate(180deg); }
+  .gl-chips-years { list-style: none; margin: 0; padding: 4px 8px 20px; display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%); }
+  .gl-chips-years::-webkit-scrollbar { display: none; }
+  .gl-chips-years li { flex-shrink: 0; scroll-snap-align: center; }
+  .gl-ychip { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface-raised); color: var(--text); white-space: nowrap; text-decoration: none; }
+  .gl-ychip.is-current { border: 1.5px solid var(--brand); background: var(--brand-tint); }
+  .gl-ychip-y { font-family: var(--font-display); font-size: 20px; font-weight: 500; }
+  .gl-ychip.is-current .gl-ychip-y { font-weight: 600; color: var(--brand); }
+  .gl-count { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+
+  /* year view */
+  .gl-body { padding-top: 32px; padding-bottom: 64px; }
+  .gl-year { display: flex; flex-direction: column; gap: 20px; }
+  .gl-year-head { padding-bottom: 18px; border-bottom: 1px solid var(--text); }
+  .gl-year-t { display: flex; flex-direction: column; gap: 6px; }
+  .gl-year-h { font-family: var(--font-display); font-size: clamp(3.75rem, 2.707rem + 4.286vw, 5.5rem); font-weight: 500; line-height: 0.9; }
+  .gl-year-count { font-size: 14px; color: var(--text-muted); }
+  .gl-path { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; color: var(--text-muted); }
+  .gl-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+  .gl-filter { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid var(--border-strong); border-radius: 999px; background: transparent; color: var(--text); font-size: 15px; font-weight: 600; }
+  .gl-filter:hover { border-color: var(--text); }
+  .gl-filter :global(.gl-tick) { display: none; }
+  .gl-filter[aria-pressed='true'] { border: 1.5px solid var(--brand); background: var(--brand-tint); color: var(--brand); }
+  .gl-filter[aria-pressed='true'] :global(.gl-tick) { display: block; }
+
+  .gl-albums { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 14px; }
+  .gl-item { grid-column: span var(--mc); }
+  .gl-tile { height: 100%; display: flex; flex-direction: column; gap: 8px; color: var(--text); text-decoration: none; }
+  .gl-tile--link:hover { color: var(--text); }
+  .gl-tile--link:hover .gl-tile-name { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 1px; }
+  .gl-cover { position: relative; display: block; aspect-ratio: var(--mr); overflow: hidden; }
+  .gl-cover-img { position: absolute; inset: 0; display: flex; align-items: flex-end; padding: 8px; font-size: 10px; line-height: 1.3; color: var(--text-muted); }
+  @media (prefers-reduced-motion: no-preference) {
+    .gl-cover-img { transition: transform 400ms cubic-bezier(.22, 1, .36, 1); }
+    .gl-tile--link:hover .gl-cover-img { transform: scale(1.025); }
+  }
+  .gl-featured { position: absolute; left: 10px; top: 10px; display: inline-flex; align-items: center; height: 26px; padding: 0 8px; background: var(--bg); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brand); }
+  .gl-tile-text { display: flex; flex-direction: column; gap: 2px; }
+  .gl-tile-name { font-family: var(--font-display); font-size: var(--ms); font-weight: 500; line-height: 1.1; }
+  .gl-tile-meta { font-size: 12px; color: var(--text-muted); }
+
+  .gl-empty { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 40px 22px; background: var(--surface-raised); border: 1px solid var(--border); }
+  .gl-empty-icon { width: 48px; height: 38px; }
+  .gl-empty-t { font-family: var(--font-display); font-size: 30px; font-weight: 500; line-height: 1.1; }
+  .gl-empty-p { font-size: 15px; line-height: 1.6; color: var(--text-muted); }
+  .gl-btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0 16px; border: 1.5px solid var(--brand); border-radius: var(--radius-md); background: transparent; color: var(--brand); font-size: 15px; font-weight: 600; }
+  .gl-btn:hover { background: var(--brand-tint); }
+  .gl-link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--brand); font-size: 15px; font-weight: 600; text-decoration: underline; text-decoration-color: var(--link-underline); text-underline-offset: 6px; }
+  .gl-draft { padding: 14px 16px; border: 1.5px dashed var(--warning-text); border-radius: var(--radius-sm); background: var(--accent-tint); font-size: 14px; line-height: 1.5; }
+  .gl-draft strong { color: var(--warning-text); }
+
+  @media (min-width: 1024px) {
+    .gl-hero { padding: 28px 0 72px; }
+    .gl-hero-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; gap: 0 32px; }
+    .gl-crumbs { grid-column: 1 / -1; }
+    .gl-h1 { grid-column: 1 / span 6; margin-top: 36px; line-height: 0.88; letter-spacing: -0.02em; }
+    .gl-hero-text { grid-column: 7 / span 6; align-self: end; display: flex; flex-direction: column; gap: 20px; }
+
+    .gl-body { padding-top: 64px; padding-bottom: 128px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; align-items: start; }
+    .gl-rail { grid-column: 1 / span 2; position: sticky; top: 112px; display: flex; flex-direction: column; }
+    .gl-rail-list { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--border); }
+    .gl-rail-link { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 46px; padding: 6px 12px 6px 18px; color: var(--text); text-decoration: none; }
+    .gl-rail-link:hover { background: var(--surface-raised); color: var(--text); }
+    .gl-rail-link.is-current { background: var(--brand-tint); box-shadow: inset 3px 0 0 var(--brand); }
+    .gl-rail-y { font-family: var(--font-display); font-size: 22px; font-weight: 500; line-height: 1; color: var(--text-muted); }
+    .gl-rail-link:hover .gl-rail-y { color: var(--text); }
+    .gl-rail-link.is-current .gl-rail-y { font-size: 28px; font-weight: 600; color: var(--brand); }
+
+    .gl-year { grid-column: 3 / span 10; gap: 28px; padding-left: 24px; }
+    .gl-year-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; padding-bottom: 24px; }
+    .gl-year-t { gap: 10px; }
+    .gl-year-count { font-size: 15px; }
+
+    .gl-albums { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 132px; gap: 28px 24px; }
+    .gl-item { grid-column: span var(--dc); grid-row: span var(--dr); }
+    .gl-tile { gap: 12px; }
+    .gl-cover { flex: 1; min-height: 0; aspect-ratio: auto; }
+    .gl-cover-img { padding: 12px; font-size: 12px; line-height: 1.35; }
+    .gl-featured { left: 16px; top: 16px; height: 30px; padding: 0 10px; font-size: 12px; }
+    .gl-tile-text { flex-direction: row; justify-content: space-between; align-items: baseline; gap: 16px; }
+    .gl-tile-name { font-size: var(--ds); line-height: 1.08; }
+    .gl-tile-meta { flex-shrink: 0; font-size: 13px; }
+
+    .gl-empty { gap: 16px; padding: 72px 56px; }
+    .gl-empty-icon { width: 56px; height: 44px; }
+    .gl-empty-t { font-size: 40px; }
+    .gl-empty-p { font-size: 16px; }
+    .gl-link { font-size: 16px; }
+    .gl-draft { padding: 18px 20px; font-size: 15px; }
+  }
+</style>

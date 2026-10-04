@@ -1,0 +1,26 @@
+/* Motion: transform and opacity only. Every moment has a reduced-motion state.
+   Content is hidden for a reveal only when JS is running and motion is allowed,
+   so nothing is ever invisible without JavaScript. */
+@keyframes kb-fan { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
+@keyframes kb-panel { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@keyframes kb-mega { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+@keyframes kb-sheet { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes kb-fade { from { opacity: 0; } to { opacity: 1; } }
+/* An ivory cover shrinking off a drawn arc (LearningDesktop/Mobile hero path). */
+@keyframes kb-draw { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+@media (prefers-reduced-motion: no-preference) {
+  .rays-fan { transform-origin: 50% 100%; animation: kb-fan 1100ms var(--ease-out) both; }
+  .panel-in { animation: kb-panel var(--dur-component) var(--ease-out) both; }
+
+  html.js .reveal {
+    opacity: 0;
+    transform: translateY(var(--reveal-travel));
+    transition: opacity 700ms var(--ease-out), transform 700ms var(--ease-out);
+    transition-delay: calc(var(--reveal-i, 0) * 80ms);
+  }
+  html.js .reveal.is-in { opacity: 1; transform: none; }
+
+  .arrow-nudge .arrow { transition: transform var(--dur-micro) var(--ease-out); }
+  .arrow-nudge:hover .arrow { transform: translateX(4px); }
+}

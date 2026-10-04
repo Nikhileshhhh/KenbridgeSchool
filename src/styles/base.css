@@ -1,0 +1,92 @@
+/* Reset, document defaults, type styles and focus. */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: calc(var(--header-h) + 16px); }
+@media (max-width: 1279px) { html { scroll-padding-top: calc(var(--mobile-header-h) + 16px); } }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  /* Figures follow the boards: Cormorant's default old-style figures in running serif text,
+     lining tabular figures only where marked (.tnum: dates in tables, times, results). */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd { margin: 0; }
+ul[role="list"], ol[role="list"] { list-style: none; margin: 0; padding: 0; }
+img, svg, video, canvas { display: block; max-width: 100%; }
+img { height: auto; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+address { font-style: normal; }
+/* `hidden` always wins over component display rules. */
+[hidden] { display: none !important; }
+table { border-collapse: collapse; }
+
+a { color: var(--brand); }
+a:hover { color: var(--brand-strong); }
+.on-dark a { color: var(--text-on-dark); }
+
+/* Focus ring: 2px #005FCC, 2px offset; #7FB2FF inside dark sections. Never removed. */
+:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+:focus:not(:focus-visible) { outline: none; }
+
+/* ---- type styles (Type board) ---- */
+.display-xl, .display-l, .h1, .h2, .h3, .serif {
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+.display-xl { font-size: var(--fs-display-xl); line-height: 0.95; letter-spacing: -0.02em; }
+.display-l { font-size: var(--fs-display-l); line-height: 1; letter-spacing: -0.015em; }
+.h1 { font-size: var(--fs-h1); line-height: 1.05; letter-spacing: -0.01em; }
+.h2 { font-size: var(--fs-h2); line-height: 1.1; }
+.h3 { font-size: var(--fs-h3); line-height: 1.2; font-weight: 600; }
+.numeral {
+  font-family: var(--font-display);
+  font-size: var(--fs-numeral);
+  font-weight: 500;
+  line-height: 0.9;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+/* One italic word per headline, in maroon (saffron on dark). */
+.em { font-style: italic; color: var(--brand); }
+.on-dark .em { color: var(--accent); }
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-variant-caps: small-caps;
+  letter-spacing: 0.04em;
+  line-height: 0.9;
+}
+.lead { font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem); line-height: 1.6; color: var(--text-muted); max-width: 42rem; }
+.on-dark .lead { color: var(--text-on-dark-muted); }
+.body { font-size: var(--fs-body); line-height: 1.6; max-width: var(--measure); text-wrap: pretty; }
+.small { font-size: var(--fs-small); line-height: 1.5; font-weight: 500; }
+.muted { color: var(--text-muted); }
+.on-dark .muted { color: var(--text-on-dark-muted); }
+.eyebrow-text {
+  font-size: var(--fs-eyebrow);
+  font-weight: 700;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+}
+.tnum { font-variant-numeric: tabular-nums lining-nums; }
+
+/* Section title with the ink rule beneath (design-system sheets). */
+.rule-title { padding-bottom: 12px; border-bottom: 1px solid var(--text); }
+
+/* Prose links: underline always present (Components board). */
+.link {
+  color: var(--brand);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--link-underline);
+  text-underline-offset: 6px;
+}
+.link:hover { color: var(--brand-strong); text-decoration-thickness: 2px; text-decoration-color: currentColor; }

@@ -1,0 +1,14 @@
+# Facility data from the FacilityDetail and CampusDesktop board scripts. Only school-approved copy goes in
+# what / how / features; anything not yet approved goes in pending (shown only when facilityDrafts is on).
+num: '02'
+name: Classrooms
+short: classrooms
+group: learn
+descriptor: '“A beautiful home away from home.”'
+atlasDesc: 'Furniture specially designed for growing children of all ages: “a beautiful home away from home”.'
+homePhoto: Class-Room.jpg
+atlasPhoto: Class-Room.jpg
+photos: [Class-Room.jpg]
+facts:
+  - { value: '72', unit: '', label: 'Classrooms, 50 sq m each', source: CBSE Mandatory Public Disclosure }
+what: [Furniture specially designed for growing children of all ages.]
