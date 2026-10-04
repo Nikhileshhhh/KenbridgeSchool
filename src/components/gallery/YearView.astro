@@ -5,7 +5,9 @@
 // Each year is a real page, /gallery/2025-26; /gallery?year=2025-26 301s there (vercel.json).
 import Breadcrumbs from '../shell/Breadcrumbs.astro';
 import Icon from '../ui/Icon.astro';
+import Photo from '../ui/Photo.astro';
 import { getMain, getSettings } from '../../lib/site';
+import { coverFile, findPhoto } from '../../lib/photos';
 import { academicYearsSince } from '../../lib/academic-year';
 import { tileVars, tileSizes } from '../../lib/gallery-layout.js';
 
@@ -23,6 +25,11 @@ const albums = (data?.albums ?? [])
     return { name, cat: G.categoryOf[name] ?? 'Celebrations', lead: name === data?.lead, href: page ? `/gallery/${year}/${page.slug}` : undefined, count: page ? `${page.photos.length} photos` : '[n] photos' };
   })
   .sort((a, b) => Number(b.lead) - Number(a.lead));
+// Each album's cover, once supplied (src/assets/photos/cover-<year>-<album>.jpg)
+const covers: Record<string, string | undefined> = Object.fromEntries(await Promise.all(albums.map(async (a) => {
+  const file = coverFile(year, a.name);
+  return [a.name, (await findPhoto({ file })) ? file : undefined];
+})));
 const countOf = (y: string) => { const d = G.years.find((x) => x.year === y); return d ? `${d.albums.length}${d.more ? '+' : ''}` : ''; };
 const more = !!data?.more;
 const countLabel = albums.length ? `${albums.length} album${albums.length === 1 ? '' : 's'}${more ? ' shown' : ''}` : 'No albums yet';
@@ -90,7 +97,9 @@ const crumbs = [{ label: 'Home', href: '/' }, { label: 'Gallery' }];
           const inner = (
             <>
               <span class="gl-cover" style={`background:var(${tones[i % 4]})`}>
-                <span class="gl-cover-img" role="img" aria-label={`Cover photo placeholder: ${a.name}`}>[Cover · {a.name}]</span>
+                {covers[a.name]
+                  ? <span class="gl-cover-img gl-cover-img--photo"><Photo file={covers[a.name]} alt="" sizes={i === 0 ? '(min-width: 1024px) 50vw, 100vw' : '(min-width: 1024px) 25vw, 50vw'} maxWidth={1280} /></span>
+                  : <span class="gl-cover-img" role="img" aria-label={`Cover photo placeholder: ${a.name}`}>[Cover · {a.name}]</span>}
                 {a.lead && i === 0 && <span class="gl-featured">Featured</span>}
               </span>
               <span class="gl-tile-text"><span class="gl-tile-name">{a.name}</span><span class="gl-tile-meta tnum">{year} · {a.count}</span></span>
@@ -175,6 +184,7 @@ const crumbs = [{ label: 'Home', href: '/' }, { label: 'Gallery' }];
   .gl-tile--link:hover .gl-tile-name { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 1px; }
   .gl-cover { position: relative; display: block; aspect-ratio: var(--mr); overflow: hidden; }
   .gl-cover-img { position: absolute; inset: 0; display: flex; align-items: flex-end; padding: 8px; font-size: 10px; line-height: 1.3; color: var(--text-muted); }
+  .gl-cover .gl-cover-img--photo { padding: 0; }
   @media (prefers-reduced-motion: no-preference) {
     .gl-cover-img { transition: transform 400ms cubic-bezier(.22, 1, .36, 1); }
     .gl-tile--link:hover .gl-cover-img { transform: scale(1.025); }

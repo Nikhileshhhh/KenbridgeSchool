@@ -10,7 +10,8 @@ descriptor: Planned with perfect acoustics.
 atlasDesc: 'Planned with perfect acoustics: the venue for events, seminars, workshops and guest lectures.'
 homePhoto: MPH.jpg
 atlasPhoto: MPH.jpg
-photos: [MPH.jpg]
+# The current site's Facilities › Multipurpose Hall tab shows both.
+photos: [MPH.jpg, DSC0816.jpg]
 what: [Planned with perfect acoustics to make every event a memorable experience.]
 how: ['The venue for events, seminars, workshops and guest lectures by eminent educationists.']
 related: [dance-music-room, indoor-sports-room, library]

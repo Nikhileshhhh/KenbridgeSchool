@@ -6,7 +6,7 @@ short: lab
 group: learn
 descriptor: Designed around the needs of young learners.
 atlasDesc: Designed around the needs of young learners.
-homePhoto: '[Science Lab photo]'
-atlasPhoto: science lab
-photoNeeded: true
-photos: []
+# The current site's Facilities › Science Lab tab photo (5.jpg there).
+homePhoto: Science-Lab.jpg
+atlasPhoto: Science-Lab.jpg
+photos: [Science-Lab.jpg]

@@ -10,9 +10,7 @@ if (dialog && typeof dialog.showModal === 'function') {
     b.addEventListener('click', () => {
       opener = b;
       set('[data-banner-year]', b.dataset.year);
-      set('[data-banner-file]', b.dataset.file);
-      set('[data-banner-file-sm]', b.dataset.file);
-      dialog.querySelector('[data-banner-img]').setAttribute('aria-label', `Placeholder for the ${b.dataset.year} result banner at full size. The transcription on the page lists the same names and scores.`);
+      dialog.querySelectorAll('[data-banner-img]').forEach((el) => { el.hidden = el.dataset.bannerImg !== b.dataset.year; });
       dialog.showModal();
     });
   });

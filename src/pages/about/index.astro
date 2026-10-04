@@ -6,9 +6,13 @@ import FlameMark from '../../components/ui/FlameMark.astro';
 import Icon from '../../components/ui/Icon.astro';
 import NextLinks from '../../components/ui/NextLinks.astro';
 import Emblem from '../../components/emblem/Emblem.astro';
+import Photo from '../../components/ui/Photo.astro';
 import { getMain, getHome } from '../../lib/site';
+import { findPhoto } from '../../lib/photos';
 
 const about = await getMain('about');
+const heroPhoto = await findPhoto({ label: about.hero.photo });
+const beyondHas = await Promise.all(about.beyond.photos.map(async (p) => !!(await findPhoto({ label: p.label }))));
 const founder = await getMain('founder');
 const principal = await getMain('principal');
 const { vision, mission } = await getHome();
@@ -25,8 +29,14 @@ const yearSize = (y: string) => (y.length > 6 ? 76 : y.length > 4 ? 96 : 120);
   breadcrumbs={crumbs}
 >
   <section class="ab-hero on-dark" aria-labelledby="aboutTitle">
-    <div class="ab-hero-bg" role="img" aria-label={about.hero.photoAlt}><div class="ab-hero-shade"></div></div>
-    <span class="ab-hero-ph"><span class="only-lg">{about.hero.photo}</span><span class="only-sm">{about.hero.photoSm}</span></span>
+    {heroPhoto ? (
+      <div class="ab-hero-bg"><Photo label={about.hero.photo} class="ab-hero-img" sizes="100vw" priority /><div class="ab-hero-shade"></div></div>
+    ) : (
+      <>
+        <div class="ab-hero-bg" role="img" aria-label={about.hero.photoAlt}><div class="ab-hero-shade"></div></div>
+        <span class="ab-hero-ph"><span class="only-lg">{about.hero.photo}</span><span class="only-sm">{about.hero.photoSm}</span></span>
+      </>
+    )}
     <div class="container ab-hero-grid">
       <div class="ab-hero-copy">
         <Breadcrumbs items={crumbs} onDark />
@@ -86,8 +96,10 @@ const yearSize = (y: string) => (y.length > 6 ? 76 : y.length > 4 ? 96 : 120);
       <div class="ab-photos">
         {about.beyond.photos.map((p, i) => (
           <figure class:list={['ab-fig', i === 0 && 'ab-fig--wide only-lg']}>
-            <div class="ab-ph" role="img" aria-label={p.altSm && i > 0 ? p.altSm : p.alt}>
-              <span class="only-lg">{p.label}</span>{p.labelSm && <span class="only-sm">{p.labelSm}</span>}
+            <div class:list={['ab-ph', beyondHas[i] && 'ab-ph--photo']} role={beyondHas[i] ? undefined : 'img'} aria-label={beyondHas[i] ? undefined : p.altSm && i > 0 ? p.altSm : p.alt}>
+              <Photo label={p.label} class="ab-img" sizes="(min-width: 1024px) 25vw, 45vw" maxWidth={1280}>
+                <span class="only-lg">{p.label}</span>{p.labelSm && <span class="only-sm">{p.labelSm}</span>}
+              </Photo>
             </div>
             <figcaption class="ab-cap only-lg">{p.caption}</figcaption>
           </figure>
@@ -237,6 +249,8 @@ const yearSize = (y: string) => (y.length > 6 ? 76 : y.length > 4 ? 96 : 120);
   .ab-fig { margin: 0; display: flex; flex-direction: column; }
   .ab-ph { background: var(--ph-1); display: flex; align-items: flex-end; padding: 8px; font-size: 11px; color: var(--text-muted); aspect-ratio: 1 / 1; }
   .ab-ph--wide { aspect-ratio: 3 / 2; padding: 10px; font-size: 12px; }
+  .ab-hero-bg :global(.ab-hero-img) { position: absolute; inset: 0; }
+  .ab-photos .ab-ph.ab-ph--photo { padding: 0; overflow: hidden; }
   .ab-cap { padding-top: 8px; font-size: 13px; color: var(--text-muted); }
   .ab-closing { margin-top: 8px; padding-top: 24px; border-top: 1px solid var(--text); font-family: var(--font-display); font-size: clamp(1.75rem, 1.229rem + 2.133vw, 2.75rem); font-style: italic; line-height: 1.25; }
 

@@ -5,18 +5,22 @@
 import Emblem from '../emblem/Emblem.astro';
 import Icon from '../ui/Icon.astro';
 import StatusPill from './StatusPill.astro';
+import Photo from '../ui/Photo.astro';
 import { getHome, getServices } from '../../lib/site';
+import { findPhoto } from '../../lib/photos';
 
 const home = await getHome();
 const services = await getServices();
 const h = home.hero;
+// The photo behind the hero is a blurred, darkened backdrop (desktop), so it carries no alt text.
+const heroPhoto = await findPhoto({ label: h.photo });
 ---
 <section class="hero on-dark" aria-labelledby="heroTitle">
   <div class="hero-bg" aria-hidden="true">
-    <div class="hero-photo"></div>
+    <div class="hero-photo">{heroPhoto && <Photo label={h.photo} alt="" class="hero-img" sizes="100vw" maxWidth={960} />}</div>
     <div class="hero-shade"></div>
   </div>
-  <div class="hero-photo-label" role="img" aria-label={h.photoAlt}><span class="only-lg">{h.photo}</span></div>
+  {!heroPhoto && <div class="hero-photo-label" role="img" aria-label={h.photoAlt}><span class="only-lg">{h.photo}</span></div>}
 
   <div class="container hero-grid">
     <div class="hero-emblem">
@@ -53,6 +57,7 @@ const h = home.hero;
     background: radial-gradient(ellipse 90% 40% at 50% 22%, rgba(150, 92, 52, 0.5) 0%, rgba(42, 10, 11, 0) 75%), #2E1012;
   }
   .hero-shade { display: none; }
+  .hero-photo :global(.hero-img) { display: none; }
   .hero-photo-label { position: absolute; inset: 0; pointer-events: none; }
   .hero-photo-label span { position: absolute; right: var(--margin); bottom: 40px; font-size: 13px; color: var(--text-on-dark-muted); }
 
@@ -88,6 +93,8 @@ const h = home.hero;
         radial-gradient(ellipse 80% 40% at 60% 100%, rgba(70, 60, 30, 0.45) 0%, rgba(42, 10, 11, 0) 70%),
         #2E1012;
     }
+    /* Blurred 24 px and darkened (HomeDesktop board); scaled so the blur has no soft edge. */
+    .hero-photo :global(.hero-img) { display: block; position: absolute; inset: 0; filter: blur(24px) brightness(0.55); transform: scale(1.08); opacity: 0.7; }
     .hero-shade { display: block; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(42, 10, 11, 0.92) 0%, rgba(42, 10, 11, 0.7) 42%, rgba(42, 10, 11, 0.15) 100%); }
     .hero-grid {
       display: grid;

@@ -7,11 +7,17 @@ import Breadcrumbs from '../../components/shell/Breadcrumbs.astro';
 import Icon from '../../components/ui/Icon.astro';
 import Placeholder from '../../components/ui/Placeholder.astro';
 import TourDialog from '../../components/home/TourDialog.astro';
+import Photo from '../../components/ui/Photo.astro';
 import { getMain, getFacilities, getSchool, getServices } from '../../lib/site';
+import { findPhoto } from '../../lib/photos';
 
 const C = await getMain('campus');
 const school = await getSchool();
 const services = await getServices();
+const heroPhoto = await findPhoto({ label: C.hero.photo });
+// The tour video's own YouTube thumbnail (src/assets/photos/tour-<video id>.jpg)
+const tourThumb = `tour-${new URL(services.virtualTour.url).searchParams.get('v')}.jpg`;
+const hasTourThumb = !!(await findPhoto({ file: tourThumb }));
 const facs = (await getFacilities()).map((f) => ({
   slug: f.id,
   num: f.data.num,
@@ -36,11 +42,20 @@ const crumbs = [{ label: 'Home', href: '/' }, { label: 'Our Campus' }];
   breadcrumbs={crumbs}
 >
   <section class="cp-hero on-dark" aria-labelledby="campusH1">
-    <div class="cp-hero-bg" role="img" aria-label={C.hero.alt}></div>
-    <div class="cp-hero-shade" aria-hidden="true"></div>
-    <span class="cp-corner cp-corner--l only-lg" aria-hidden="true"></span>
-    <span class="cp-corner cp-corner--r only-lg" aria-hidden="true"></span>
-    <span class="cp-hero-ph" aria-hidden="true"><span class="only-lg">{C.hero.photo}</span><span class="only-sm">{C.hero.photoSm}</span></span>
+    {heroPhoto ? (
+      <>
+        <div class="cp-hero-bg"><Photo label={C.hero.photo} class="cp-hero-img" sizes="100vw" priority /></div>
+        <div class="cp-hero-shade" aria-hidden="true"></div>
+      </>
+    ) : (
+      <>
+        <div class="cp-hero-bg" role="img" aria-label={C.hero.alt}></div>
+        <div class="cp-hero-shade" aria-hidden="true"></div>
+        <span class="cp-corner cp-corner--l only-lg" aria-hidden="true"></span>
+        <span class="cp-corner cp-corner--r only-lg" aria-hidden="true"></span>
+        <span class="cp-hero-ph" aria-hidden="true"><span class="only-lg">{C.hero.photo}</span><span class="only-sm">{C.hero.photoSm}</span></span>
+      </>
+    )}
     <div class="container cp-hero-copy">
       <Breadcrumbs items={crumbs} onDark collapse />
       <h1 id="campusH1" class="cp-h1">{C.hero.title}</h1>
@@ -127,9 +142,15 @@ const crumbs = [{ label: 'Home', href: '/' }, { label: 'Our Campus' }];
       </div>
       <div class="cp-atlas-grid">
         <figure id="atlasPreview" class="cp-preview only-lg">
-          <div class="cp-preview-photo swap" role="img" aria-label={`Placeholder for a photograph: ${first.previewLabel.slice(1, -1)}`} data-atlas-photo>
+          <div class="cp-preview-photo swap" data-atlas-photo>
+            {facs.map((f, i) => (
+              <div class="cp-slide" data-atlas-slide hidden={i !== 0}>
+                <Photo label={f.previewLabel} class="cp-slide-img" sizes="(min-width: 1440px) 640px, 45vw" maxWidth={1920}>
+                  <span role="img" aria-label={`Placeholder for a photograph: ${f.previewLabel.slice(1, -1)}`}>{f.previewLabel}</span>
+                </Photo>
+              </div>
+            ))}
             <span class="cp-preview-num tnum" aria-hidden="true" data-atlas-bignum>{first.num}</span>
-            <span data-atlas-label>{first.previewLabel}</span>
           </div>
           <figcaption class="cp-preview-cap" aria-live="polite">
             <span class="cp-preview-id"><span class="cp-preview-n tnum" data-atlas-num>{first.num}</span><span class="cp-preview-name" data-atlas-name>{first.name}</span></span>
@@ -141,7 +162,7 @@ const crumbs = [{ label: 'Home', href: '/' }, { label: 'Our Campus' }];
           <ol class="cp-atlas-list" aria-label="Facilities" role="list">
             {facs.map((f, i) => (
               <li id={`fac-${f.slug}`} class:list={['cp-row', i === 0 && 'is-on']} data-atlas-row data-slug={f.slug} data-num={f.num} data-name={f.name} data-label={f.previewLabel} data-href={f.href}>
-                <span class="cp-row-thumb only-sm"><Placeholder label={f.thumbLabel} ratio="4 / 3" alt={f.thumbAlt} class="cp-thumb-ph" /></span>
+                <span class="cp-row-thumb only-sm"><Placeholder label={f.thumbLabel} ratio="4 / 3" alt={f.thumbAlt} sizes="120px" class="cp-thumb-ph" /></span>
                 <button type="button" class="cp-row-btn js-only only-lg" aria-controls="atlasPreview" aria-pressed={i === 0 ? 'true' : 'false'} data-atlas-pick>
                   <span class="cp-row-num tnum">{f.num}</span><span class="cp-row-name">{f.name}<span class="vh">, show in preview</span></span>
                 </button>
@@ -166,11 +187,12 @@ const crumbs = [{ label: 'Home', href: '/' }, { label: 'Our Campus' }];
   <section class="cp-close" aria-label="Visit the campus">
     <div class="container cp-close-grid">
       <a class="cp-tour on-dark" href={services.virtualTour.url} target="_blank" rel="noopener" data-tour-open>
+        {hasTourThumb && <span class="cp-tour-photo" aria-hidden="true"><Photo file={tourThumb} alt="" class="cp-tour-img" sizes="(min-width: 1024px) 50vw, 100vw" /></span>}
         <span class="cp-tour-bg" aria-hidden="true"></span>
         <span class="cp-tour-play" aria-hidden="true"><Icon name="play" size={34} /></span>
         <span class="cp-tour-foot">
           <span class="cp-tour-text"><span class="cp-tour-k">{C.closing.tourEyebrow}</span><span class="cp-tour-title">{C.closing.tourTitle}</span></span>
-          <span class="cp-tour-thumb only-lg">{C.closing.tourThumb}</span>
+          {!hasTourThumb && <span class="cp-tour-thumb only-lg">{C.closing.tourThumb}</span>}
         </span>
         <span class="vh" data-tour-note> (opens YouTube in a new tab)</span>
       </a>
@@ -184,7 +206,7 @@ const crumbs = [{ label: 'Home', href: '/' }, { label: 'Our Campus' }];
     </div>
   </section>
 
-  <TourDialog titleSm="Virtual tour of the campus" noteSm="[YouTube NA7Ksy1WsnY] Captions available on YouTube." ph="[YouTube video NA7Ksy1WsnY · campus tour · privacy-enhanced embed]" />
+  <TourDialog titleSm="Virtual tour of the campus" noteSm="Captions available on YouTube." />
 </BaseLayout>
 
 <script>
@@ -199,6 +221,7 @@ const crumbs = [{ label: 'Home', href: '/' }, { label: 'Our Campus' }];
   /* ---------- hero ---------- */
   .cp-hero { position: relative; min-height: 700px; padding-bottom: 44px; background: #3B1416; color: var(--text-on-dark); overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
   .cp-hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 40% at 55% 32%, rgba(96, 110, 60, 0.5) 0%, rgba(59, 20, 22, 0) 70%), radial-gradient(ellipse 60% 25% at 30% 55%, rgba(140, 100, 60, 0.38) 0%, rgba(59, 20, 22, 0) 70%), #3B1416; }
+  .cp-hero-bg :global(.cp-hero-img), .cp-tour-photo { position: absolute; inset: 0; }
   .cp-hero-shade { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(42, 10, 11, 0.94) 0%, rgba(42, 10, 11, 0.4) 55%, rgba(42, 10, 11, 0.55) 100%); }
   .cp-corner { position: absolute; top: 121px; width: 24px; height: 24px; border: 0 solid var(--text-on-dark-muted); }
   .cp-corner--l { left: 32px; border-left-width: 1px; border-top-width: 1px; }
@@ -365,6 +388,10 @@ const crumbs = [{ label: 'Home', href: '/' }, { label: 'Our Campus' }];
     .cp-atlas-grid { margin-top: 48px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 32px; }
     .cp-preview { grid-column: 1 / span 7; align-self: start; position: sticky; top: 112px; margin: 0; display: flex; flex-direction: column; gap: 20px; }
     .cp-preview-photo { position: relative; aspect-ratio: 4 / 3; background: var(--ph-1); display: flex; align-items: flex-end; padding: 16px; font-size: 13px; line-height: 1.4; color: var(--text-muted); }
+    .cp-slide[hidden] { display: none; }
+    .cp-slide:has(.cp-slide-img) { position: absolute; inset: 0; }
+    .cp-preview-num { z-index: 1; }
+    .cp-preview-photo:has(.cp-slide:not([hidden]) .cp-slide-img) .cp-preview-num { color: rgba(251, 247, 240, 0.55); }
     .cp-preview-num { position: absolute; left: 20px; top: 12px; font-family: var(--font-display); font-size: 120px; font-weight: 500; line-height: 1; color: rgba(127, 3, 5, 0.18); }
     .cp-preview-cap { display: grid; grid-template-columns: 1fr auto; gap: 8px 24px; align-items: end; }
     .cp-preview-id { display: flex; flex-direction: column; gap: 6px; }

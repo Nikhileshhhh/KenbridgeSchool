@@ -17,7 +17,8 @@ main:
             - { label: Founder, meta: Late Shri Neville Irani, href: /about/founder }
             - { label: Principal’s Message, meta: Mrs. Neeta Purohit, href: /about/principal }
       photo: Founder’s portrait, school archive
-      caption: '[Caption for the founder’s portrait.]'
+      # The current site's Founder page captions this portrait "Mr. Neville Homi Irani, Founder, Kenbridge School, Gulbarga."
+      caption: Mr. Neville Homi Irani, Founder.
     - key: learning
       label: Learning
       hub: /learning
@@ -74,7 +75,8 @@ main:
       years: true
       cols: 1
       photo: Cover photo from the latest album
-      caption: '[Album name, 2026–27.]'
+      # The latest album on the current site's gallery (2026-27).
+      caption: Independence Day, 2026–27.
     - key: information
       label: Information
       # Links to the hub are named "School Information" for screen readers and search engines;

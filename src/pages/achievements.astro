@@ -9,7 +9,9 @@ import Icon from '../components/ui/Icon.astro';
 import Placeholder from '../components/ui/Placeholder.astro';
 import NextLinks from '../components/ui/NextLinks.astro';
 import PassChart from '../components/achievements/PassChart.astro';
+import Photo from '../components/ui/Photo.astro';
 import { getMain, getResults } from '../lib/site';
+import { coverFile, findPhoto } from '../lib/photos';
 
 const P = await getMain('achievements');
 const R = await getResults();
@@ -22,6 +24,11 @@ const rows = [
   { year: R.firstBatch.year, registered: '—', passed: '—', pct: `${R.firstBatch.passPct}%`, remarks: 'First batch' }
 ];
 const banners = R.banners;
+// A banner is published only with its typed transcription (results.yaml); then its real shape is used.
+const published: Record<string, string | undefined> = Object.fromEntries(await Promise.all(banners.map(async (b) => {
+  const p = b.rows.length > 0 ? await findPhoto({ file: b.file }) : undefined;
+  return [b.year, p ? `${p.src.width} / ${p.src.height}` : undefined];
+})));
 const current = banners.length - 1; // the latest year opens first
 const crumbs = [{ label: 'Home', href: '/' }, { label: 'Results & Achievements' }];
 ---
@@ -153,7 +160,9 @@ const crumbs = [{ label: 'Home', href: '/' }, { label: 'Results & Achievements' 
         {banners.map((b) => (
           <div id={`yrPanel${b.year}`} role="tabpanel" aria-labelledby={`yrTab${b.year}`} tabindex="0" class="ac-panel">
             <div class="ac-banner">
-              <Placeholder label={`[Result banner · ${b.file}]`} ratio="16 / 9" alt={`Placeholder for the ${b.year} result banner (${b.file})`} class="ac-banner-ph" />
+              {published[b.year]
+                ? <Placeholder label={`[Result banner · ${b.file}]`} ratio={published[b.year]} alt="" class="ac-banner-img" sizes="(min-width: 1024px) 760px, calc(100vw - 32px)" />
+                : <Placeholder label={`[Result banner · ${b.file}]`} ratio="16 / 9" alt={`Placeholder for the ${b.year} result banner (${b.file})`} class="ac-banner-ph" photo={false} />}
               <button type="button" class="ac-zoom js-only" aria-haspopup="dialog" data-banner-open data-year={b.year} data-file={b.file}><Icon name="expand" size={14} /><span class="only-lg">View full size</span><span class="only-sm">Full size</span><span class="vh">: {b.year} result banner</span></button>
             </div>
             <div class="ac-trans">
@@ -189,8 +198,8 @@ const crumbs = [{ label: 'Home', href: '/' }, { label: 'Results & Achievements' 
         {P.beyond.albums.map((a) => (
           <li>
             <a class="ac-album" href={a.href}>
-              <span class="only-lg"><Placeholder label="[Album cover]" ratio="4 / 5" alt={`Placeholder for the album cover: ${a.name}`} class="ac-cover" /></span>
-              <span class="only-sm"><Placeholder label="[Album cover]" ratio="1 / 1" alt={`Placeholder for the album cover: ${a.name}`} class="ac-cover ac-cover--sm" /></span>
+              <span class="only-lg"><Placeholder label="[Album cover]" file={coverFile(a.year, a.name)} photoAlt="" sizes="240px" ratio="4 / 5" alt={`Placeholder for the album cover: ${a.name}`} class="ac-cover" /></span>
+              <span class="only-sm"><Placeholder label="[Album cover]" file={coverFile(a.year, a.name)} photoAlt="" sizes="96px" ratio="1 / 1" alt={`Placeholder for the album cover: ${a.name}`} class="ac-cover ac-cover--sm" /></span>
               <span class="ac-album-text"><span class="ac-album-name">{a.name}</span><span class="ac-album-meta tnum">{a.year} · {a.count}</span></span>
             </a>
           </li>
@@ -219,9 +228,15 @@ const crumbs = [{ label: 'Home', href: '/' }, { label: 'Results & Achievements' 
       <h2 id="boxTitle" class="ac-box-title">Result banner, <span data-banner-year>{banners[current]?.year}</span></h2>
       <button type="button" class="ac-box-close" data-banner-close autofocus>Close<Icon name="close" size={14} /></button>
     </div>
-    <div class="ac-box-img" role="img" data-banner-img>
-      <span><span class="only-lg">[Result banner · <span data-banner-file>{banners[current]?.file}</span> · full size]</span><span class="only-sm">[Result banner · <span data-banner-file-sm>{banners[current]?.file}</span> · pinch to zoom]</span></span>
-    </div>
+    {banners.map((b, i) => published[b.year] ? (
+      <div class="ac-box-img ac-box-img--photo" data-banner-img={b.year} hidden={i !== current}>
+        <Photo file={b.file} class="ac-box-photo" sizes="(min-width: 1024px) 1000px, 100vw" />
+      </div>
+    ) : (
+      <div class="ac-box-img" role="img" data-banner-img={b.year} hidden={i !== current} aria-label={`Placeholder for the ${b.year} result banner at full size. The transcription on the page lists the same names and scores.`}>
+        <span><span class="only-lg">[Result banner · {b.file} · full size]</span><span class="only-sm">[Result banner · {b.file} · pinch to zoom]</span></span>
+      </div>
+    ))}
     <p class="ac-box-note"><span class="only-lg">The names and scores are also typed out beside the banner on the page. Press Esc to close.</span><span class="only-sm">The names and scores are typed out under the banner on the page.</span></p>
   </dialog>
 </BaseLayout>
@@ -330,6 +345,7 @@ const crumbs = [{ label: 'Home', href: '/' }, { label: 'Results & Achievements' 
   .ac-album:hover .ac-album-name { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 1px; }
   .ac-album :global(.ac-cover) { padding: 10px; font-size: 11px; line-height: 1.35; }
   .ac-album :global(.ac-cover--sm) { padding: 8px; font-size: 10px; }
+  .ac-album :global(.ac-cover.ph--photo) { padding: 0; }
   .ac-album-text { display: flex; flex-direction: column; gap: 2px; min-height: 44px; }
   .ac-album-name { font-family: var(--font-display); font-size: 22px; font-weight: 500; line-height: 1.1; }
   .ac-album-meta { font-size: 13px; color: var(--text-muted); }
@@ -345,6 +361,9 @@ const crumbs = [{ label: 'Home', href: '/' }, { label: 'Results & Achievements' 
   .ac-box-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
   .ac-box-title { font-family: var(--font-display); font-size: 24px; font-weight: 500; }
   .ac-box-close { display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 12px; border: 1px solid rgba(251, 247, 240, 0.45); border-radius: var(--radius-md); background: transparent; color: var(--text-on-dark); font-size: 15px; font-weight: 600; }
+  .ac-box-img[hidden] { display: none; }
+  .ac-box-img.ac-box-img--photo { aspect-ratio: auto; padding: 0; background: none; }
+  .ac-box-img--photo :global(.ac-box-photo) { height: auto; object-fit: contain; }
   .ac-box-img { aspect-ratio: 4 / 5; background: var(--ph-dark); display: flex; align-items: flex-end; padding: 12px; font-size: 12px; color: var(--text-on-dark-muted); }
   .ac-box-note { font-size: 13px; color: var(--text-on-dark-muted); }
   @media (prefers-reduced-motion: no-preference) { .ac-box[open] { animation: kb-sheet 320ms var(--ease-out) both; } }

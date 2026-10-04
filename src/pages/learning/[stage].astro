@@ -203,8 +203,8 @@ const vars = `--mark:var(--stage${p.stage}-mark);--tx:var(--stage${p.stage}-text
             {related.map((r) => (
               <li>
                 <a class="pd-fac" href={r.href}>
-                  <span class="only-lg"><Placeholder label={`[Photo · ${r.photo}]`} ratio="3 / 2" alt={`Placeholder for a photograph: ${r.photo}`} class="pd-fac-ph" /></span>
-                  <span class="only-sm"><Placeholder label={`[Photo · ${r.photoSm}]`} ratio="1 / 1" alt={`Placeholder for a photograph: ${r.photoSm}`} class="pd-fac-ph pd-fac-ph--sm" /></span>
+                  <span class="only-lg"><Placeholder label={`[Photo · ${r.photo}]`} ratio="3 / 2" alt={`Placeholder for a photograph: ${r.photo}`} sizes="(min-width: 1024px) 400px, 45vw" class="pd-fac-ph" /></span>
+                  <span class="only-sm"><Placeholder label={`[Photo · ${r.photoSm}]`} ratio="1 / 1" alt={`Placeholder for a photograph: ${r.photoSm}`} sizes="120px" class="pd-fac-ph pd-fac-ph--sm" /></span>
                   <span class="pd-fac-row"><span class="pd-fac-name">{r.name}</span><Icon name="arrow" size={20} class="pd-fac-arrow" /></span>
                 </a>
               </li>

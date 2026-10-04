@@ -2,16 +2,26 @@
 // HomeDesktop §8 / HomeMobile campus. Learn / Play / Create / Gather are tabs (arrow keys,
 // Home, End). Without JS the tab row is hidden and all four scenes are listed.
 import Icon from '../ui/Icon.astro';
+import Photo from '../ui/Photo.astro';
 import { getHome } from '../../lib/site';
+import { findPhoto } from '../../lib/photos';
 const { campusScenes, campusPhoto, campusPhotoSm } = await getHome();
+const aerial = await findPhoto({ label: campusPhoto });
 ---
 <section class="campus on-dark" aria-labelledby="campusTitle">
-  <div class="campus-photo" role="img" aria-label="Placeholder: full-bleed aerial photograph of the campus (DJI_0401)">
-    <div class="campus-shade" aria-hidden="true"></div>
-    <span class="campus-corner campus-corner--l only-lg" aria-hidden="true"></span>
-    <span class="campus-corner campus-corner--r only-lg" aria-hidden="true"></span>
-    <span class="campus-ph"><span class="only-lg">{campusPhoto}</span><span class="only-sm">{campusPhotoSm}</span></span>
-  </div>
+  {aerial ? (
+    <div class="campus-photo">
+      <Photo label={campusPhoto} class="campus-img" sizes="100vw" />
+      <div class="campus-shade" aria-hidden="true"></div>
+    </div>
+  ) : (
+    <div class="campus-photo" role="img" aria-label="Placeholder: full-bleed aerial photograph of the campus (DJI_0401)">
+      <div class="campus-shade" aria-hidden="true"></div>
+      <span class="campus-corner campus-corner--l only-lg" aria-hidden="true"></span>
+      <span class="campus-corner campus-corner--r only-lg" aria-hidden="true"></span>
+      <span class="campus-ph"><span class="only-lg">{campusPhoto}</span><span class="only-sm">{campusPhotoSm}</span></span>
+    </div>
+  )}
   <div class="container campus-grid">
     <div class="campus-intro">
       <span class="campus-eyebrow eyebrow-text">Campus</span>
@@ -27,9 +37,11 @@ const { campusScenes, campusPhoto, campusPhotoSm } = await getHome();
       <div class="campus-panels">
         {campusScenes.map((s, i) => (
           <div id={`campusPanel${i}`} role="tabpanel" aria-labelledby={`campusTab${i}`} class="campus-panel" data-tab-panel>
-            <div class="campus-thumb" role="img" aria-label={`Placeholder for a photograph: ${s.photo}`}>
-              <span class="only-lg">[{s.photo}]</span><span class="only-sm">[{s.photoSm ?? s.photo}]</span>
-            </div>
+            <Photo label={`[${s.photo}]`} class="campus-thumb-img" sizes="(min-width: 1024px) 200px, 120px" maxWidth={640}>
+              <div class="campus-thumb" role="img" aria-label={`Placeholder for a photograph: ${s.photo}`}>
+                <span class="only-lg">[{s.photo}]</span><span class="only-sm">[{s.photoSm ?? s.photo}]</span>
+              </div>
+            </Photo>
             <div class="campus-panel-text">
               <span class="campus-verb">{s.verb}</span>
               <strong class="campus-places">{s.places}</strong>
@@ -50,6 +62,8 @@ const { campusScenes, campusPhoto, campusPhotoSm } = await getHome();
     background: radial-gradient(ellipse 70% 50% at 55% 40%, rgba(96, 110, 60, 0.45) 0%, rgba(59, 20, 22, 0) 70%), #3B1416;
   }
   .campus-shade { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(42, 10, 11, 0.92) 0%, rgba(42, 10, 11, 0) 60%); }
+  .campus-photo :global(.campus-img) { position: absolute; inset: 0; }
+  .campus-panel :global(.campus-thumb-img) { aspect-ratio: 1 / 1; height: auto; }
   .campus-ph { position: absolute; left: 20px; top: 20px; font-size: 12px; color: var(--text-on-dark-muted); }
   .campus-grid { display: contents; }
   .campus-intro { position: relative; grid-row: 1; grid-column: 1; align-self: end; display: flex; flex-direction: column; gap: 10px; padding: 24px 20px; }

@@ -5,8 +5,7 @@ import './tour.js';
 /* ---- "Ten places on campus": hover / focus (desktop) or tap (phones) swaps the preview ---- */
 const fac = document.querySelector('[data-fac]');
 if (fac) {
-  const label = fac.querySelector('[data-fac-photo-label]');
-  const photo = fac.querySelector('[data-fac-photo]');
+  const slides = [...fac.querySelectorAll('[data-fac-slide]')];
   const name = fac.querySelector('[data-fac-name]');
   const num = fac.querySelector('[data-fac-num]');
   const visit = fac.querySelector('[data-fac-visit]');
@@ -16,8 +15,7 @@ if (fac) {
     if (i === current) return;
     current = i;
     const d = items[i].dataset;
-    label.textContent = `[Photo · ${d.photo}]`;
-    photo.setAttribute('aria-label', `Placeholder for a photograph of ${d.name}`);
+    slides.forEach((s, k) => { s.hidden = k !== i; });
     name.textContent = d.name;
     num.textContent = d.num;
     visit.href = d.href;

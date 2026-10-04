@@ -2,6 +2,7 @@
 // HomeDesktop §9 / HomeMobile "Ten places on campus". Desktop: an index of links; hover or focus
 // swaps the large preview. Phones: rows are toggle buttons (aria-pressed) that set the preview,
 // whose "Visit" link opens the facility. Without JS every row is a plain link.
+import Photo from '../ui/Photo.astro';
 import { getFacilities } from '../../lib/site';
 const facilities = await getFacilities();
 const first = facilities[0];
@@ -16,9 +17,15 @@ const items = facilities.map((f) => ({
       <h2 id="facTitle" class="fac-title">Ten places on campus</h2>
     </div>
     <figure class="fac-fig">
-      <div class="fac-photo" role="img" aria-label={`Placeholder for a photograph of ${first.data.name}`} data-fac-photo>
-        <span data-fac-photo-label>[Photo · {first.data.homePhoto}]</span>
-      </div>
+      {items.map((f, i) => (
+        <div class="fac-slide" data-fac-slide hidden={i !== 0}>
+          <Photo label={`[Photo · ${f.photo}]`} class="fac-img" sizes="(min-width: 1024px) 48vw, calc(100vw - 32px)" maxWidth={1920}>
+            <div class="fac-photo" role="img" aria-label={`Placeholder for a photograph of ${f.name}`}>
+              <span>[Photo · {f.photo}]</span>
+            </div>
+          </Photo>
+        </div>
+      ))}
       <figcaption class="fac-cap">
         <strong class="fac-cap-name" data-fac-name>{first.data.name}</strong>
         <span class="fac-cap-num tnum only-lg"><span data-fac-num>{first.data.num}</span> / 10</span>
@@ -50,6 +57,8 @@ const items = facilities.map((f) => ({
   .fac-eyebrow { font-size: 12px; color: var(--brand); }
   .fac-title { font-family: var(--font-display); font-size: clamp(2.5rem, 1.943rem + 2.286vw, 4rem); font-weight: 500; line-height: 1.05; }
   .fac-fig { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .fac-slide[hidden] { display: none; }
+  .fac-slide :global(.fac-img) { aspect-ratio: 4 / 3; height: auto; }
   .fac-photo { aspect-ratio: 4 / 3; background: var(--ph-1); display: flex; align-items: flex-end; padding: 12px; font-size: 12px; color: var(--text-muted); }
   .fac-cap { display: flex; justify-content: space-between; align-items: center; }
   .fac-cap-name { font-size: 16px; }

@@ -2,10 +2,15 @@
 // HomeDesktop §10 / HomeMobile "Life at KenBridge": Annual Day 2025-26 and the recent albums.
 // Recent album tiles link to their gallery year until each album's photos are imported (PLAN gap 3).
 import Icon from '../ui/Icon.astro';
+import Photo from '../ui/Photo.astro';
 import { getHome } from '../../lib/site';
+import { coverFile, findPhoto } from '../../lib/photos';
 const { life } = await getHome();
 const albumHref = `/gallery/${life.album.year}/${life.album.slug}`;
-const recentHref = `/gallery/${life.recentYear.replace('–', '-')}`;
+const recentYear = life.recentYear.replace('–', '-');
+const recentHref = `/gallery/${recentYear}`;
+const has = await Promise.all(life.photos.map(async (label) => !!(await findPhoto({ label }))));
+const phAlt = 'Placeholder: Annual Day 2025-26 photograph';
 ---
 <section class="life" aria-labelledby="lifeTitle">
   <div class="container life-inner">
@@ -18,14 +23,21 @@ const recentHref = `/gallery/${life.recentYear.replace('–', '-')}`;
     </div>
 
     <div class="life-mosaic">
-      <div class="life-ph life-ph--main" role="img" aria-label="Placeholder: Annual Day 2025-26 photograph">
-        <span class="only-lg">{life.photos[0]}</span><span class="only-sm">{life.photoSm}</span>
+      <div class:list={['life-ph life-ph--main', has[0] && 'has-photo']} role={has[0] ? undefined : 'img'} aria-label={has[0] ? undefined : phAlt}>
+        <Photo label={life.photos[0]} class="life-img" sizes="(min-width: 1024px) 58vw, calc(100vw - 32px)">
+          <span class="only-lg">{life.photos[0]}</span><span class="only-sm">{life.photoSm}</span>
+        </Photo>
       </div>
       <div class="life-side">
-        <div class="life-ph life-ph--b only-lg" role="img" aria-label="Placeholder: Annual Day 2025-26 photograph">{life.photos[1]}</div>
+        <div class:list={['life-ph life-ph--b only-lg', has[1] && 'has-photo']} role={has[1] ? undefined : 'img'} aria-label={has[1] ? undefined : phAlt}>
+          <Photo label={life.photos[1]} class="life-img" sizes="40vw" maxWidth={1280}>{life.photos[1]}</Photo>
+        </div>
         <div class="life-pair">
-          <div class="life-ph life-ph--s" role="img" aria-label="Placeholder: Annual Day 2025-26 photograph"><span class="only-lg">{life.photos[2]}</span></div>
-          <div class="life-ph life-ph--s" role="img" aria-label="Placeholder: Annual Day 2025-26 photograph"><span class="only-lg">{life.photos[3]}</span></div>
+          {[2, 3].map((k) => (
+            <div class:list={['life-ph life-ph--s', has[k] && 'has-photo']} role={has[k] ? undefined : 'img'} aria-label={has[k] ? undefined : phAlt}>
+              <Photo label={life.photos[k]} class="life-img" sizes="(min-width: 1024px) 20vw, 45vw" maxWidth={960}><span class="only-lg">{life.photos[k]}</span></Photo>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -36,7 +48,9 @@ const recentHref = `/gallery/${life.recentYear.replace('–', '-')}`;
         {life.recent.map((name) => (
           <li class="life-album-li">
             <a class="life-album" href={recentHref}>
-              <span class="life-cover" aria-hidden="true"><span class="only-lg">[Album cover]</span></span>
+              <span class="life-cover" aria-hidden="true">
+                <Photo file={coverFile(recentYear, name)} alt="" class="life-img" sizes="(min-width: 1024px) 18vw, 40vw" maxWidth={640}><span class="only-lg">[Album cover]</span></Photo>
+              </span>
               <span class="life-album-name">{name}</span>
             </a>
           </li>
@@ -68,6 +82,7 @@ const recentHref = `/gallery/${life.recentYear.replace('–', '-')}`;
   .life-album-link { display: inline-flex; align-items: center; min-height: 44px; font-size: 16px; font-weight: 600; text-decoration: underline; text-decoration-color: var(--link-underline); text-underline-offset: 6px; }
   .life-mosaic { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .life-ph { background: var(--ph-1); display: flex; align-items: flex-end; font-size: 12px; color: var(--text-muted); padding: 10px; }
+  .life-ph.has-photo, .life-cover:has(.life-img) { padding: 0; overflow: hidden; }
   .life-ph--main { grid-column: 1 / -1; aspect-ratio: 3 / 2; }
   .life-side, .life-pair { display: contents; }
   .life-ph--s { aspect-ratio: 1 / 1; }

@@ -117,7 +117,11 @@ type Doc = { title: string; kind: 'pdf' | 'na' | 'unavailable'; note?: string; h
       <section id="infra" class="md-sec" aria-labelledby="infra-h">
         <h2 id="infra-h" class="md-h2"><span class="md-l2">E.</span>Infrastructure</h2>
         <dl class="md-dl tnum">
-          {M.infrastructure.map((r) => <div class="md-row"><dt>{r.label}</dt><dd>{r.value}</dd></div>)}
+          {M.infrastructure.map((r) => (
+            <div class="md-row"><dt>{r.label}</dt><dd>{r.href
+              ? <a href={r.href} target="_blank" rel="noopener">{r.value}<Icon name="external" size={14} /><span class="vh"> (YouTube video, opens in a new tab)</span></a>
+              : r.value}</dd></div>
+          ))}
         </dl>
       </section>
     </div>

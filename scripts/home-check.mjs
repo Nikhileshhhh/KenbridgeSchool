@@ -80,7 +80,7 @@ try {
   // Facilities preview
   await page.locator('.fac-link').nth(3).focus();
   check((await page.locator('[data-fac-name]').textContent()) === 'Multipurpose Hall', 'focusing a facility updates the preview');
-  check((await page.locator('[data-fac-photo-label]').textContent()) === '[Photo · MPH.jpg]', 'the preview keeps the exact placeholder wording');
+  check(await page.locator('[data-fac-slide]:not([hidden])').count() === 1 && /MPH\.jpg/.test(await page.locator('[data-fac-slide]:not([hidden])').innerHTML()), 'the preview shows only that facility’s photo (MPH.jpg) or its placeholder');
 
   // Tour dialog
   const tour = page.locator('.hero [data-tour-open]');

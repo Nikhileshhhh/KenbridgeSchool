@@ -20,7 +20,7 @@ const atlas = document.querySelector('[data-atlas]');
 if (atlas) {
   const rows = [...atlas.querySelectorAll('[data-atlas-row]')];
   const photo = atlas.querySelector('[data-atlas-photo]');
-  const label = atlas.querySelector('[data-atlas-label]');
+  const slides = [...atlas.querySelectorAll('[data-atlas-slide]')];
   const bignum = atlas.querySelector('[data-atlas-bignum]');
   const num = atlas.querySelector('[data-atlas-num]');
   const name = atlas.querySelector('[data-atlas-name]');
@@ -33,8 +33,7 @@ if (atlas) {
     if (i < 0 || i === current) return;
     current = i;
     const d = rows[i].dataset;
-    label.textContent = d.label;
-    photo.setAttribute('aria-label', `Placeholder for a photograph: ${d.label.slice(1, -1)}`);
+    slides.forEach((s, k) => { s.hidden = k !== i; });
     bignum.textContent = d.num;
     num.textContent = d.num;
     name.textContent = d.name;

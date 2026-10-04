@@ -7,7 +7,10 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../../components/shell/Breadcrumbs.astro';
 import Icon from '../../../components/ui/Icon.astro';
+import Photo from '../../../components/ui/Photo.astro';
+import { getImage } from 'astro:assets';
 import { getMain } from '../../../lib/site';
+import { coverFile, findPhoto } from '../../../lib/photos';
 
 export async function getStaticPaths() {
   const G = await getMain('gallery');
@@ -22,17 +25,21 @@ const tones = ['--ph-1', '--ph-2', '--ph-3', '--ph-4'];
 // Board geometry: 4 columns in 1312px with 16px gaps (desktop); 2 in 350px with 10px gaps (phones).
 const colD = (1312 - 16 * 3) / 4;
 const colM = (350 - 10) / 2;
-const photos = a.photos.map((p, i) => {
+const photos = await Promise.all(a.photos.map(async (p, i) => {
   const n = i + 1;
   const hD = Math.round(colD / p.ratio);
   const hM = Math.round(colM / p.ratio);
+  const found = await findPhoto({ file: p.file });
+  // The lightbox's full-size copy, fitted to the largest screen it is shown on (1152 px wide).
+  const full = found ? (await getImage({ src: found.src, width: Math.min(found.src.width, 1920), format: 'webp' })).src : undefined;
   return {
-    n, n2: pad(n), file: p.file, ratio: p.ratio,
-    alt: p.alt ?? `[Alt text for photo ${n}: who and what is in the picture]`,
+    n, n2: pad(n), file: p.file, ratio: p.ratio, found: !!found, full,
+    alt: p.alt ?? found?.alt ?? `[Alt text for photo ${n}: who and what is in the picture]`,
     caption: p.caption ?? `[Caption for photo ${n} from the school: the moment, the class or house, the performance.]`,
     spanD: Math.ceil((hD + 16) / 4), spanM: Math.ceil((hM + 10) / 4)
   };
-});
+}));
+const moreCovers = await Promise.all(a.more.map(async (m) => ((await findPhoto({ file: coverFile(year, m) })) ? coverFile(year, m) : undefined)));
 const crumbs = [{ label: 'Gallery', href: '/gallery' }, { label: year, href: `/gallery/${year}` }, { label: a.name }];
 const ld = [{ label: 'Home', href: '/' }, ...crumbs];
 ---
@@ -65,11 +72,15 @@ const ld = [{ label: 'Home', href: '/' }, ...crumbs];
       <ul class="al-grid" role="list" data-masonry>
         {photos.map((p, i) => (
           <li class="al-item" style={`--sd:${p.spanD};--sm:${p.spanM};--ratio:${p.ratio}`} data-ratio={p.ratio}>
-            <button type="button" class="al-thumb js-only" aria-haspopup="dialog" aria-label={`Open photo ${p.n} of ${total}: ${p.alt}`} data-lb-open={i} data-file={p.file} data-alt={p.alt} data-caption={p.caption} style={`background:var(${tones[i % 4]})`}>
-              <span class="al-thumb-img"><span aria-hidden="true">[{p.n2} · {p.file}]</span></span>
+            <button type="button" class="al-thumb js-only" aria-haspopup="dialog" aria-label={`Open photo ${p.n} of ${total}: ${p.alt}`} data-lb-open={i} data-file={p.file} data-alt={p.alt} data-caption={p.caption} data-src={p.full} style={`background:var(${tones[i % 4]})`}>
+              <span class:list={['al-thumb-img', p.found && 'al-thumb-img--photo']}>
+                <Photo file={p.file} alt="" sizes="(min-width: 1024px) 320px, 50vw" maxWidth={960}><span aria-hidden="true">[{p.n2} · {p.file}]</span></Photo>
+              </span>
             </button>
-            <div class="al-thumb al-thumb--static no-js-only" role="img" aria-label={p.alt} style={`background:var(${tones[i % 4]})`}>
-              <span class="al-thumb-img"><span aria-hidden="true">[{p.n2} · {p.file}]</span></span>
+            <div class="al-thumb al-thumb--static no-js-only" role={p.found ? undefined : 'img'} aria-label={p.found ? undefined : p.alt} style={`background:var(${tones[i % 4]})`}>
+              <span class:list={['al-thumb-img', p.found && 'al-thumb-img--photo']}>
+                <Photo file={p.file} sizes="(min-width: 1024px) 320px, 50vw" maxWidth={960}><span aria-hidden="true">[{p.n2} · {p.file}]</span></Photo>
+              </span>
             </div>
           </li>
         ))}
@@ -80,8 +91,10 @@ const ld = [{ label: 'Home', href: '/' }, ...crumbs];
       <div class="container al-more-in">
         <h2 class="al-more-h tnum">More from {year}</h2>
         <ul class="al-more-list" role="list">
-          {a.more.map((m) => (
-            <li><a class="al-more-tile" href={`/gallery/${year}`}><span class="al-more-cover" role="img" aria-label={`Cover photo placeholder: ${m}`}>[Cover · {m}]</span><span class="al-more-text"><span class="al-more-name">{m}</span><span class="al-more-meta tnum">{year} · [n] photos</span></span></a></li>
+          {a.more.map((m, k) => (
+            <li><a class="al-more-tile" href={`/gallery/${year}`}>{moreCovers[k]
+              ? <span class="al-more-cover al-more-cover--photo"><Photo file={moreCovers[k]} alt="" sizes="(min-width: 1024px) 200px, 30vw" maxWidth={640} /></span>
+              : <span class="al-more-cover" role="img" aria-label={`Cover photo placeholder: ${m}`}>[Cover · {m}]</span>}<span class="al-more-text"><span class="al-more-name">{m}</span><span class="al-more-meta tnum">{year} · [n] photos</span></span></a></li>
           ))}
         </ul>
         <a class="al-back tnum" href={`/gallery/${year}`}><Icon name="arrow-left" size={16} />Back to {year}</a>
@@ -146,6 +159,10 @@ const ld = [{ label: 'Home', href: '/' }, ...crumbs];
   .al-item { grid-row: span var(--sm); }
   .al-thumb { display: block; width: 100%; height: calc(100% - 10px); padding: 0; border: 0; overflow: hidden; text-align: left; }
   .al-thumb-img { display: flex; align-items: flex-end; width: 100%; height: 100%; padding: 8px; font-size: 11px; line-height: 1.3; color: var(--text-muted); }
+  .al-thumb-img.al-thumb-img--photo { padding: 0; }
+  .al-more-cover.al-more-cover--photo { padding: 0; overflow: hidden; }
+  .lb-img.has-photo { padding: 0; }
+  .lb-img :global(img) { display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; user-select: none; }
   .al-thumb:focus-visible { outline-offset: 3px; }
   @media (prefers-reduced-motion: no-preference) {
     .al-thumb-img { transition: transform 400ms cubic-bezier(.22, 1, .36, 1); }

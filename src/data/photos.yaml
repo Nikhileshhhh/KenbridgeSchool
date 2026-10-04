@@ -1,6 +1,97 @@
-# Alt text for supplied photographs (src/assets/photos/<file>). A photo named in a placeholder label
-# renders only once its file is in src/assets/photos/ AND it has an entry here, written or approved by
-# the school. Use "" only for a purely decorative image. Example:
-#   Drone-Front.jpg: The school's front building seen from above, with the playground in front.
+# Alt text for supplied photographs (src/assets/photos/<file>). A photo fills a placeholder once its
+# file is in src/assets/photos/ AND it has an entry here. Use "" only for a purely decorative image.
+#
+# The photos are the current site's own (kenbridgegulbarga.com), each used where the current site uses
+# it; the source of every file is listed in PLACEHOLDERS.md › "Photos from the current site".
+# TODO(content): the alt text below was written from what each photo shows and the current site's own
+# headings (the current site has none); the school to approve or replace it.
+#
+# Album covers are decorative ("") because every cover sits beside the album's name.
 main:
-  alt: {}
+  alt:
+    Drone-Front.jpg: Aerial view of the KenBridge School campus, with the main building beside the highway.
+    DSC_9673.jpg: The KenBridge School building and its front driveway, lined with palms.
+    DJI_0401.jpg: Aerial view of the school playground, with students lined up around the field and the school buildings behind.
+    Class-Room.jpg: Students at their desks in a KenBridge classroom, with a teacher at the interactive board.
+    MPH.jpg: Students and guests seated in the Neville Irani Multipurpose Hall.
+    DSC0816.jpg: Students performing on the stage of the Neville Irani Multipurpose Hall.
+    Science-Lab.jpg: Students watching a teacher demonstrate an experiment in the science lab.
+    Math-Lab.jpg: Students working with models and computers in the Maths Lab.
+    Indoor-Sports-Room-1.jpg: Students playing chess and board games in the indoor sports room.
+    Indoor-Sports-Room-2.jpg: Students playing table tennis in the indoor sports room.
+    Indoor-Sports-Room-3.jpg: Students playing carrom in the indoor sports room.
+    Dance-Room-2.jpg: Students in a dance class in the dance room.
+    Music-Room-2.jpg: Students learning the guitar in the music room.
+    Library-2.jpg: Students reading at long tables in the school library.
+    Library-3.jpg: Students reading at the library tables, with bookshelves along the walls.
+    lib3.jpg: Library shelves filled with books.
+    comp2.jpg: The computer lab, with rows of computers along the walls.
+    Pre-Primary.jpg: Pre-primary children at low tables in a bright activity room.
+    Founder.jpg: Mr. Neville Homi Irani, founder of KenBridge School.
+    toppers_2021-1.jpg: The school’s Class X 2021 results banner, with photographs of the top achievers and the result analysis.
+    toppers_2022.jpg: The school’s Class X 2022 results banner, with photographs of the top achievers and the result analysis.
+    2023-Results.jpg: The school’s Class X 2023 results banner, with photographs of the top achievers and the result analysis.
+    2024-results.jpg: The school’s Class X 2024 results banner, with photographs of the top achievers and the result analysis.
+    2026BannerREV.jpg: The school’s Class X 2026 results banner, with photographs of the top achievers and the result analysis.
+    ANNUAL-2025-26SC_01.jpg: Annual Day 2025–26, students dancing on a brightly lit stage.
+    ANNUAL-2025-26SC_02.jpg: Annual Day 2025–26, a girl dancing between giant paper roses.
+    ANNUAL-2025-26SC_03.jpg: Annual Day 2025–26, students in traditional costume dancing on stage.
+    ANNUAL-2025-26SC_04.jpg: Annual Day 2025–26, the whole stage lit in blue, with sparklers.
+    ANNUAL-2025-26SC_05.jpg: Annual Day 2025–26, a wide view of the stage with sparkler fountains.
+    ANNUAL-2025-26SC_06.jpg: Annual Day 2025–26, a wide view of the stage under coloured lights.
+    ANNUAL-2025-26SC_07.jpg: Annual Day 2025–26, students with guitars and rose costumes performing.
+    ANNUAL-2025-26SC_08.jpg: Annual Day 2025–26, a group in rose costumes in front of a red rose backdrop.
+    ANNUAL-2025-26SC_09.jpg: Annual Day 2025–26, students in a group dance in front of a large screen.
+    ANNUAL-2025-26SC_10.jpg: Annual Day 2025–26, students dancing in floral costumes.
+    ANNUAL-2025-26SC_11.jpg: Annual Day 2025–26, students in black and white costumes in a dance formation.
+    ANNUAL-2025-26SC_12.jpg: Annual Day 2025–26, dancers in green under a shower of confetti.
+    ANNUAL-2025-26SC_13.jpg: Annual Day 2025–26, young children in green costumes dancing in a line.
+    ANNUAL-2025-26SC_14.jpg: Annual Day 2025–26, students in gold costumes dancing with props.
+    ANNUAL-2025-26SC_15.jpg: Annual Day 2025–26, a wide view of the stage during a group performance.
+    ANNUAL-2025-26SC_16.jpg: Annual Day 2025–26, students in costume performing a dance drama.
+    ANNUAL-2025-26SC_17.jpg: Annual Day 2025–26, students in black performing before a temple backdrop.
+    ANNUAL-2025-26SC_18.jpg: Annual Day 2025–26, students in black dancing on a patterned stage.
+    cover-2026-27-endowment-lecture.jpg: ''
+    cover-2026-27-yoga-day.jpg: ''
+    cover-2026-27-investiture-ceremony.jpg: ''
+    cover-2026-27-environment-day.jpg: ''
+    cover-2026-27-independence-day.jpg: ''
+    cover-2025-26-annual-day.jpg: ''
+    cover-2025-26-environment-day.jpg: ''
+    cover-2025-26-yoga-day.jpg: ''
+    cover-2025-26-investiture-ceremony.jpg: ''
+    cover-2025-26-endowment-lecture.jpg: ''
+    cover-2025-26-grand-parents-day.jpg: ''
+    cover-2025-26-excursion.jpg: ''
+    cover-2025-26-inauguration-of-sports-week.jpg: ''
+    cover-2025-26-republic-day.jpg: ''
+    cover-2025-26-graduation-day.jpg: ''
+    cover-2024-25-sports-day.jpg: ''
+    cover-2024-25-investiture-ceremony.jpg: ''
+    cover-2024-25-environment-day.jpg: ''
+    cover-2024-25-yoga-day.jpg: ''
+    cover-2024-25-robotic-lab.jpg: ''
+    cover-2024-25-red-colour-day.jpg: ''
+    cover-2024-25-little-minds-big-impact.jpg: ''
+    cover-2024-25-math-art-competition.jpg: ''
+    cover-2024-25-endowment-lecture.jpg: ''
+    cover-2024-25-republic-day.jpg: ''
+    cover-2024-25-wonderla.jpg: ''
+    cover-2024-25-interschool-dance.jpg: ''
+    cover-2024-25-independence-day.jpg: ''
+    cover-2024-25-farewell-party.jpg: ''
+    cover-2024-25-christmas.jpg: ''
+    cover-ipl-kbs.jpg: ''
+    # The campus tour video's YouTube thumbnail (decorative: the card names the tour).
+    tour-NA7Ksy1WsnY.jpg: ''
+  # Labels that name no file, matched by their wording (case-insensitive), to the photo the current
+  # site uses for that subject.
+  labels:
+    Pre-primary activity room: Pre-Primary.jpg # current site › Our School › Pre Primary
+    Science lab session: Science-Lab.jpg # current site › Facilities › Science Lab
+    Science Lab photo: Science-Lab.jpg
+    Playground photo: DJI_0401.jpg # current site › Facilities › Play Ground
+    A Primary classroom at work: Class-Room.jpg # current site › Facilities › Class Room
+    Cover photo from the latest album: cover-2026-27-independence-day.jpg # current site › Gallery › 2026-27
+    SC_11: ANNUAL-2025-26SC_11.jpg
+    SC_15: ANNUAL-2025-26SC_15.jpg

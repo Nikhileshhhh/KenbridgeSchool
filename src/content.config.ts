@@ -388,7 +388,7 @@ const info = defineCollection({
       documents: z.array(z.object({ title: z.string(), kind: z.enum(['pdf', 'na', 'unavailable']), note: z.string().optional(), href: z.string().optional() })),
       academics: z.array(z.object({ title: z.string(), kind: z.enum(['pdf', 'na', 'unavailable']), note: z.string().optional(), href: z.string().optional() })),
       staff: z.array(z.object({ role: z.string(), value: z.string(), details: z.string().optional() })),
-      infrastructure: z.array(z.object({ label: z.string(), value: z.string() }))
+      infrastructure: z.array(z.object({ label: z.string(), value: z.string(), href: z.string().url().optional() }))
     })
   })
 });
@@ -423,7 +423,11 @@ const contact = defineCollection({
 
 const photos = defineCollection({
   loader: file('src/data/photos.yaml'),
-  schema: z.object({ alt: z.record(z.string(), z.string()) })
+  schema: z.object({
+    alt: z.record(z.string(), z.string()),
+    /** Placeholder wording → supplied file, for labels that name no file ("Pre-primary activity room"). */
+    labels: z.record(z.string(), z.string()).default({})
+  })
 });
 
 export const collections = {

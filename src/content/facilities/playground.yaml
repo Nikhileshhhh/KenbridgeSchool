@@ -6,8 +6,8 @@ short: playground
 group: grow
 descriptor: Developed to support various sports events.
 atlasDesc: Developed to support various sports events, with synthetic courts for outdoor games.
-homePhoto: '[Playground photo]'
-atlasPhoto: playground
-photoNeeded: true
-photos: []
+# The current site's Facilities › Play Ground tab shows the aerial view of the field (DJI_0401).
+homePhoto: DJI_0401.jpg
+atlasPhoto: DJI_0401
+photos: [DJI_0401.jpg]
 what: ['Developed to support various sports events, with synthetic courts for outdoor games.']

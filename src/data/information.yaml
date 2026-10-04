@@ -198,4 +198,6 @@ main:
       - { label: Library, value: 150 sq m }
       - { label: Internet facility, value: 'Yes' }
       - { label: Toilets, value: Girls 60 · Boys 60 · CWSN 2 }
-      - { label: Inspection video, value: '[Inspection video link]' }
+      # The current site's disclosure links "Inspection Video · Watch Video" to this video
+      # ("KenBridge School CBSE Inspection", on the school's YouTube channel).
+      - { label: Inspection video, value: KenBridge School CBSE Inspection, href: 'https://www.youtube.com/watch?v=QaUFgbvBKJE' }

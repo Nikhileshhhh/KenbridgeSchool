@@ -7,7 +7,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/shell/Breadcrumbs.astro';
 import Icon from '../../components/ui/Icon.astro';
 import Placeholder from '../../components/ui/Placeholder.astro';
+import Photo from '../../components/ui/Photo.astro';
 import { getFacilities, getSettings, metaDescription } from '../../lib/site';
+import { findPhoto } from '../../lib/photos';
 
 export async function getStaticPaths() {
   const all = await getFacilities();
@@ -20,6 +22,7 @@ const f = all[facility!];
 const { facilityDrafts: drafts } = await getSettings();
 
 const hero = f.photos[0] ?? 'photo needed';
+const heroPhoto = await findPhoto({ label: `[Photo · ${hero}]` });
 type Block = { id: string; title: string; paras: string[]; list: string[]; pending?: string; pendingItems: string[] };
 const blocks: Block[] = [];
 const add = (id: string, title: string, paras: string[], list: string[], pNote?: string, pItems: string[] = []) => {
@@ -50,11 +53,20 @@ const ldCrumbs = [{ label: 'Home', href: '/' }, ...crumbs];
   breadcrumbs={ldCrumbs}
 >
   <section class="fd-hero on-dark" aria-labelledby="facH1">
-    <div class="fd-hero-bg" role="img" aria-label={`Placeholder for a photograph: ${f.name} (${hero})`}></div>
-    <div class="fd-hero-shade" aria-hidden="true"></div>
-    <span class="fd-corner fd-corner--l only-lg" aria-hidden="true"></span>
-    <span class="fd-corner fd-corner--r only-lg" aria-hidden="true"></span>
-    <span class="fd-hero-ph" aria-hidden="true"><span class="only-lg">[Photo · {hero} · full bleed]</span><span class="only-sm">[Photo · {hero} · portrait crop]</span></span>
+    {heroPhoto ? (
+      <>
+        <div class="fd-hero-bg"><Photo file={heroPhoto.file} class="fd-hero-img" sizes="100vw" priority /></div>
+        <div class="fd-hero-shade" aria-hidden="true"></div>
+      </>
+    ) : (
+      <>
+        <div class="fd-hero-bg" role="img" aria-label={`Placeholder for a photograph: ${f.name} (${hero})`}></div>
+        <div class="fd-hero-shade" aria-hidden="true"></div>
+        <span class="fd-corner fd-corner--l only-lg" aria-hidden="true"></span>
+        <span class="fd-corner fd-corner--r only-lg" aria-hidden="true"></span>
+        <span class="fd-hero-ph" aria-hidden="true"><span class="only-lg">[Photo · {hero} · full bleed]</span><span class="only-sm">[Photo · {hero} · portrait crop]</span></span>
+      </>
+    )}
     <div class="container fd-hero-copy">
       <Breadcrumbs items={crumbs} onDark collapse />
       <p class="fd-kicker tnum">Facility {f.num} of 10</p>
@@ -147,7 +159,7 @@ const ldCrumbs = [{ label: 'Home', href: '/' }, ...crumbs];
           {related.map((r) => (
             <li>
               <a class="fd-rel" href={r.href}>
-                <Placeholder label={`[${r.note}]`} alt={`Placeholder for a photograph: ${r.name}`} class="fd-rel-ph" />
+                <Placeholder label={`[${r.note}]`} alt={`Placeholder for a photograph: ${r.name}`} photoAlt="" sizes="96px" class="fd-rel-ph" />
                 <span class="fd-rel-text"><span class="fd-rel-num tnum">{r.num}</span><span class="fd-rel-name">{r.name}</span></span>
                 <Icon name="arrow" size={20} class="fd-rel-arrow" />
               </a>
@@ -177,6 +189,7 @@ const ldCrumbs = [{ label: 'Home', href: '/' }, ...crumbs];
   .fd-corner { position: absolute; top: 121px; width: 24px; height: 24px; border: 0 solid var(--text-on-dark-muted); }
   .fd-corner--l { left: 32px; border-left-width: 1px; border-top-width: 1px; }
   .fd-corner--r { right: 32px; border-right-width: 1px; border-top-width: 1px; }
+  .fd-hero-bg :global(.fd-hero-img) { position: absolute; inset: 0; }
   .fd-hero-ph { position: absolute; left: var(--margin); top: 92px; font-size: 12px; color: var(--text-on-dark-muted); }
   .fd-hero-copy { position: relative; display: flex; flex-direction: column; gap: 14px; }
   .fd-kicker { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
@@ -235,6 +248,7 @@ const ldCrumbs = [{ label: 'Home', href: '/' }, ...crumbs];
   .fd-rel:hover { color: var(--text); }
   .fd-rel:hover .fd-rel-name { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 1px; }
   .fd-rel :global(.fd-rel-ph) { aspect-ratio: 4 / 3 !important; padding: 5px; font-size: 9px; line-height: 1.2; }
+  .fd-rel :global(.fd-rel-ph.ph--photo) { padding: 0; }
   .fd-rel-text { display: flex; flex-direction: column; gap: 2px; }
   .fd-rel-num { font-size: 12px; font-weight: 700; color: var(--brand); }
   .fd-rel-name { font-family: var(--font-display); font-size: 24px; font-weight: 500; line-height: 1.1; }

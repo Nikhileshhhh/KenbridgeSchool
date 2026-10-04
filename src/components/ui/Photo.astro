@@ -1,0 +1,49 @@
+---
+// A supplied photograph in place of a placeholder that has its own markup (hero backgrounds, menu
+// figures, album covers). Renders the picture when the label's photo (or `file`) has been supplied,
+// otherwise the slot, which is the placeholder exactly as designed. See src/lib/photos.ts.
+import { Picture } from 'astro:assets';
+import { findPhoto } from '../../lib/photos';
+
+interface Props {
+  label?: string;
+  file?: string;
+  /** Overrides the alt text from photos.yaml, e.g. "" where visible text already names the photo. */
+  alt?: string;
+  class?: string;
+  /** Above the fold (a hero): load eagerly with high priority. */
+  priority?: boolean;
+  /** The image's displayed width, for srcset selection. */
+  sizes?: string;
+  /** Largest width to generate; small slots need no 2880 px copy. */
+  maxWidth?: number;
+}
+const { label, file, alt, class: cls, priority = false, sizes = '100vw', maxWidth = 2880 } = Astro.props;
+const photo = await findPhoto({ label, file });
+const widths = photo ? [390, 640, 960, 1280, 1920, 2880].filter((w) => w <= Math.min(photo.src.width, maxWidth)) : [];
+if (photo && !widths.length) widths.push(Math.min(photo.src.width, maxWidth));
+---
+{photo ? (
+  <Picture
+    src={photo.src}
+    alt={alt ?? photo.alt}
+    formats={['avif', 'webp']}
+    fallbackFormat="jpg"
+    widths={widths}
+    sizes={sizes}
+    loading={priority ? 'eager' : 'lazy'}
+    fetchpriority={priority ? 'high' : undefined}
+    decoding="async"
+    class:list={['photo', cls]}
+    pictureAttributes={{ class: 'photo-pic' }}
+    data-photo={photo.file}
+  />
+) : (
+  <slot />
+)}
+
+<style>
+  /* The <picture> wrapper takes no box, so the image sizes against the slot it replaces. */
+  :global(.photo-pic) { display: contents; }
+  :global(img.photo) { display: block; width: 100%; height: 100%; object-fit: cover; }
+</style>

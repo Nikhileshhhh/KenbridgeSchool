@@ -41,6 +41,32 @@ if (root && dialog && typeof dialog.showModal === 'function') {
     failed.hidden = state !== 'failed';
   }
 
+  // The full-size photo (data-src on the thumbnail): "Loading" until it arrives, "failed" + Try again
+  // if it cannot. The stage keeps its role="img" and aria-label (the photo's alt), so the <img> is alt="".
+  const label = $('[data-lb-label]');
+  function load(i, retry = false) {
+    let pic = img.querySelector('img');
+    // Not draggable: a native image drag would swallow the swipe between photos.
+    if (!pic) { pic = document.createElement('img'); pic.alt = ''; pic.decoding = 'async'; pic.draggable = false; img.prepend(pic); }
+    img.classList.add('has-photo');
+    label.hidden = true;
+    const src = thumbs[i].dataset.src;
+    const ready = () => { if (index === i) setState('loaded'); };
+    pic.onload = ready;
+    pic.onerror = () => { if (index === i) setState('failed'); };
+    if (retry || pic.getAttribute('src') !== src) {
+      setState('loading');
+      if (retry) pic.removeAttribute('src');
+      pic.src = src;
+    }
+    if (pic.complete && pic.naturalWidth) ready();
+  }
+  function setLabelOnly() {
+    img.querySelector('img')?.remove();
+    img.classList.remove('has-photo');
+    label.hidden = false;
+  }
+
   function show(i) {
     if (i < 0 || i >= total) return;
     index = i;
@@ -56,7 +82,9 @@ if (root && dialog && typeof dialog.showModal === 'function') {
     $$('[data-lb-prev]').forEach((b) => b.setAttribute('aria-disabled', String(i === 0)));
     $$('[data-lb-next]').forEach((b) => b.setAttribute('aria-disabled', String(i === total - 1)));
     live.textContent = `Photo ${i + 1} of ${total}`;
-    setState(forced === 'loading' || forced === 'failed' ? forced : 'loaded');
+    if (forced === 'loading' || forced === 'failed') setState(forced);
+    else if (t.src) load(i);
+    else { setLabelOnly(); setState('loaded'); }
     img.classList.remove('is-in');
     void img.offsetWidth;
     img.classList.add('is-in');
@@ -75,7 +103,10 @@ if (root && dialog && typeof dialog.showModal === 'function') {
   $$('[data-lb-prev]').forEach((b) => b.addEventListener('click', () => step(-1)));
   $$('[data-lb-next]').forEach((b) => b.addEventListener('click', () => step(1)));
   $('[data-lb-close]').addEventListener('click', () => dialog.close());
-  $('[data-lb-retry]').addEventListener('click', () => { setState('loading'); setTimeout(() => setState('loaded'), 900); });
+  $('[data-lb-retry]').addEventListener('click', () => {
+    if (thumbs[index]?.dataset.src) load(index, true);
+    else { setState('loading'); setTimeout(() => setState('loaded'), 900); }
+  });
   dialog.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }

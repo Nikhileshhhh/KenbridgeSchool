@@ -3,6 +3,7 @@
 // Panels are plain lists of links (not role="menu"), per ShellHeader › Semantics.
 import FlameMark from '../ui/FlameMark.astro';
 import Icon from '../ui/Icon.astro';
+import Photo from '../ui/Photo.astro';
 import type { ResolvedLink } from '../../lib/site';
 
 interface Group { label?: string; links: ResolvedLink[] }
@@ -88,7 +89,9 @@ const { id, eyebrow, title, titlePrefix, hub, intro, lead, cols, groups, years, 
     </div>
 
     <figure class="mega-figure">
-      <div class="mega-photo" role="img" aria-label={`Placeholder: ${photo}`}>[Photo · {photo}]</div>
+      <Photo label={`[Photo · ${photo}]`} class="mega-img" sizes="(min-width: 1440px) 300px, 21vw" maxWidth={960}>
+        <div class="mega-photo" role="img" aria-label={`Placeholder: ${photo}`}>[Photo · {photo}]</div>
+      </Photo>
       <figcaption class="mega-caption">{caption}</figcaption>
     </figure>
   </div>
@@ -141,6 +144,7 @@ const { id, eyebrow, title, titlePrefix, hub, intro, lead, cols, groups, years, 
     line-height: 1.4;
     color: var(--text-muted);
   }
+  .mega-figure :global(.mega-img) { aspect-ratio: 4 / 3; height: auto; object-position: center 30%; }
   .mega-caption { font-size: 13px; line-height: 1.5; color: var(--text-muted); }
 
   .mlink { color: var(--text); text-decoration: none; }
