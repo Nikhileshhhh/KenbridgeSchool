@@ -99,6 +99,7 @@ const crumbLd = breadcrumbs && breadcrumbs.length > 1
     <meta name="twitter:card" content="summary_large_image" />
     <script type="application/ld+json" set:html={JSON.stringify(org)} />
     {crumbLd && <script type="application/ld+json" set:html={JSON.stringify(crumbLd)} />}
+    <slot name="head" />{/* Page extras for <head>, e.g. Home preloads its LCP image. */}
   </head>
   <body id="top">
     <a class="skip-link" href="#main">Skip to main content</a>

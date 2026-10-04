@@ -77,6 +77,9 @@ main:
       caption: '[Album name, 2026–27.]'
     - key: information
       label: Information
+      # Links to the hub are named "School Information" for screen readers and search engines;
+      # "Information" alone is too generic as link text. The words shown stay as designed.
+      fullLabel: School Information
       hub: /information
       eyebrow: Information
       title: Information

@@ -16,12 +16,19 @@ import AdmissionsPath from '../components/home/AdmissionsPath.astro';
 import QuickAccess from '../components/home/QuickAccess.astro';
 import ClosingScene from '../components/home/ClosingScene.astro';
 import TourDialog from '../components/home/TourDialog.astro';
+import { getImage } from 'astro:assets';
+import logo from '../assets/brand/logo-official-transparent.png';
+
+// The hero emblem is the LCP element but sits deep in the HTML (after the header and menus):
+// preload it from <head>. Same options as Emblem.astro, so it is the same file.
+const lcp = await getImage({ src: logo, width: 512, height: 512, format: 'png' });
 ---
 <BaseLayout
   title="Home"
   description="KenBridge School Gulbarga is a CBSE English-medium school in Kalaburagi, Karnataka, founded in 2011 by the Homi Educational Trust. Pre-KG to Class X."
   header="hero"
 >
+  <link slot="head" rel="preload" as="image" href={lcp.src} fetchpriority="high" />
   <HomeHero />
   <ValuesBand />
   <IdeaSection />
@@ -43,3 +50,13 @@ import TourDialog from '../components/home/TourDialog.astro';
   import '../scripts/journey.js';
   import '../scripts/home.js';
 </script>
+
+<style is:global>
+  /* Below the fold, the browser skips layout until a section nears the viewport (mobile LCP and
+     style/layout cost). Content stays in the accessibility tree and find-in-page. Not the pinned
+     journey, whose sticky scene and scroll maths need real layout. */
+  main > :is(.values, .idea, .vm, .proof, .ach, .campus, .fac, .life, .adm, .qa, .closing) {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 900px;
+  }
+</style>

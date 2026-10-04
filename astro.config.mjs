@@ -10,7 +10,9 @@ export default defineConfig({
   trailingSlash: 'never',
   build: {
     format: 'file',
-    inlineStylesheets: 'auto'
+    // Every page's CSS is small (≈ 16 KB raw on Home), so it is inlined: no render-blocking requests,
+    // which is most of the mobile LCP on slow connections.
+    inlineStylesheets: 'always'
   },
   integrations: [
     sitemap({

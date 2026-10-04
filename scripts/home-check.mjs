@@ -15,6 +15,10 @@ const focusText = (page) => page.evaluate(() => document.activeElement?.textCont
 
 const server = await startPreview();
 const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+// Headless Chromium renders WebGL in software, which the site deliberately skips for real visitors;
+// force the 3D path here so it is still tested.
+const newContext = browser.newContext.bind(browser);
+browser.newContext = async (o) => { const c = await newContext(o); await c.addInitScript(() => { window.__kbEmblemForce3D = true; }); return c; };
 try {
   /* ---------- desktop, JS on, motion allowed ---------- */
   const page = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
@@ -84,6 +88,8 @@ try {
   await page.keyboard.press('Enter');
   check(await page.locator('[data-tour-dialog]').isVisible(), 'Take the virtual tour opens the dialog');
   check((await focusText(page)).startsWith('Close'), 'focus moves to Close');
+  // Let the 320 ms open fade finish, or axe measures a half-transparent dialog.
+  await page.locator('[data-tour-dialog]').evaluate((d) => Promise.all(d.getAnimations({ subtree: true }).map((a) => a.finished)));
   await axe(page, 'Home desktop, tour dialog open');
   await page.keyboard.press('Escape');
   check(!(await page.locator('[data-tour-dialog]').isVisible()), 'Esc closes the dialog');

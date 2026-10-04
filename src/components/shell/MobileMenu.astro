@@ -25,7 +25,7 @@ const sections = nav.sections.map((s) => {
       ...facilities.map((f) => resolveLink({ label: f.data.name, href: `/campus/${f.id}` }, services))
     ];
   }
-  return { key: s.key, label: s.label, hub: s.hub, years: s.years, links };
+  return { key: s.key, label: s.label, fullLabel: s.fullLabel, hub: s.hub, years: s.years, links };
 });
 const [phone1, phone2] = school.phones;
 ---
@@ -51,7 +51,7 @@ const [phone1, phone2] = school.phones;
               <span class="mm-label">{s.label}</span>
               <span class="mm-icon" aria-hidden="true"><Icon name="plus" size={14} class="mm-plus" /><Icon name="minus" size={14} class="mm-minus" /></span>
             </button>
-            <a class="mm-toggle mm-hub no-js-only" href={s.hub}><span class="mm-label">{s.label}</span></a>
+            <a class="mm-toggle mm-hub no-js-only" href={s.hub}><span class="mm-label">{s.fullLabel && <span class="vh">{s.fullLabel.slice(0, -s.label.length)}</span>}{s.label}</span></a>
           </h2>
           <div id={`mm-${s.key}`} class="mm-panel" data-mm-panel>
             {s.years ? (

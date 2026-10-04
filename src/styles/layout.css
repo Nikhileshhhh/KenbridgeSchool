@@ -23,3 +23,6 @@
 .stack-3 { gap: var(--space-3); }
 .stack-4 { gap: var(--space-4); }
 .stack-6 { gap: var(--space-6); }
+
+/* The footer is below the fold everywhere: skip its layout until it nears the viewport. */
+.site-footer { content-visibility: auto; contain-intrinsic-size: auto 820px; }

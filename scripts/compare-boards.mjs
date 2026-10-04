@@ -125,6 +125,8 @@ try {
     if (only.length && !only.some((o) => c.name.includes(o))) continue;
     console.log(`… ${c.name}`);
     const ctx = await browser.newContext({ viewport: { width: c.width, height: c.height ?? 900 }, reducedMotion: c.motion ?? 'reduce' });
+    // Headless WebGL is software, which the site skips; force the 3D emblem for the board comparisons.
+    await ctx.addInitScript(() => { window.__kbEmblemForce3D = true; });
     const page = await ctx.newPage();
     await page.goto(BASE + c.url, { waitUntil: 'networkidle' });
     await page.waitForTimeout(300);

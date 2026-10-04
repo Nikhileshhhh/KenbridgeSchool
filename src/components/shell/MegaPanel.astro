@@ -11,6 +11,8 @@ interface Props {
   eyebrow: string;
   title: string;
   hub: string;
+  /** Visually hidden words before the title link, so it is not just "Information". */
+  titlePrefix?: string;
   intro: string;
   lead?: { label: string; href: string };
   cols: number;
@@ -19,13 +21,13 @@ interface Props {
   photo: string;
   caption: string;
 }
-const { id, eyebrow, title, hub, intro, lead, cols, groups, years, photo, caption } = Astro.props;
+const { id, eyebrow, title, titlePrefix, hub, intro, lead, cols, groups, years, photo, caption } = Astro.props;
 ---
 <div id={id} class="mega-panel" data-mega-panel hidden>
   <div class="container mega-grid">
     <div class="mega-intro">
       <div class="mega-eyebrow eyebrow-text"><FlameMark size={12} /><span>{eyebrow}</span></div>
-      <a class="mega-title" href={hub}>{title}</a>
+      <a class="mega-title" href={hub}>{titlePrefix && <span class="vh">{titlePrefix}</span>}{title}</a>
       <p class="mega-text">{intro}</p>
     </div>
 

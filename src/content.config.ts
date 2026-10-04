@@ -76,6 +76,8 @@ const navigation = defineCollection({
       z.object({
         key: z.string(),
         label: z.string(),
+        /** A fuller name for links to the hub (e.g. "School Information"); the extra words are visually hidden. */
+        fullLabel: z.string().optional(),
         hub: z.string(),
         eyebrow: z.string(),
         title: z.string(),

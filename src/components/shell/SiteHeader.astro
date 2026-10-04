@@ -93,7 +93,7 @@ const [phone1, phone2] = school.phones;
           return (
             <li class="nav-li">
               <a class:list={['nav-item no-js-only', isCurrent && 'is-current']} href={s.hub}>
-                {s.label}{isCurrent && <span class="vh"> (current section)</span>}
+                {s.fullLabel && <span class="vh">{s.fullLabel.slice(0, -s.label.length)}</span>}{s.label}{isCurrent && <span class="vh"> (current section)</span>}
               </a>
               <button
                 type="button"
@@ -109,6 +109,7 @@ const [phone1, phone2] = school.phones;
                 id={`mega-${s.key}`}
                 eyebrow={s.eyebrow}
                 title={s.title}
+                titlePrefix={s.fullLabel?.endsWith(s.title) ? s.fullLabel.slice(0, -s.title.length) : undefined}
                 hub={s.hub}
                 intro={s.intro}
                 lead={s.lead}

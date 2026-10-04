@@ -1,5 +1,5 @@
 // Launch check (batch 12) on every built page:
-//  · Keyboard (1440, JS on): the first Tab lands on the skip link, Enter moves focus into <main>;
+//  · Keyboard (1440, JS on, reduced motion): the first Tab lands on the skip link, Enter moves focus into <main>;
 //    then 40 Tab stops: every focused element shows a focus indicator, is on screen, and focus
 //    never gets stuck.
 //  · JS off (390 and 1440): no sideways scroll, the h1 shows, nothing that needs JS is visible,
@@ -18,12 +18,17 @@ const fail = (msg) => { console.log(`✗ ${msg}`); failures++; };
 const server = await startPreview();
 const browser = await chromium.launch();
 try {
-  const kb = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  // Reduced motion here so smooth scrolling has finished when focus is measured (and the 3D emblem,
+  // slow in software WebGL, stays static); motion itself is checked in its own pass below.
+  const kb = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
   const nojs = await browser.newContext({ viewport: { width: 390, height: 844 }, javaScriptEnabled: false });
   const nojsWide = await browser.newContext({ viewport: { width: 1440, height: 900 }, javaScriptEnabled: false });
   const rm = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
+  // axe needs JS to run, so the no-JS axe pass strips the page's own scripts in a JS-enabled context.
+  const axCtx = await browser.newContext({ viewport: { width: 390, height: 844 } });
   for (const route of routes) {
     let bad = 0;
+    const t0 = Date.now(); const lap = (s) => process.env.LC_DEBUG && console.log(`  ${route} ${s} ${Date.now() - t0}ms`);
     // ---- Keyboard ----
     const p = await kb.newPage();
     await p.goto(BASE + route, { waitUntil: 'load' });
@@ -54,6 +59,7 @@ try {
       if (repeats >= 2) { fail(`${route}: focus is stuck on ${info.desc}`); bad++; break; }
     }
     await p.close();
+    lap('keyboard');
 
     // ---- JS off ----
     for (const ctx of [nojs, nojsWide]) {
@@ -74,11 +80,13 @@ try {
       if (r.noHref) { fail(`${route} JS off @${w}: ${r.noHref} link(s) without href`); bad++; }
       await q.close();
     }
-    const ax = await nojs.newPage();
+    lap('js off');
+    const ax = await axCtx.newPage();
     await gotoWithoutScripts(ax, BASE + route);
     const res = await new AxeBuilder({ page: ax }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze();
     if (res.violations.length) { fail(`${route} JS off @390 axe: ${res.violations.map((v) => `${v.id} ${v.nodes.map((n) => n.target.join(' ')).slice(0, 2).join(' | ')}`).join('; ')}`); bad++; }
     await ax.close();
+    lap('axe');
 
     // ---- Reduced motion ----
     const m = await rm.newPage();

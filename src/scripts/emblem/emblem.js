@@ -12,10 +12,22 @@ const PARTS = {
 const HIT_ORDER = ['rays', 'flame', 'nib', 'head', 'book'];
 const reduceMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+// WebGL on a real GPU only: failIfMajorPerformanceCaveat refuses software rendering (SwiftShader,
+// no GPU, blocklisted drivers), where the 3D scene would block the main thread for seconds. Those
+// devices keep the static official artwork, as with reduced motion.
 function webglOK() {
+  // QA only: the check scripts set this so the 3D path is still tested in headless (software) Chromium.
+  if (window.__kbEmblemForce3D) return true;
   try {
     const c = document.createElement('canvas');
-    return !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl')));
+    const o = { failIfMajorPerformanceCaveat: true };
+    const gl = window.WebGLRenderingContext && (c.getContext('webgl2', o) || c.getContext('webgl', o));
+    if (!gl) return false;
+    // Some browsers still hand out a software context; recognise the common software renderers.
+    const info = gl.getExtension('WEBGL_debug_renderer_info');
+    const renderer = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
+    return !/swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer);
   } catch { return false; }
 }
 const saveData = () => !!(navigator.connection && navigator.connection.saveData);

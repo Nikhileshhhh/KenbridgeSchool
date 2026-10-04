@@ -51,7 +51,9 @@ export async function gotoWithoutScripts(page, url) {
     const req = route.request();
     if (req.resourceType() === 'document') {
       const res = await route.fetch();
-      const html = (await res.text()).replace(/<script\b[\s\S]*?<\/script>/gi, '');
+      // Sections with content-visibility: auto are not rendered until scrolled near, and axe would
+      // then measure contrast against a missing background; render everything, as a reader would see it.
+      const html = (await res.text()).replace(/<script\b[\s\S]*?<\/script>/gi, '').replace('</head>', '<style>*{content-visibility:visible!important}</style></head>');
       return route.fulfill({ response: res, body: html, headers: { ...res.headers(), 'content-type': 'text/html; charset=utf-8' } });
     }
     if (req.resourceType() === 'script') return route.abort();
